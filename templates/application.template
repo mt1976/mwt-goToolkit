@@ -1,0 +1,252 @@
+package application
+// ----------------------------------------------------------------
+// Automatically generated  "/application/{{.ObjectNameLower}}.go"
+// ----------------------------------------------------------------
+// Package            : application
+// Object 			  : {{.ObjectName}}
+// Endpoint Root 	  : {{.EndpointRoot}}
+// Search QueryString : {{.QueryString}}
+// From   			  : {{.SourceName}}
+// ----------------------------------------------------------------
+// Template Generator : {{.Version}}
+// ----------------------------------------------------------------
+// Date & Time		  : {{.Date}} at {{.Time}}
+// Who & Where		  : {{.Who}} on {{.Host}}
+// ----------------------------------------------------------------
+
+import (
+	"html/template"
+	"net/http"
+
+	adaptor "github.com/mt1976/templatebuiler/adaptor"
+	core "github.com/mt1976/templatebuiler/core"
+	dao "github.com/mt1976/templatebuiler/dao"
+	dm "github.com/mt1976/templatebuiler/datamodel"
+	logs "github.com/mt1976/templatebuiler/logs"
+)
+
+//{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
+type {{.ObjectNameLower}}_PageList struct {
+	UserMenu         []dm.AppMenuItem
+	UserRole         string
+	Title            string
+	PageTitle        string
+	ItemsOnPage 	 int
+	ItemList  		 []dm.{{.ObjectName}}
+}
+
+//{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
+type {{.ObjectNameLower}}_Page struct {
+	UserMenu    []dm.AppMenuItem
+	UserRole    string
+	Title       string
+	PageTitle   string
+	ID          string
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+	{{range .FieldsList}}
+	{{.FieldName}} string
+	{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+}
+
+const (
+	Template_Redirect = dm.{{.ObjectName}}_PathList
+)
+
+//{{.ObjectName}}_Publish annouces the endpoints available for this object
+func {{.ObjectName}}_Publish(mux http.ServeMux) {
+	mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList)
+	mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView)
+	mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit)
+	mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew)
+	mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave)
+	mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete)
+	logs.Publish({{.SourceName}}, dm.{{.ObjectName}}_Title)
+}
+
+//{{.ObjectName}}_HandlerList is the handler for the list page
+func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+
+	inUTL := r.URL.Path
+	w.Header().Set("Content-Type", "text/html")
+	core.ServiceMessage(inUTL)
+
+	var returnList []dm.{{.ObjectName}}
+	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
+
+
+	pageDetail := {{.ObjectNameLower}}_PageList{
+		Title:            core.ApplicationProperties["appname"],
+		PageTitle:        PageTitle(dm.{{.ObjectName}}_Title, core.Action_List),
+		ItemsOnPage: noItems,
+		ItemList:  returnList,
+		UserMenu:         UserMenu_Get(r),
+		UserRole:         core.GetUserRole(r),
+	}
+
+	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateList, core.GetUserRole(r)))
+	t.Execute(w, pageDetail)
+
+}
+
+//{{.ObjectName}}_HandlerView is the handler used to View a page
+func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+	// Code Continues Below
+
+	w.Header().Set("Content-Type", "text/html")
+	logs.Servicing(r.URL.Path)
+
+	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
+	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
+
+	pageDetail := {{.ObjectNameLower}}_Page{
+		Title:       core.ApplicationProperties["appname"],
+		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
+		UserMenu:    UserMenu_Get(r),
+		UserRole:    core.GetUserRole(r),
+		ID:		     rD.ID,
+		// 
+		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+		{{range .FieldsList}}
+		{{.FieldName}}: rD.{{.FieldName}},
+		{{end}}
+		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+		//
+	}
+
+	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
+	t.Execute(w, pageDetail)
+
+}
+
+//{{.ObjectName}}_HandlerEdit is the handler used generate the Edit page
+func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+	// Code Continues Below
+
+	w.Header().Set("Content-Type", "text/html")
+	logs.Servicing(r.URL.Path)
+
+	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
+	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
+	
+	pageDetail := {{.ObjectNameLower}}_Page{
+		Title:       core.ApplicationProperties["appname"],
+		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
+		UserMenu:    UserMenu_Get(r),
+		UserRole:    core.GetUserRole(r),
+		//Autogenerated {{.Date}} by {{.Who}} on {{.Host}}
+		ID:          rD.Code,
+			// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+		{{range .FieldsList}}
+		{{.FieldName}}: rD.{{.FieldName}},
+		{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+		//Post Import Actions - START
+
+		// Post Import Actions - END
+	}
+
+	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateEdit, core.GetUserRole(r)))
+	t.Execute(w, pageDetail)
+
+}
+
+//{{.ObjectName}}_HandlerEdit is the handler used process the saving of an {{.ObjectName}}
+func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+	// Code Continues Below
+
+	w.Header().Set("Content-Type", "text/html")
+	logs.Servicing(r.URL.Path)
+
+	var item dm.{{.ObjectName}}
+
+	item.Code = r.FormValue("Code")
+	if len(item.Code) == 0 {
+		item.Code = r.FormValue("ID")
+	}
+	{{range .FieldsList}}
+	item.{{.FieldName}}: r.FormValue("{{.FieldName}}")
+	{{end}}
+
+	// Alternative Leave this to an adaptor
+	// adaptor.{{.ObjectName}}_XMLExport(item)
+
+	dao.{{.ObjectName}}_Store(item)	
+
+	http.Redirect(w, r, Template_Redirect, http.StatusFound)
+
+}
+
+//{{.ObjectName}}_HandlerEdit is the handler used process the creation of an {{.ObjectName}}
+func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+	// Code Continues Below
+
+	tmpl := "newSienaCentre"
+
+	inUTL := r.URL.Path
+	w.Header().Set("Content-Type", "text/html")
+	core.ServiceMessage(inUTL)
+
+	pageDetail := {{.ObjectNameLower}}_Page{
+		Title:       core.ApplicationProperties["appname"],
+		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
+		UserMenu:    UserMenu_Get(r),
+		UserRole:    core.GetUserRole(r),
+		ID:          "NEW",
+		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+		{{range .FieldsList}}
+		{{.FieldName}}: "",
+		{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+
+		// Post Import Actions - START
+
+		// Post Import Actions - END
+	}
+
+	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
+	t.Execute(w, pageDetail)
+
+}
+
+//{{.ObjectName}}_HandlerEdit is the handler used process the deletion of an {{.ObjectName}}
+func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
+	// Mandatory Security Validation
+	if !(core.SessionValidate(w, r)) {
+		core.LogoutHandler(w, r)
+		return
+	}
+	// Code Continues Below
+
+	logs.Servicing(r.URL.Path)
+	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
+
+	dao.{{.ObjectName}}_Delete(searchID)	
+
+	http.Redirect(w, r, Template_Redirect, http.StatusFound)
+}

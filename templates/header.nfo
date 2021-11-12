@@ -1,0 +1,16 @@
+// ----------------------------------------------------------------
+// Automatically generated  "/application/{{ .ObjectNameLower}}.go"
+// ----------------------------------------------------------------
+// Package            : main
+// Object 			  : {{.ObjectName}}
+// Endpoint Root 	  : {{.EndpointRoot}}
+// Search QueryString : {{.QueryString}}
+// From   			  : {{.SourceName}}
+// ----------------------------------------------------------------
+// Template Generator : {{.Version}}
+// ----------------------------------------------------------------
+// Date & Time		  : {{.Date}} at {{.Time}}
+// Who & Where		  : {{.Who}} on {{.Host}}
+// ----------------------------------------------------------------
+
+{{ .ObjectNameLower}}

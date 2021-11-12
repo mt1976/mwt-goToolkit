@@ -1,0 +1,52 @@
+package datamodel
+
+// ----------------------------------------------------------------
+// Automatically generated  "/datamodel/{{.ObjectNameLower}}.go"
+// ----------------------------------------------------------------
+// Package            : datamodel
+// Object 			  : {{.ObjectName}}
+// Endpoint Root 	  : {{.EndpointRoot}}
+// Search QueryString : {{.QueryString}}
+// From   			  : {{.SourceName}}
+// ----------------------------------------------------------------
+// Template Generator : {{.Version}}
+// ----------------------------------------------------------------
+// Date & Time		  : {{.Date}} at {{.Time}}
+// Who & Where		  : {{.Who}} on {{.Host}}
+// ----------------------------------------------------------------
+
+//Centre is cheese
+type {{.ObjectName}} struct {
+{{range .FieldsList}}{{.FieldName}}        string
+{{end}}
+}
+
+const (
+	{{.ObjectName}}_Title       = "{{.UserFrendlyName}}"
+	{{.ObjectName}}_SQLTable    = "{{.TableName}}"
+	{{.ObjectName}}_SQLID       = "{{.SQLID}}"
+	{{.ObjectName}}_QueryString = "{{.QueryString}}"
+	{{.ObjectName}}_Key 		= "{{.SearchKey}}"
+	///
+	/// Handler Views
+	///
+	{{.ObjectName}}_TemplateList = "{{.ObjectName}}_List"
+	{{.ObjectName}}_TemplateView = "{{.ObjectName}}_View"
+	{{.ObjectName}}_TemplateEdit = "{{.ObjectName}}_Edit"
+	{{.ObjectName}}_TemplateNew  = "{{.ObjectName}}_New"
+	///
+	/// Handler Monitor Paths
+	{{.ObjectName}}_PathList   = "/{{.ObjectName}}List/"
+	{{.ObjectName}}_PathView   = "/{{.ObjectName}}View/"
+	{{.ObjectName}}_PathEdit   = "/{{.ObjectName}}Edit/"
+	{{.ObjectName}}_PathNew    = "/{{.ObjectName}}New/"
+	{{.ObjectName}}_PathSave   = "/{{.ObjectName}}Save/"
+	{{.ObjectName}}_PathDelete = "/{{.ObjectName}}Delete/"
+	///
+	/// Field Definitions
+	///
+
+{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
+{{end}}
+
+)

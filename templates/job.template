@@ -1,0 +1,53 @@
+package jobs
+// ----------------------------------------------------------------
+// Automatically generated  "/application/{{.ObjectNameLower}}.go"
+// ----------------------------------------------------------------
+// Package            : jobs
+// Object 			  : {{.ObjectName}}
+// Endpoint Root 	  : {{.EndpointRoot}}
+// Search QueryString : {{.QueryString}}
+// From   			  : {{.SourceName}}
+// ----------------------------------------------------------------
+// Template Generator : {{.Version}}
+// ----------------------------------------------------------------
+// Date & Time		  : {{.Date}} at {{.Time}}
+// Who & Where		  : {{.Who}} on {{.Host}}
+// ----------------------------------------------------------------
+
+import (
+	"fmt"
+	"log"
+
+	application "github.com/mt1976/templatebuiler/application"
+	core "github.com/mt1976/templatebuiler/core"
+	dm "github.com/mt1976/templatebuiler/datamodel"
+	logs "github.com/mt1976/templatebuiler/logs"
+	cron "github.com/robfig/cron/v3"
+)
+
+func {{.ObjectName}}_Job() dm.JobDefinition {
+	var j dm.JobDefinition
+	j.ID = "{{.ObjectName}}"
+	j.Name = "{{.ObjectName}}"
+	j.Period = "10 1 * * *"
+	j.Description = "{{.ObjectName}} processing"
+	j.Type = core.Monitor
+	return j
+}
+
+func {{.ObjectName}}_Register(c *cron.Cron) {
+	application.RegisterSchedule({{.ObjectName}}_Job())
+	c.AddFunc({{.ObjectName}}_Job().Period, func() { {{.ObjectName}}_Run() })
+}
+
+// RunJobRollover is a Rollover function
+func {{.ObjectName}}_Run() {
+	logs.StartJob({{.ObjectName}}_Job().Name)
+	message := ""
+	/// CONTENT STARTS
+	
+
+	/// CONTENT ENDS
+	application.UpdateSchedule({{.ObjectName}}_Job(), message)
+	logs.EndJob({{.ObjectName}}_Job().Name)
+}
