@@ -7,10 +7,24 @@
 // Search QueryString : {{.QueryString}}
 // From   			  : {{.SourceName}}
 // ----------------------------------------------------------------
+// Database Information
+// ----------------------------------------------------------------
+// SQL Table          : {{.SQLTableName}}
+// SQL Table ID       : {{.SQLTableID}}
+// ----------------------------------------------------------------
 // Template Generator : {{.Version}}
 // ----------------------------------------------------------------
 // Date & Time		  : {{.Date}} at {{.Time}}
 // Who & Where		  : {{.Who}} on {{.Host}}
+// For Project        : {{.ProjectRepo}}
 // ----------------------------------------------------------------
-
-{{ .ObjectNameLower}}
+// Artifacts Generated
+// ----------------------------------------------------------------
+{{range .MessageList}}{{.Message}}
+{{end}}// ----------------------------------------------------------------
+// Fields Generated
+// ----------------------------------------------------------------
+|Field  |Type   |Object Def |SQL Version    |Default    |
+{{range .FieldsList}}|{{.FieldName}}          |{{.Type}}     |{{$.ObjectName}}_{{.FieldName}}     |{{.FieldSQL}}     |{{.Default}}       |
+{{end}}// ----------------------------------------------------------------
+// End of File

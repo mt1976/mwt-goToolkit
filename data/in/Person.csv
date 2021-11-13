@@ -1,0 +1,16 @@
+passportno,String, 
+Field2,String,X
+Field3,String,X
+Field4,String,X
+Field5,String,X
+Field6,String,X
+Field7,String,X
+Field8,String,X
+Field9,String,X
+ID,Int,0
+Code,Float,1.21231
+_who,String,os
+_host,String, 
+_created,Time,
+Cheese,String, toast
+Field15,String,X

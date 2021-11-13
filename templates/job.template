@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"log"
 
-	application "github.com/mt1976/templatebuiler/application"
-	core "github.com/mt1976/templatebuiler/core"
-	dm "github.com/mt1976/templatebuiler/datamodel"
-	logs "github.com/mt1976/templatebuiler/logs"
-	cron "github.com/robfig/cron/v3"
+	application "{{.ProjectRepo}}application"
+	core        "{{.ProjectRepo}}core"
+	dm          "{{.ProjectRepo}}datamodel"
+	logs        "{{.ProjectRepo}}logs"
+	cron        "github.com/robfig/cron/v3"
 )
 
 func {{.ObjectName}}_Job() dm.JobDefinition {

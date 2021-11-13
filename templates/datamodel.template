@@ -23,12 +23,11 @@ type {{.ObjectName}} struct {
 
 const (
 	{{.ObjectName}}_Title       = "{{.UserFrendlyName}}"
-	{{.ObjectName}}_SQLTable    = "{{.TableName}}"
-	{{.ObjectName}}_SQLID       = "{{.SQLID}}"
+	{{.ObjectName}}_SQLTable    = "{{.SQLTableName}}"
+	{{.ObjectName}}_SQLTableID  = "{{.SQLTableID}}"
 	{{.ObjectName}}_QueryString = "{{.QueryString}}"
-	{{.ObjectName}}_Key 		= "{{.SearchKey}}"
 	///
-	/// Handler Views
+	/// Handler Defintions
 	///
 	{{.ObjectName}}_TemplateList = "{{.ObjectName}}_List"
 	{{.ObjectName}}_TemplateView = "{{.ObjectName}}_View"
@@ -36,6 +35,7 @@ const (
 	{{.ObjectName}}_TemplateNew  = "{{.ObjectName}}_New"
 	///
 	/// Handler Monitor Paths
+	///
 	{{.ObjectName}}_PathList   = "/{{.ObjectName}}List/"
 	{{.ObjectName}}_PathView   = "/{{.ObjectName}}View/"
 	{{.ObjectName}}_PathEdit   = "/{{.ObjectName}}Edit/"
@@ -43,10 +43,9 @@ const (
 	{{.ObjectName}}_PathSave   = "/{{.ObjectName}}Save/"
 	{{.ObjectName}}_PathDelete = "/{{.ObjectName}}Delete/"
 	///
-	/// Field Definitions
+	/// SQL Field Definitions
 	///
-
-{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
+{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
 {{end}}
-
+	/// Definitions End
 )

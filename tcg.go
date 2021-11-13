@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -19,9 +21,10 @@ import (
 	logs "github.com/mt1976/templatebuiler/logs"
 )
 
-type replacements struct {
+type enrichments struct {
 	ObjectName      string
 	ObjectNameLower string
+	ObjectGlyph     string
 	EndpointRoot    string
 	QueryString     string
 	SourceName      string
@@ -32,16 +35,24 @@ type replacements struct {
 	Host            string
 	FieldsList      []fields
 	UserFrendlyName string
-	TableName       string
-	SQLID           string
+	SQLTableName    string
+	SQLTableID      string
 	SearchKey       string
 	SourceType      string
+	MessageList     []messages
+	Path            string
+	ProjectRepo     string
 }
 
 type fields struct {
 	FieldName string
 	Type      string
 	Default   string
+	FieldSQL  string
+}
+
+type messages struct {
+	Message string
 }
 
 func main() {
@@ -120,9 +131,11 @@ func main() {
 	// logs.Information("Template", menuTemplate)
 	// logs.Information("Template", headerInfoTemplate)
 	logs.Break()
-	logs.Information("Populate", "Replacement Values")
 	//clear terminal screen
-	logs.Clear()
+	//	logs.Clear()
+
+	///
+
 	for i := 0; i < noFiles; i++ {
 
 		// if last four character in paths[i] are ".cfg" then proceed otherwise skip this item
@@ -131,13 +144,51 @@ func main() {
 		fmt.Println(fileExtension) // gives "lo"
 
 		if fileExtension == ".cfg" {
+			logs.Information("Processing", paths[i])
+			logs.Information("Populate", "Replacement Values")
 
-			processTemplate("dao.template", paths[i], "dao")
-			processTemplate("application.template", paths[i], "application")
-			processTemplate("datamodel.template", paths[i], "datamodel")
-			processTemplate("header.nfo", paths[i], "header")
-			processTemplate("job.template", paths[i], "job")
-			processTemplate("menu.template", paths[i], "menu")
+			props := core.Config_Get(paths[i])
+			enrichment := enrichments{ObjectName: props["objectname"]}
+			//capitalize first character of enrichment.ObjectName
+			enrichment.ObjectName = strings.Title(enrichment.ObjectName)
+
+			enrichment.ObjectNameLower = strings.ToLower(enrichment.ObjectName)
+			enrichment.Version = release
+			enrichment.Time = time.Now().Format(core.TIMEFORMATUSER)
+			enrichment.Date = time.Now().Format(core.DATEFORMATUSER)
+			enrichment.Host = tmpHostname
+			enrichment.Who = username()
+			enrichment.UserFrendlyName = props["userfrendlyname"]
+			enrichment.SQLTableName = props["tablename"]
+			enrichment.SQLTableID = props["sqlid"]
+			enrichment.QueryString = props["querystring"]
+			//enrichment.SearchKey = props["sqlid"]
+			enrichment.SourceType = props["whichdb"]
+			enrichment.Path = pwd
+			enrichment.ObjectGlyph = props["objectglyph"]
+			enrichment.ProjectRepo = props["projectrepo"] + "/"
+
+			csvPath := pwd + "/data/in/" + enrichment.ObjectName + ".csv"
+
+			enrichment = ReadCsvFile(csvPath, enrichment)
+
+			processTemplate("dao.template", paths[i], "dao", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* dao"})
+
+			processTemplate("application.template", paths[i], "application", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* application"})
+
+			processTemplate("datamodel.template", paths[i], "datamodel", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* datamodel"})
+
+			processTemplate("job.template", paths[i], "job", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* job"})
+
+			processTemplate("menu.template", paths[i], "menu", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* menu"})
+
+			processTemplate("header.nfo", paths[i], "results", enrichment)
+			enrichment.MessageList = append(enrichment.MessageList, messages{Message: "* results"})
 
 		}
 
@@ -147,28 +198,20 @@ func main() {
 
 }
 
-func loadTemplate(name string) string {
-	applicationTemplate, _ := core.ReadDataFile(name, "/templates")
-	logs.Success("Template '" + name + "' Loaded")
-	return applicationTemplate
-}
+func addField(en enrichments, fn string, tp string, df string) []fields {
 
-func testit(path string) {
-	logs.Information("Processing File", path)
-	//read the file
-	file, err := os.Open(path)
-	if err != nil {
-		logs.Fatal("Can't Open File", err)
-	}
-	defer file.Close()
-	//read the file
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		logs.Fatal("Cant Get Data", err)
-	}
-	//print the file
-	logs.Information("File Contents", string(data))
+	origfn := fn
 
+	//if first charachter of fieldName is _ then replace _ with SYS
+	if string(fn[0]) == "_" {
+		fn = "SYS" + fn
+		fn = strings.Replace(fn, "_", "", -1)
+	}
+
+	en.FieldsList = append(en.FieldsList, fields{FieldName: fn, Type: tp, Default: df, FieldSQL: origfn})
+	info := fmt.Sprintf("Added Field: %s %s %s %s", fn, tp, df, origfn)
+	logs.Information(info, "")
+	return en.FieldsList
 }
 
 //Get list of files from a folder
@@ -200,58 +243,66 @@ func username() string {
 
 func genUUID() string {
 	id := uuid.New()
-	fmt.Printf("github.com/google/uuid:         %s\n", id.String())
+	//fmt.Printf("github.com/google/uuid:         %s\n", id.String())
 	return id.String()
 }
 
-func processTemplate(w string, p string, c string) {
-	logs.Information("Processing File", p)
-	//testit(paths[i])
-	pwd, _ := os.Getwd()
-	release := fmt.Sprintf("%s [r%s-%s]", core.ApplicationProperties["releaseid"], core.ApplicationProperties["releaselevel"], core.ApplicationProperties["releasenumber"])
-	tmpHostname, _ := os.Hostname()
-	///
-	props := core.Config_Get(p)
-	enrichment := replacements{ObjectName: props["objectname"]}
-	enrichment.ObjectNameLower = strings.ToLower(enrichment.ObjectName)
-	enrichment.Version = release
-	enrichment.Time = time.Now().Format(core.TIMEFORMATUSER)
-	enrichment.Date = time.Now().Format(core.DATEFORMATUSER)
-	enrichment.Host = tmpHostname
-	enrichment.Who = username()
-	enrichment.UserFrendlyName = props["userfrendlyname"]
-	enrichment.TableName = props["tablename"]
-	enrichment.SQLID = props["sqlid"]
-	enrichment.QueryString = props["querystring"]
-	enrichment.SearchKey = props["sqlid"]
-	enrichment.SourceType = props["whichdb"]
-
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Field1", Type: "String"})
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Field2", Type: "Float"})
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "ID", Type: "Int"})
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Code", Type: "String"})
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Name", Type: "Time"})
-	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "_who", Type: "String"})
+func processTemplate(w string, p string, c string, e enrichments) {
+	logs.Information("Processing File", w)
 
 	//spew.Dump(replacements)
-	fp := pwd + "/templates/" + "dao.template"
+	fp := e.Path + "/templates/" + w
 	logs.Information("Template File", fp)
 
 	t, err := template.ParseFiles(fp)
 	if err != nil {
+		logs.Error("Load Template", err)
 	}
 
-	f, err := os.Create(pwd + "/" + core.SienaProperties["static_out"] + "/" + c + "/" + enrichment.ObjectNameLower + genUUID() + ".gotmp")
+	f, err := os.Create(e.Path + "/" + core.SienaProperties["static_out"] + "/" + c + "/" + e.ObjectNameLower + genUUID() + ".gotmp")
 	if err != nil {
 		log.Println("create file: ", err)
 		return
 	}
 
-	err2 := t.Execute(f, enrichment)
+	err2 := t.Execute(f, e)
 	if err2 != nil {
+		logs.Error("Process Template", err2)
 	}
 	f.Close()
 
-	logs.Break()
-	logs.Break()
+}
+
+func ReadCsvFile(filePath string, e enrichments) enrichments {
+	// Load a csv file.
+	logs.Information("Read CSV", filePath)
+	f, _ := os.Open(filePath)
+	//logs.Information("File Open", filePath)
+	// Create a new reader.
+	r := csv.NewReader(f)
+	//logs.Information("New Reader", filePath)
+	for {
+		record, err := r.Read()
+		//fmt.Printf("record: %v\n", record)
+		// Stop at EOF.
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			logs.Fatal("Read CSV", err)
+			panic(err)
+		}
+		// Display record.
+		// ... Display record length.
+		// ... Display all individual elements of the slice.
+		// fmt.Println(record)
+		// fmt.Println(len(record))
+		// for value := range record {
+		// 	fmt.Printf("  %v\n", record[value])
+		// }
+		e.FieldsList = addField(e, record[0], record[1], record[2])
+
+	}
+	return e
 }
