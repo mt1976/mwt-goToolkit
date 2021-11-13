@@ -13,6 +13,7 @@ import (
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/google/uuid"
 
 	core "github.com/mt1976/templatebuiler/core"
 	logs "github.com/mt1976/templatebuiler/logs"
@@ -123,54 +124,25 @@ func main() {
 	//clear terminal screen
 	logs.Clear()
 	for i := 0; i < noFiles; i++ {
-		logs.Information("Processing File", paths[i])
-		//testit(paths[i])
-		props := core.Config_Get(paths[i])
-		replacements := replacements{ObjectName: props["objectname"]}
-		replacements.ObjectNameLower = strings.ToLower(replacements.ObjectName)
-		replacements.Version = release
-		replacements.Time = time.Now().Format(core.TIMEFORMATUSER)
-		replacements.Date = time.Now().Format(core.DATEFORMATUSER)
-		replacements.Host = tmpHostname
-		replacements.Who = username()
-		replacements.UserFrendlyName = props["userfrendlyname"]
-		replacements.TableName = props["tablename"]
-		replacements.SQLID = props["sqlid"]
-		replacements.QueryString = props["querystring"]
-		replacements.SearchKey = props["sqlid"]
-		replacements.SourceType = props["whichdb"]
 
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "Field1", Type: "String"})
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "Field2", Type: "Float"})
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "ID", Type: "Int"})
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "Code", Type: "String"})
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "Name", Type: "Time"})
-		replacements.FieldsList = append(replacements.FieldsList, fields{FieldName: "_who", Type: "String"})
+		// if last four character in paths[i] are ".cfg" then proceed otherwise skip this item
 
-		//spew.Dump(replacements)
-		fp := pwd + "/templates/" + "dao.template"
-		logs.Information("Template File", fp)
+		fileExtension := paths[i][len(paths[i])-4:]
+		fmt.Println(fileExtension) // gives "lo"
 
-		t, err := template.ParseFiles(fp)
-		if err != nil {
+		if fileExtension == ".cfg" {
+
+			processTemplate("dao.template", paths[i], "dao")
+			processTemplate("application.template", paths[i], "application")
+			processTemplate("datamodel.template", paths[i], "datamodel")
+			processTemplate("header.nfo", paths[i], "header")
+			processTemplate("job.template", paths[i], "job")
+			processTemplate("menu.template", paths[i], "menu")
+
 		}
-
-		f, err := os.Create(paths[i] + "output" + "dao")
-		if err != nil {
-			log.Println("create file: ", err)
-			return
-		}
-
-		err2 := t.Execute(f, replacements)
-		if err2 != nil {
-		}
-		f.Close()
-
-		logs.Break()
-		logs.Break()
 
 	}
-	logs.Success("Templates Loaded")
+	logs.Success("Templating Complete")
 	logs.Break()
 
 }
@@ -224,4 +196,62 @@ func username() string {
 		log.Fatal(err)
 	}
 	return usr.Username
+}
+
+func genUUID() string {
+	id := uuid.New()
+	fmt.Printf("github.com/google/uuid:         %s\n", id.String())
+	return id.String()
+}
+
+func processTemplate(w string, p string, c string) {
+	logs.Information("Processing File", p)
+	//testit(paths[i])
+	pwd, _ := os.Getwd()
+	release := fmt.Sprintf("%s [r%s-%s]", core.ApplicationProperties["releaseid"], core.ApplicationProperties["releaselevel"], core.ApplicationProperties["releasenumber"])
+	tmpHostname, _ := os.Hostname()
+	///
+	props := core.Config_Get(p)
+	enrichment := replacements{ObjectName: props["objectname"]}
+	enrichment.ObjectNameLower = strings.ToLower(enrichment.ObjectName)
+	enrichment.Version = release
+	enrichment.Time = time.Now().Format(core.TIMEFORMATUSER)
+	enrichment.Date = time.Now().Format(core.DATEFORMATUSER)
+	enrichment.Host = tmpHostname
+	enrichment.Who = username()
+	enrichment.UserFrendlyName = props["userfrendlyname"]
+	enrichment.TableName = props["tablename"]
+	enrichment.SQLID = props["sqlid"]
+	enrichment.QueryString = props["querystring"]
+	enrichment.SearchKey = props["sqlid"]
+	enrichment.SourceType = props["whichdb"]
+
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Field1", Type: "String"})
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Field2", Type: "Float"})
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "ID", Type: "Int"})
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Code", Type: "String"})
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "Name", Type: "Time"})
+	enrichment.FieldsList = append(enrichment.FieldsList, fields{FieldName: "_who", Type: "String"})
+
+	//spew.Dump(replacements)
+	fp := pwd + "/templates/" + "dao.template"
+	logs.Information("Template File", fp)
+
+	t, err := template.ParseFiles(fp)
+	if err != nil {
+	}
+
+	f, err := os.Create(pwd + "/" + core.SienaProperties["static_out"] + "/" + c + "/" + enrichment.ObjectNameLower + genUUID() + ".gotmp")
+	if err != nil {
+		log.Println("create file: ", err)
+		return
+	}
+
+	err2 := t.Execute(f, enrichment)
+	if err2 != nil {
+	}
+	f.Close()
+
+	logs.Break()
+	logs.Break()
 }

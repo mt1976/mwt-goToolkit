@@ -16,6 +16,8 @@ github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe h1:lXe2qZdvpiX5WZ
 github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe/go.mod h1:8vg3r2VgvsThLBIFL93Qb5yWzgyZWhEmBwUJWevAkK0=
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31 h1:bg4oHsGjsPxX869hm28e/vWbjemDGB6b9PwINRtnEkE=
 github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31/go.mod h1:9qhdPWwVn7/FE1L4TF4rMIix5Lyx8ip5WnHpQ3RiPFk=
 github.com/kisielk/sqlstruct v0.0.0-20210630145711-dae28ed37023 h1:/pb3UJ+3ZtSEUKWnufwsoVF7f0AX5ytPULbTwHMgbq4=
