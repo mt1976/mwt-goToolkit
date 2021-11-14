@@ -33,7 +33,7 @@ func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 
 	tsql := "SELECT * FROM " + get_TableName(core.{{.SourceType}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
-	tsql = tsql + " WHERE " + {{.ObjectName}}_SQLTableID + "='" + id + "'"
+	tsql = tsql + " WHERE " + {{.ObjectName}}_SQLSearchID + "='" + id + "'"
 
 	_, _, recordItem, _ := fetchData(tsql)
 	return 1, recordItem, nil
@@ -45,7 +45,7 @@ func {{.ObjectName}}_Delete(id string) (int, dm.{{.ObjectName}}, error) {
 	object_Table := core.ApplicationPropertiesDB["schema"] + "." + dm.{{.ObjectName}}_SQLTable
 
 	tsql := "DELETE FROM " + object_Table
-	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLTableID + " = '" + id + "'"
+	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
 
 	das.Execute(tsql)
 }
@@ -68,8 +68,8 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	userID := currentUserID.Name
 	host, _ := os.Hostname()
 
-	if len(r.InternalID) == 0 {
-		r.InternalID = new{{.ObjectNameLower}}StoreID
+	if len(r.AppInternalID) == 0 {
+		r.AppInternalID = new{{.ObjectNameLower}}StoreID
 		r.SYSCreated = createDate
 		r.SYSWho = userID
 		r.SYSHost = host
@@ -86,7 +86,7 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	{{range .FieldsList}}   tsql = tsql + sq(r.{{.FieldName}}) + ", " 
 	{{end}}tsql = tsql + ")"
 
-	{{.ObjectName}}_Delete(r.InternalID)
+	{{.ObjectName}}_Delete(r.AppInternalID)
 
 	das.Execute(tsql)
 
@@ -108,7 +108,7 @@ func fetchData(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, erro
 
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-    recItem.InternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLTableID}}
+    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLSearchID}})
 {{range .FieldsList}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}")
 {{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Post Import Actions

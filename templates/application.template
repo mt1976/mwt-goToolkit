@@ -41,7 +41,7 @@ type {{.ObjectNameLower}}_Page struct {
 	UserRole    string
 	Title       string
 	PageTitle   string
-	InternalID  string
+	AppInternalID  string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{.FieldName}} string
 	{{end}}
@@ -112,7 +112,7 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		InternalID:		     rD.InternalID,
+		AppInternalID:		     rD.AppInternalID,
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 		{{range .FieldsList}}{{.FieldName}}: rD.{{.FieldName}},
@@ -146,7 +146,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		InternalID:          rD.InternalID,
+		AppInternalID:          rD.AppInternalID,
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 		{{range .FieldsList}}	{{.FieldName}}: rD.{{.FieldName}},
 		{{end}}
@@ -175,7 +175,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 
 	var item dm.{{.ObjectName}}
 
-	item.InternalID = r.FormValue("InternalID")
+	item.AppInternalID = r.FormValue("AppInternalID")
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	item.{{.FieldName}}: r.FormValue("{{.FieldName}}")
 	{{end}}
@@ -210,7 +210,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		InternalID:   "NEW",
+		AppInternalID:   "NEW",
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 		{{range .FieldsList}}	{{.FieldName}}: "{{.Default}}",
 		{{end}}

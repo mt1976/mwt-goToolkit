@@ -14,10 +14,10 @@
 // ----------------------------------------------------------------
 
     {
-      "ID": "??",
+      "ID": "{{.UUID}}",
       "Text": "{{.UserFrendlyName}}",
       "Glyph": "{{.ObjectGlyph}}",
-      "HREF": "/{{.ObjectName}}_List",
+      "HREF": "/{{.EndpointRoot}}List",
       "OnClick": "",
       "TextClass": ""
     }

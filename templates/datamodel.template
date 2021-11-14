@@ -17,6 +17,7 @@ package datamodel
 
 //Centre is cheese
 type {{.ObjectName}} struct {
+	AppInternalID string  // Special field for internal use only
 {{range .FieldsList}}{{.FieldName}}        string
 {{end}}
 }
@@ -24,7 +25,7 @@ type {{.ObjectName}} struct {
 const (
 	{{.ObjectName}}_Title       = "{{.UserFrendlyName}}"
 	{{.ObjectName}}_SQLTable    = "{{.SQLTableName}}"
-	{{.ObjectName}}_SQLTableID  = "{{.SQLTableID}}"
+	{{.ObjectName}}_SQLSearchID = "{{.SQLSearchID}}"
 	{{.ObjectName}}_QueryString = "{{.QueryString}}"
 	///
 	/// Handler Defintions

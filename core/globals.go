@@ -26,9 +26,6 @@ var InstanceProperties map[string]string
 var MasterPropertiesDB map[string]string
 var MasterDB *sql.DB
 
-var SienaProperties map[string]string
-var SienaPropertiesDB map[string]string
-var SienaDB *sql.DB
 var SienaSystemDate DateItem
 
 var SessionManager *scs.SessionManager
@@ -146,9 +143,6 @@ func Initialise() {
 
 	//SienaSystemDate DateItem
 	ApplicationProperties = Properties_Get(APPCONFIG)
-	SienaProperties = Properties_Get(SIENACONFIG)
-	SienaPropertiesDB = Properties_Get(SQLCONFIG)
-	ApplicationPropertiesDB = Properties_Get(DATASTORECONFIG)
 
 	IsChildInstance = false
 	if len(ApplicationPropertiesDB["instance"]) != 0 {
@@ -156,56 +150,26 @@ func Initialise() {
 	}
 	//
 
-	logs.Information("Connecting to application databases...", "")
-
-	//MasterDB, _ = GlobalsDatabaseConnect(MasterPropertiesDB)
-
-	ApplicationDB, _ = GlobalsDatabaseConnect(ApplicationPropertiesDB)
-	//log.Printf("Initialisation", ApplicationDB.Stats())
-
-	SienaDB, _ = GlobalsDatabaseConnect(SienaPropertiesDB)
-	//log.Printf("Initialisation", SienaDB.Stats())
-	logs.Success("Connections established")
-
-	//
-
-	SessionManager = scs.New()
-	life, err := time.ParseDuration(ApplicationProperties["sessionlife"])
-	if err != nil {
-		logs.Fatal("No Session Life Found", err)
-	}
-	SessionManager.Lifetime = life
-	SessionManager.IdleTimeout = 20 * time.Minute
-	SessionManager.Cookie.Name = ApplicationProperties["releaseid"]
-	SessionManager.Cookie.HttpOnly = true
-	SessionManager.Cookie.Persist = true
-	//SessionManager.Cookie.SameSite = http.SameSiteStrictMode
-	SessionManager.Cookie.Secure = false
-
 	logs.Information("Initialisation", "Vroooom Vrooooom! "+Bike+Bike)
 }
 
 // Load a Properties File
 func Properties_Get(inPropertiesFile string) map[string]string {
-	wctProperties := make(map[string]string)
+	p := make(map[string]string)
 	//machineName, _ := os.Hostname()
 	// For docker - if can't find properties file (create one from the template properties file)
 	propertiesFileName := "config/" + inPropertiesFile
 	if fileExists(propertiesFileName) {
 		// Do nothign this is ok
 	} else {
-
-		ok := copyDataFile(inPropertiesFile, "config/", "config/fileSystem/config")
-		if !ok {
-			logs.Error("Issue in Copy Function", nil)
-		}
+		logs.Error("No Properties File Found", nil)
 	}
 
-	err := cfg.Load(propertiesFileName, wctProperties)
+	err := cfg.Load(propertiesFileName, p)
 	if err != nil {
 		logs.Fatal("Cannot Load Properties File "+propertiesFileName, err)
 	}
-	return wctProperties
+	return p
 }
 
 // Load a Properties File
@@ -277,27 +241,6 @@ func deleteDataFile(fileName string, path string) int {
 	}
 	logs.Information("File Deleted", fileName+" - "+path)
 	return 1
-}
-
-func copyDataFile(fileName string, fromPath string, toPath string) bool {
-
-	logs.Warning("Copying " + fileName + " from " + fromPath + " to " + toPath)
-
-	content, err := ReadDataFile(fileName, fromPath)
-	if err != nil {
-		logs.Fatal("File Read Error", err)
-	}
-
-	ok, err2 := writeDataFile(fileName, toPath, content)
-	if err2 != nil {
-		logs.Fatal("File Write Error", err2)
-	}
-
-	if !ok {
-		logs.Fatal("Unable to Copy "+fileName+" from "+fromPath+" to "+toPath, nil)
-	}
-
-	return true
 }
 
 // getFundsCheckList read all employees
