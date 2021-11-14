@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/leekchan/accounting"
-	"github.com/mt1976/templatebuiler/logs"
+	logs "github.com/mt1976/templateBuilder/logs"
 )
 
 // Converts a siena style date, as a user readable date

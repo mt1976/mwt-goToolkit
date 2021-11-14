@@ -5,8 +5,8 @@ import (
 	"log"
 	"strconv"
 
+	logs "github.com/mt1976/templateBuilder/logs"
 	"github.com/mt1976/templatebuiler/core"
-	"github.com/mt1976/templatebuiler/logs"
 )
 
 func Query(db *sql.DB, query string) ([]map[string]interface{}, int, error) {

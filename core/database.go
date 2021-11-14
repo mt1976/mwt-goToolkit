@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	logs "github.com/mt1976/templatebuiler/logs"
+	logs "github.com/mt1976/templateBuilder/logs"
 )
 
 func extractCreate(in string) string {
@@ -15,7 +15,7 @@ func extractCreate(in string) string {
 	findCREATE := "CREATE"
 	selectPos := strings.Index(in, findCREATE)
 	//log.Println(findCREATE, selectPos)
-	newString := in[selectPos:len(in)]
+	newString := in[selectPos:]
 	findGO := "GO"
 	goPos := strings.Index(newString, findGO)
 	outString := newString[0:goPos]

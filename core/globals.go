@@ -9,7 +9,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/jimlawless/cfg"
-	"github.com/mt1976/templatebuiler/logs"
+	logs "github.com/mt1976/templateBuilder/logs"
 )
 
 var startTime = time.Now()
