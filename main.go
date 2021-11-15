@@ -523,6 +523,7 @@ func setupEnrichment(props map[string]string) enrichments {
 	} else {
 		e.EndpointRoot = props["endpointroot"]
 	}
+	e.EndpointRoot = strings.ToUpper(e.EndpointRoot[:1]) + e.EndpointRoot[1:]
 
 	e.Path = getPWD()
 	e.ObjectGlyph = props["objectglyph"]
