@@ -67,6 +67,7 @@ type enrichments struct {
 	CanDelete          bool
 	CanList            bool
 	PropertiesName     string
+	UsesAdaptor        bool
 }
 
 type fields struct {
@@ -529,10 +530,12 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.UUID = genUUID()
 
 	e.PropertiesName = ""
+	e.UsesAdaptor = false
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
 	} else {
 		e.PropertiesName = props["propertiesoverride"]
+		e.UsesAdaptor = true
 	}
 
 	e = setupTemplateEnrichment(e, props)
