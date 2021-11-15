@@ -296,6 +296,10 @@ func processTemplate(w string, p string, destFolder string, e enrichments) {
 		extn = ".nfo"
 	}
 
+	if destFolder == "design/menu" {
+		extn = ".json"
+	}
+
 	//spew.Dump(replacements)
 	fp := e.Path + "/templates/" + w
 
