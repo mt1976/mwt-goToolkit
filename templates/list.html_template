@@ -91,7 +91,7 @@
                 <thead class="thead-light">
                   <tr>
                     <th class="text-center">#</th>
-                    {{range .FieldsList}}<th class="text-center">{{.FieldName}}</th>
+                    {{range .FieldsList}}{{if .IsUserField}}<th class="text-center">{{.FieldName}}</th>{{end}}
                     {{end}}
                     <th class="text-center">Actions</th>
                   </tr>
@@ -100,7 +100,8 @@
                   {{.RangeItemList}}
                   <tr>
                     <td class="text-center align-middle"></td>
-                    {{range .FieldsList}}<td class="align-middle">{{.TemplateField}}</td>
+                    {{range .FieldsList}}{{if .IsUserField}}<td class="align-middle">{{.TemplateField}}</td>{{end}}
+        
                     {{end}}
                     <td class="text-center" style="width:1px;">
                       <div class="btn-group">

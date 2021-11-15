@@ -82,6 +82,7 @@ type fields struct {
 	Hidden        string
 	ValueID       string
 	IsMandatory   bool
+	IsUserField   bool
 }
 
 type messages struct {
@@ -235,6 +236,7 @@ func addField(en enrichments, fn string, tp string, df string, mand bool) []fiel
 
 	noinput := ""
 	hidden := ""
+	userField := true
 
 	if string(fn[0]) == "_" {
 		//Convert fn to Title Case
@@ -244,6 +246,7 @@ func addField(en enrichments, fn string, tp string, df string, mand bool) []fiel
 		fn = "SYS" + fn
 		noinput = "hidden"
 		hidden = "hidden"
+		userField = false
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
@@ -258,7 +261,8 @@ func addField(en enrichments, fn string, tp string, df string, mand bool) []fiel
 		Disabled:      noinput,
 		Hidden:        hidden,
 		ValueID:       wrap(fn),
-		IsMandatory:   mand})
+		IsMandatory:   mand,
+		IsUserField:   userField})
 	logs.Information(info, "")
 
 	return en.FieldsList
