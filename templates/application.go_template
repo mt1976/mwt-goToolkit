@@ -60,7 +60,7 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{end}}
 	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{end}}
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{end}}
-	logs.Publish({{.SourceName}}, dm.{{.ObjectName}}_Title)
+	logs.Publish("{{.PropertiesName}}", dm.{{.ObjectName}}_Title)
 }
 
 //{{.ObjectName}}_HandlerList is the handler for the list page
@@ -177,7 +177,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 
 	item.AppInternalID = r.FormValue("AppInternalID")
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	item.{{.FieldName}}: r.FormValue("{{.FieldName}}")
+	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue("{{.FieldName}}")
 	{{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
@@ -198,8 +198,6 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Code Continues Below
-
-	tmpl := "newSienaCentre"
 
 	inUTL := r.URL.Path
 	w.Header().Set("Content-Type", "text/html")

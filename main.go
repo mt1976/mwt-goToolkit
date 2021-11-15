@@ -14,7 +14,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
@@ -67,6 +66,7 @@ type enrichments struct {
 	CanNew             bool
 	CanDelete          bool
 	CanList            bool
+	PropertiesName     string
 }
 
 type fields struct {
@@ -173,14 +173,14 @@ func processConfigFile(configFile string) {
 	}
 
 	if strings.ToUpper(props["create_job"]) == "Y" {
-		processTemplate("job"+go_template, configFile, "job", e)
+		processTemplate("job"+go_template, configFile, "jobs", e)
 		e.MessageList = append(e.MessageList, messages{Message: "* job"})
 	} else {
 		logs.Information("Skipping", "job")
 	}
 
 	if strings.ToUpper(props["create_menu"]) == "Y" {
-		processTemplate("menu"+json_template, configFile, "menu", e)
+		processTemplate("menu"+json_template, configFile, "design/menu", e)
 		e.MessageList = append(e.MessageList, messages{Message: "* menu"})
 	} else {
 		logs.Information("Skipping", "menu")
@@ -208,8 +208,8 @@ func processConfigFile(configFile string) {
 		logs.Information("Skipping", "html")
 	}
 
-	processTemplate("results"+nfo_template, configFile, "results", e)
-	e.MessageList = append(e.MessageList, messages{Message: "* results"})
+	processTemplate("catalog"+nfo_template, configFile, "design/catalog", e)
+	e.MessageList = append(e.MessageList, messages{Message: "* catalog"})
 }
 
 func wrap(in string) string {
@@ -287,6 +287,15 @@ func genUUID() string {
 func processTemplate(w string, p string, destFolder string, e enrichments) {
 	logs.Information("Processing Template", w)
 
+	extn := ".go_tmp"
+	if core.ApplicationProperties["deliverto"] != "" {
+		extn = ".go"
+	}
+
+	if destFolder == "catalog" {
+		extn = ".nfo"
+	}
+
 	//spew.Dump(replacements)
 	fp := e.Path + "/templates/" + w
 
@@ -295,7 +304,7 @@ func processTemplate(w string, p string, destFolder string, e enrichments) {
 		logs.Error("Load Template", err)
 	}
 
-	f, err := os.Create(e.Path + data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + ".go_tmp")
+	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + extn)
 	if err != nil {
 		logs.Error("Create file: ", err)
 		return
@@ -322,7 +331,7 @@ func processHTMLTemplate(w string, p string, destFolder string, e enrichments) {
 		logs.Error("Load Template", err)
 	}
 
-	f, err := os.Create(e.Path + data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + fileNamePrefix + ".html")
+	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + fileNamePrefix + ".html")
 	if err != nil {
 		logs.Error("Create file: ", err)
 		return
@@ -444,7 +453,13 @@ func getPWD() string {
 }
 
 func data_out() string {
-	return core.ApplicationProperties["data_out"]
+	do := ""
+	if core.ApplicationProperties["deliverto"] != "" {
+		do = core.ApplicationProperties["deliverto"]
+	} else {
+		do = getPWD() + core.ApplicationProperties["data_out"]
+	}
+	return do
 }
 
 func data_in() string {
@@ -509,6 +524,13 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.ProjectRepo = props["projectrepo"] + "/"
 	e.UUID = genUUID()
 
+	e.PropertiesName = ""
+	if props["propertiesoverride"] == "" {
+		e.PropertiesName = "Application"
+	} else {
+		e.PropertiesName = props["propertiesoverride"]
+	}
+
 	e = setupTemplateEnrichment(e, props)
 
 	e = setupPermissions(e, props)
@@ -563,7 +585,7 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 		e.CanList = false
 	}
 
-	spew.Dump(e)
+	//spew.Dump(e)
 
 	return e
 }

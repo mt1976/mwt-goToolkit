@@ -1,3 +1,5 @@
+package dao
+
 // ----------------------------------------------------------------
 // Automatically generated  "/dao/{{.ObjectNameLower}}.go"
 // ----------------------------------------------------------------
@@ -5,7 +7,6 @@
 // Object 			  : {{.ObjectName}}
 // Endpoint Root 	  : {{.EndpointRoot}}
 // Search QueryString : {{.QueryString}}
-// From   			  : {{.SourceName}}
 // ----------------------------------------------------------------
 // Template Generator : {{.Version}}
 // ----------------------------------------------------------------
@@ -15,7 +16,11 @@
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/user"
+	"time"
 
+	"github.com/google/uuid"
 	core "{{.ProjectRepo}}core"
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
@@ -24,7 +29,7 @@ import (
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 
-	tsql := "SELECT * FROM " + get_TableName(core.{{.SourceType}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	count, recordList, _, _ := fetchData(tsql)
 	return count, recordList, nil
 }
@@ -32,15 +37,15 @@ func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 // {{.ObjectName}}_GetByID() returns a single {{.ObjectName}} record
 func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 
-	tsql := "SELECT * FROM " + get_TableName(core.{{.SourceType}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
-	tsql = tsql + " WHERE " + {{.ObjectName}}_SQLSearchID + "='" + id + "'"
+	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
 
 	_, _, recordItem, _ := fetchData(tsql)
 	return 1, recordItem, nil
 }
 
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
-func {{.ObjectName}}_Delete(id string) (int, dm.{{.ObjectName}}, error) {
+func {{.ObjectName}}_Delete(id string) {
 
 	object_Table := core.ApplicationPropertiesDB["schema"] + "." + dm.{{.ObjectName}}_SQLTable
 
@@ -69,7 +74,7 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	host, _ := os.Hostname()
 
 	if len(r.AppInternalID) == 0 {
-		r.AppInternalID = new{{.ObjectNameLower}}StoreID
+		r.AppInternalID = new{{.ObjectNameLower}}StoreID()
 		r.SYSCreated = createDate
 		r.SYSWho = userID
 		r.SYSHost = host
@@ -78,7 +83,7 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	r.SYSUpdated = createDate
 //TODO Deal with the if its Application or null add this bit, otherwise dont.
 
-	tsql := "INSERT INTO" + get_TableName(core.{{.SourceType}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "INSERT INTO" + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " ("
 	{{range .FieldsList}}   tsql = tsql + dm.{{$.ObjectName}}_{{.FieldName}} + ", " 
 	{{end}}tsql = tsql + ") "
@@ -108,7 +113,7 @@ func fetchData(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, erro
 
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLSearchID}})
+    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLSearchID}},"")
 {{range .FieldsList}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}")
 {{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Post Import Actions
