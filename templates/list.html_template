@@ -1,7 +1,5 @@
-<head>
-
 <!----------------------------------------------------------------
-Automatically generated  "/html/{{ .ObjectName}}_List.html"
+Automatically generated  "/html/{{ .ObjectName}}_New.html"
 ----------------------------------------------------------------
 Object               : {{.ObjectName}}
 Endpoint Root        : {{.EndpointRoot}}
@@ -14,6 +12,7 @@ Date & Time          : {{.Date}} at {{.Time}}
 Who & Where          : {{.Who}} on {{.Host}}
 For Project          : {{.ProjectRepo}}
 ------------------------------------------------------------------>
+<head>
   <!-- START OF INSERTS -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
