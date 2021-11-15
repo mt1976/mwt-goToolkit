@@ -23,7 +23,7 @@ type {{.ObjectName}} struct {
 }
 
 const (
-	{{.ObjectName}}_Title       = "{{.UserFrendlyName}}"
+	{{.ObjectName}}_Title       = "{{.FriendlyName}}"
 	{{.ObjectName}}_SQLTable    = "{{.SQLTableName}}"
 	{{.ObjectName}}_SQLSearchID = "{{.SQLSearchID}}"
 	{{.ObjectName}}_QueryString = "{{.QueryString}}"

@@ -12,13 +12,16 @@
 // Date & Time		  : {{.Date}} at {{.Time}}
 // Who & Where		  : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
-
+{{if .CanList}}
     {
       "ID": "{{.UUID}}",
-      "Text": "{{.UserFrendlyName}}",
+      "Text": "{{.FriendlyName}}",
       "Glyph": "{{.ObjectGlyph}}",
       "HREF": "/{{.EndpointRoot}}List",
       "OnClick": "",
       "TextClass": ""
     }
     ,
+    {{else}}
+//No Menu Item is Required as you cannot list {{.ObjectName}}
+{{end}}

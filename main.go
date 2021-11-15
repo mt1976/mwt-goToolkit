@@ -14,6 +14,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
@@ -37,7 +38,7 @@ type enrichments struct {
 	Who                string
 	Host               string
 	FieldsList         []fields
-	UserFrendlyName    string
+	FriendlyName       string
 	SQLTableName       string
 	SQLSearchID        string
 	SearchKey          string
@@ -60,6 +61,12 @@ type enrichments struct {
 	ItemsOnPageWc      string
 	ItemList           string
 	RangeItemList      string
+	CanView            bool
+	CanEdit            bool
+	CanSave            bool
+	CanNew             bool
+	CanDelete          bool
+	CanList            bool
 }
 
 type fields struct {
@@ -77,184 +84,132 @@ type messages struct {
 	Message string
 }
 
+const (
+	go_template   = ".go_template"
+	html_template = ".html_template"
+	json_template = ".json_template"
+	nfo_template  = ".nfo_template"
+)
+
 func main() {
 
-	tmpHostname, _ := os.Hostname()
 	logs.Break()
 	logs.Header("Template Generator")
 	logs.Break()
 
-	logs.Information("Initialising...", "")
-
 	core.Initialise()
 
-	logs.Success("Initialised")
-	logs.Break()
-
-	logs.Header("Application Information")
-	logs.Break()
-
-	logs.Header("Application")
-	logs.Information("Name", core.ApplicationProperties["appname"])
-	logs.Information("Host Name", tmpHostname)
-	release := fmt.Sprintf("%s [r%s-%s]", core.ApplicationProperties["releaseid"], core.ApplicationProperties["releaselevel"], core.ApplicationProperties["releasenumber"])
-	logs.Information("Server Release", release)
-	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
-
-	logs.Information("Licence", core.ApplicationProperties["licname"])
-	logs.Information("Lic URL", core.ApplicationProperties["liclink"])
-	logs.Header("Runtime")
-	logs.Information("GO Version", runtime.Version())
-	logs.Information("Operating System", runtime.GOOS)
-	pwd, _ := os.Getwd()
-	logs.Information("Working Directory", pwd)
-	logs.Information("User", username())
-	logs.Header("Connectivity")
-	logs.Information("Default Input", core.ApplicationProperties["static_in"])
-
-	logs.Information("Default Output", core.ApplicationProperties["static_out"])
+	headerBumpf()
 
 	logs.Break()
 	logs.Header("Searching for work...")
 	logs.Break()
-	paths := getFiles(core.ApplicationProperties["static_in"])
-	logs.Success("Found Files in " + core.ApplicationProperties["static_in"])
-	logs.Information("Found ", fmt.Sprintf("%d", len(paths))+" files in "+core.ApplicationProperties["static_in"])
-	// loop through files from Paths
+
+	paths := getFiles(data_in())
+
 	noFiles := len(paths)
+
+	logs.Success("Found Files in " + data_in())
+	logs.Information("Found ", fmt.Sprintf("%d %s %s", noFiles, " files in ", data_in()))
+
+	// loop through files from Paths
 
 	logs.Break()
 
 	for i := 0; i < noFiles; i++ {
-
 		// if last four character in paths[i] are ".cfg" then proceed otherwise skip this item
-
 		fileExtension := paths[i][len(paths[i])-4:]
 		//fmt.Println(fileExtension) // gives "lo"
-
 		if fileExtension == ".cfg" {
-			logs.Information("Processing", paths[i])
-			//	logs.Information("Populate", "Replacement Values")
-
-			props := core.Config_Get(paths[i])
-			e := enrichments{ObjectName: props["objectname"]}
-			//capitalize first character of enrichment.ObjectName
-			e.ObjectName = strings.Title(e.ObjectName)
-			e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
-			e.ObjectNameLower = strings.ToLower(e.ObjectName)
-			e.Version = release
-			e.Time = time.Now().Format(core.TIMEFORMATUSER)
-			e.Date = time.Now().Format(core.DATEFORMATUSER)
-			e.Host = tmpHostname
-			e.Who = username()
-
-			e.UserFrendlyName = props["userfrendlyname"]
-			if e.UserFrendlyName == "" {
-				e.UserFrendlyName = e.ObjectNameLower
-			}
-			e.SQLTableName = props["sqltablename"]
-			e.SQLSearchID = props["sqlsearchid"]
-			e.QueryString = props["querystring"]
-			e.QueryField = "{{." + props["queryfield"] + "}}"
-			if props["endpointroot"] == "" {
-				e.EndpointRoot = e.ObjectNameLower
-			} else {
-				e.EndpointRoot = props["endpointroot"]
-			}
-
-			e.Path = pwd
-			e.ObjectGlyph = props["objectglyph"]
-			e.ProjectRepo = props["projectrepo"] + "/"
-			e.UUID = genUUID()
-
-			e.Title = wrap("Title")
-			e.PageTitle = wrap("PageTitle")
-			e.UserMenu = wrap("UserMenu")
-			e.MenuHeader = "{{ (index .UserMenu 0).MenuHeaderText}}"
-			e.RangeUserMenuStart = "{{range .UserMenu}}"
-			e.RangeEnd = "{{end}}"
-			e.MenuHREF = wrap("MenuHREF")
-			e.MenuOnClick = wrap("MenuOnClick")
-			e.MenuGlyph = wrap("MenuGlyph")
-			e.MenuTextClass = wrap("MenuTextClass")
-			e.MenuText = wrap("MenuText")
-			e.ItemsOnPageWc = wrap("ItemsOnPage")
-			e.ItemList = wrap("ItemList")
-			e.RangeItemList = "{{range .ItemList}}"
-
-			csvPath := pwd + core.ApplicationProperties["static_in"] + "/" + e.ObjectName + ".csv"
-
-			if props["use"] == "db" {
-				// Do nothing for now
-				logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
-				e = getFieldsFromDB(e, props)
-			} else {
-				logs.Information("Getting List of fields from CSV", csvPath)
-				e = ReadCsvFile(csvPath, e)
-			}
-
-			logs.Break()
-			logs.Header("Generating Files")
-			logs.Break()
-
-			if strings.ToUpper(props["create_dao"]) == "Y" {
-				processTemplate("dao.template", paths[i], "dao", e)
-				e.MessageList = append(e.MessageList, messages{Message: "* dao"})
-			} else {
-				logs.Information("Skipping", "dao")
-			}
-
-			if strings.ToUpper(props["create_application"]) == "Y" {
-				processTemplate("application.template", paths[i], "application", e)
-				e.MessageList = append(e.MessageList, messages{Message: "* application"})
-			} else {
-				logs.Information("Skipping", "application")
-			}
-
-			if strings.ToUpper(props["create_datamodel"]) == "Y" {
-				processTemplate("datamodel.template", paths[i], "datamodel", e)
-				e.MessageList = append(e.MessageList, messages{Message: "* datamodel"})
-			} else {
-				logs.Information("Skipping", "datamodel")
-			}
-
-			if strings.ToUpper(props["create_job"]) == "Y" {
-				processTemplate("job.template", paths[i], "job", e)
-				e.MessageList = append(e.MessageList, messages{Message: "* job"})
-			} else {
-				logs.Information("Skipping", "job")
-			}
-
-			if strings.ToUpper(props["create_menu"]) == "Y" {
-				processTemplate("menu.template", paths[i], "menu", e)
-				e.MessageList = append(e.MessageList, messages{Message: "* menu"})
-			} else {
-				logs.Information("Skipping", "menu")
-			}
-
-			if strings.ToUpper(props["create_html"]) == "Y" {
-				processHTMLTemplate("htmlList.template", paths[i], "html", e, "List")
-				e.MessageList = append(e.MessageList, messages{Message: "* html - List"})
-				processHTMLTemplate("htmlView.template", paths[i], "html", e, "View")
-				e.MessageList = append(e.MessageList, messages{Message: "* html - View"})
-				processHTMLTemplate("htmlEdit.template", paths[i], "html", e, "Edit")
-				e.MessageList = append(e.MessageList, messages{Message: "* html - Edit"})
-				processHTMLTemplate("htmlNew.template", paths[i], "html", e, "New")
-				e.MessageList = append(e.MessageList, messages{Message: "* html - New"})
-			} else {
-				logs.Information("Skipping", "html")
-			}
-
-			processTemplate("header.nfo", paths[i], "results", e)
-			e.MessageList = append(e.MessageList, messages{Message: "* results"})
-
+			processConfigFile(paths[i])
 		}
-
 	}
 	logs.Break()
 	logs.Success("Templating Complete")
 	logs.Break()
+}
 
+func processConfigFile(configFile string) {
+	logs.Information("Processing", configFile)
+	//	logs.Information("Populate", "Replacement Values")
+
+	props := core.Config_Get(configFile)
+	e := setupEnrichment(props)
+
+	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
+
+	if props["use"] == "db" {
+		// Do nothing for now
+		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
+		e = getFieldsFromDB(e, props)
+	} else {
+		logs.Information("Getting List of fields from CSV", csvPath)
+		e = ReadCsvFile(csvPath, e)
+	}
+
+	logs.Break()
+	logs.Header("Generating Files")
+	logs.Break()
+
+	if strings.ToUpper(props["create_dao"]) == "Y" {
+		processTemplate("dao"+go_template, configFile, "dao", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* dao"})
+	} else {
+		logs.Information("Skipping", "dao")
+	}
+
+	if strings.ToUpper(props["create_application"]) == "Y" {
+		processTemplate("application"+go_template, configFile, "application", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* application"})
+	} else {
+		logs.Information("Skipping", "application")
+	}
+
+	if strings.ToUpper(props["create_datamodel"]) == "Y" {
+		processTemplate("datamodel"+go_template, configFile, "datamodel", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* datamodel"})
+	} else {
+		logs.Information("Skipping", "datamodel")
+	}
+
+	if strings.ToUpper(props["create_job"]) == "Y" {
+		processTemplate("job"+go_template, configFile, "job", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* job"})
+	} else {
+		logs.Information("Skipping", "job")
+	}
+
+	if strings.ToUpper(props["create_menu"]) == "Y" {
+		processTemplate("menu"+json_template, configFile, "menu", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* menu"})
+	} else {
+		logs.Information("Skipping", "menu")
+	}
+
+	if strings.ToUpper(props["create_html"]) == "Y" {
+		if e.CanList {
+			processHTMLTemplate("list", configFile, "html", e)
+			e.MessageList = append(e.MessageList, messages{Message: "* html -> list"})
+		}
+		if e.CanView {
+			processHTMLTemplate("view", configFile, "html", e)
+			e.MessageList = append(e.MessageList, messages{Message: "* html -> view"})
+		}
+		if e.CanEdit {
+			processHTMLTemplate("edit", configFile, "html", e)
+			e.MessageList = append(e.MessageList, messages{Message: "* html -> edit"})
+		}
+		if e.CanNew {
+			processHTMLTemplate("new", configFile, "html", e)
+			e.MessageList = append(e.MessageList, messages{Message: "* html -> new"})
+		}
+
+	} else {
+		logs.Information("Skipping", "html")
+	}
+
+	processTemplate("results"+nfo_template, configFile, "results", e)
+	e.MessageList = append(e.MessageList, messages{Message: "* results"})
 }
 
 func wrap(in string) string {
@@ -299,8 +254,7 @@ func addField(en enrichments, fn string, tp string, df string) []fields {
 //Get list of files from a folder
 func getFiles(dir string) []string {
 	logs.Information("Searching...", "")
-	pwd, _ := os.Getwd()
-	dir = pwd + dir + "/"
+	dir = getPWD() + dir + "/"
 	//logs.Information("In Queue Path", dir)
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -316,7 +270,7 @@ func getFiles(dir string) []string {
 	return paths
 }
 
-func username() string {
+func getUsername() string {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
@@ -330,7 +284,7 @@ func genUUID() string {
 	return id.String()
 }
 
-func processTemplate(w string, p string, c string, e enrichments) {
+func processTemplate(w string, p string, destFolder string, e enrichments) {
 	logs.Information("Processing Template", w)
 
 	//spew.Dump(replacements)
@@ -341,7 +295,7 @@ func processTemplate(w string, p string, c string, e enrichments) {
 		logs.Error("Load Template", err)
 	}
 
-	f, err := os.Create(e.Path + "/" + core.ApplicationProperties["static_out"] + "/" + c + "/" + e.ObjectCamelCase + ".go_tmp")
+	f, err := os.Create(e.Path + data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + ".go_tmp")
 	if err != nil {
 		logs.Error("Create file: ", err)
 		return
@@ -355,18 +309,20 @@ func processTemplate(w string, p string, c string, e enrichments) {
 	logs.Success(f.Name() + " Generated")
 }
 
-func processHTMLTemplate(w string, p string, c string, e enrichments, pt string) {
-	logs.Information("Processing Template", w)
+func processHTMLTemplate(w string, p string, destFolder string, e enrichments) {
+	logs.Information("Processing Template", w+html_template)
+
+	fileNamePrefix := strings.ToUpper(w[:1]) + w[1:]
 
 	//spew.Dump(replacements)
-	fp := e.Path + "/templates/" + w
+	fp := e.Path + "/templates/" + w + html_template
 
 	t, err := template.ParseFiles(fp)
 	if err != nil {
 		logs.Error("Load Template", err)
 	}
 
-	f, err := os.Create(e.Path + "/" + core.ApplicationProperties["static_out"] + "/" + c + "/" + e.ObjectName + "_" + pt + ".html")
+	f, err := os.Create(e.Path + data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + fileNamePrefix + ".html")
 	if err != nil {
 		logs.Error("Create file: ", err)
 		return
@@ -467,5 +423,147 @@ func getFieldsFromDB(e enrichments, p map[string]string) enrichments {
 		}
 		e.FieldsList = addField(e, colName, colType, colDefault)
 	}
+	return e
+}
+
+func genReleaseName() string {
+	return fmt.Sprintf("%s [r%s-%s]",
+		core.ApplicationProperties["releaseid"],
+		core.ApplicationProperties["releaselevel"],
+		core.ApplicationProperties["releasenumber"])
+}
+
+func getHostName() string {
+	host, _ := os.Hostname()
+	return host
+}
+
+func getPWD() string {
+	thisPwd, _ := os.Getwd()
+	return thisPwd
+}
+
+func data_out() string {
+	return core.ApplicationProperties["data_out"]
+}
+
+func data_in() string {
+	return core.ApplicationProperties["data_in"]
+}
+
+func headerBumpf() {
+
+	logs.Break()
+
+	logs.Header("Application Information")
+	logs.Break()
+
+	logs.Header("Application")
+	logs.Information("Name", core.ApplicationProperties["appname"])
+	logs.Information("Host Name", getHostName())
+
+	logs.Information("Server Release", genReleaseName())
+	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
+
+	logs.Information("Licence", core.ApplicationProperties["licname"])
+	logs.Information("Lic URL", core.ApplicationProperties["liclink"])
+	logs.Header("Runtime")
+	logs.Information("GO Version", runtime.Version())
+	logs.Information("Operating System", runtime.GOOS)
+
+	logs.Information("Working Directory", getPWD())
+	logs.Information("User", getUsername())
+	logs.Header("Connectivity")
+	logs.Information("Default Input", data_in())
+	logs.Information("Default Output", data_out())
+}
+
+func setupEnrichment(props map[string]string) enrichments {
+	e := enrichments{ObjectName: props["objectname"]}
+	//capitalize first character of enrichment.ObjectName
+	e.ObjectName = strings.Title(e.ObjectName)
+	e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
+	e.ObjectNameLower = strings.ToLower(e.ObjectName)
+	e.Version = genReleaseName()
+	e.Time = time.Now().Format(core.TIMEFORMATUSER)
+	e.Date = time.Now().Format(core.DATEFORMATUSER)
+	e.Host = getHostName()
+	e.Who = getUsername()
+
+	e.FriendlyName = props["friendlyname"]
+	if e.FriendlyName == "" {
+		e.FriendlyName = e.ObjectCamelCase
+	}
+	e.SQLTableName = props["sqltablename"]
+	e.SQLSearchID = strings.TrimSpace(props["sqlsearchid"])
+	e.QueryString = props["querystring"]
+	e.QueryField = "{{." + props["queryfield"] + "}}"
+	if props["endpointroot"] == "" {
+		e.EndpointRoot = e.ObjectNameLower
+	} else {
+		e.EndpointRoot = props["endpointroot"]
+	}
+
+	e.Path = getPWD()
+	e.ObjectGlyph = props["objectglyph"]
+	e.ProjectRepo = props["projectrepo"] + "/"
+	e.UUID = genUUID()
+
+	e = setupTemplateEnrichment(e, props)
+
+	e = setupPermissions(e, props)
+
+	return e
+}
+
+func setupTemplateEnrichment(e enrichments, props map[string]string) enrichments {
+	e.Title = wrap("Title")
+	e.PageTitle = wrap("PageTitle")
+	e.UserMenu = wrap("UserMenu")
+	e.MenuHeader = "{{ (index .UserMenu 0).MenuHeaderText}}"
+	e.RangeUserMenuStart = "{{range .UserMenu}}"
+	e.RangeEnd = "{{end}}"
+	e.MenuHREF = wrap("MenuHREF")
+	e.MenuOnClick = wrap("MenuOnClick")
+	e.MenuGlyph = wrap("MenuGlyph")
+	e.MenuTextClass = wrap("MenuTextClass")
+	e.MenuText = wrap("MenuText")
+	e.ItemsOnPageWc = wrap("ItemsOnPage")
+	e.ItemList = wrap("ItemList")
+	e.RangeItemList = "{{range .ItemList}}"
+	return e
+}
+
+func setupPermissions(e enrichments, props map[string]string) enrichments {
+	e.CanView = true
+	e.CanEdit = true
+	e.CanDelete = true
+	e.CanNew = true
+	e.CanSave = true
+	e.CanList = true
+
+	if strings.ToUpper(props["can_view"]) == "N" {
+		e.CanView = false
+	}
+	if strings.ToUpper(props["can_edit"]) == "N" {
+		e.CanEdit = false
+	}
+	if strings.ToUpper(props["can_delete"]) == "N" {
+		e.CanDelete = false
+	}
+	if strings.ToUpper(props["can_new"]) == "N" {
+		e.CanNew = false
+	}
+	if strings.ToUpper(props["can_save"]) == "N" {
+		e.CanSave = false
+		e.CanEdit = false
+		e.CanNew = false
+	}
+	if strings.ToUpper(props["can_list"]) == "N" {
+		e.CanList = false
+	}
+
+	spew.Dump(e)
+
 	return e
 }

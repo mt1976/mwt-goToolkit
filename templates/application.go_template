@@ -54,12 +54,12 @@ const (
 
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
-	mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList)
-	mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView)
-	mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit)
-	mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew)
-	mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave)
-	mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete)
+	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{end}}
+	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{end}}
+	{{if .CanEdit}}mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit){{end}}
+	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{end}}
+	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{end}}
+	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{end}}
 	logs.Publish({{.SourceName}}, dm.{{.ObjectName}}_Title)
 }
 
