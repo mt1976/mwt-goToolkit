@@ -1,20 +1,20 @@
 // ----------------------------------------------------------------
-// Automatically generated  "/application/template.go"
+// Automatically generated  "/application/dealconversation.go"
 // ----------------------------------------------------------------
 // Package              : main
-// Object 			    : Template
-// Endpoint Root 	    : Template
-// Search QueryString   : TemplateID
+// Object 			    : DealConversation
+// Endpoint Root 	    : DealConversation
+// Search QueryString   : ID
 // From   			    : 
 // ----------------------------------------------------------------
 // Database Information
 // ----------------------------------------------------------------
-// SQL Table Name       : template
-// SQL Table Search Col : ID
+// SQL Table Name       : sienaDealConversationLog
+// SQL Table Search Col : MessageLogReference
 // ----------------------------------------------------------------
 // Template Generator   : RussetAlbatross [r0-21.11.01]
 // ----------------------------------------------------------------
-// Date & Time		    : 15/11/2021 at 21:56:45
+// Date & Time		    : 15/11/2021 at 21:56:44
 // Who & Where		    : matttownsend on silicon.local
 // For Project          : github.com/mt1976/mwt-go-dev/
 // ----------------------------------------------------------------
@@ -23,16 +23,18 @@
 // *---------------------------+------------+------------+---------------------------*
 // | Field Name                | Type       | Default    |SQL Field Name             |
 // *---------------------------+------------+------------+---------------------------*
-// | SYSId                     | Int        |          0 | _id                       |  true |
-// | FIELD1                    | String     |            | FIELD1                    | false |
-// | FIELD2                    | String     |            | FIELD2                    | false |
-// | SYSCreated                | String     |            | _created                  | false |
-// | SYSCreatedBy              | String     |            | _createdBy                | false |
-// | SYSCreatedHost            | String     |            | _createdHost              | false |
-// | SYSUpdated                | String     |            | _updated                  | false |
-// | SYSUpdatedHost            | String     |            | _updatedHost              | false |
-// | SYSUpdatedBy              | String     |            | _updatedBy                | false |
-// | ID                        | String     |            | ID                        |  true |
+// | SienaReference            | String     |            | SienaReference            | false |
+// | Status                    | String     |            | Status                    | false |
+// | MessageType               | String     |            | MessageType               | false |
+// | ContractNumber            | String     |            | ContractNumber            | false |
+// | AckReference              | String     |            | AckReference              | false |
+// | NewTX                     | Bool       |       True | NewTX                     | false |
+// | LegNo                     | Int        |          0 | LegNo                     | false |
+// | Summary                   | String     |            | Summary                   | false |
+// | BusinessDate              | Time       |            | BusinessDate              | false |
+// | TXNo                      | Int        |          0 | TXNo                      | false |
+// | ExternalSystem            | String     |            | ExternalSystem            | false |
+// | MessageLogReference       | String     |            | MessageLogReference       |  true |
 // *---------------------------+------------+------------+---------------------------*
 // ----------------------------------------------------------------
 // Artifacts Generated
@@ -40,12 +42,10 @@
 // * dao
 // * application
 // * datamodel
-// * job
+// * adaptor
 // * menu
 // * html -> list
 // * html -> view
-// * html -> edit
-// * html -> new
 // ----------------------------------------------------------------
 // End of File
 // ----------------------------------------------------------------

@@ -1,0 +1,25 @@
+// ----------------------------------------------------------------
+// Automatically generated  "/application/dealconversation.go"
+// ----------------------------------------------------------------
+// Package            : dao
+// Object 			  : DealConversation
+// Endpoint Root 	  : DealConversation
+// Search QueryString : ID
+// From   			  : 
+// ----------------------------------------------------------------
+// Template Generator : RussetAlbatross [r0-21.11.01]
+// ----------------------------------------------------------------
+// Date & Time		  : 15/11/2021 at 21:56:44
+// Who & Where		  : matttownsend on silicon.local
+// ----------------------------------------------------------------
+
+    {
+      "ID": "b64245ec-d06e-49d9-b9e1-0d17557f5027",
+      "Text": "Deal Conversation Contents",
+      "Glyph": "fas fa-poo",
+      "HREF": "/DealConversationList",
+      "OnClick": "",
+      "TextClass": ""
+    }
+    ,
+    

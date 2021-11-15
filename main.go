@@ -68,6 +68,7 @@ type enrichments struct {
 	CanList            bool
 	PropertiesName     string
 	UsesAdaptor        bool
+	CanExport          bool
 }
 
 type fields struct {
@@ -182,6 +183,13 @@ func processConfigFile(configFile string) {
 		logs.Information("Skipping", "job")
 	}
 
+	if e.UsesAdaptor {
+		processTemplate("adaptor"+go_template, configFile, "adaptor", e)
+		e.MessageList = append(e.MessageList, messages{Message: "* adaptor"})
+	} else {
+		logs.Information("Skipping", "adaptor")
+	}
+
 	if strings.ToUpper(props["create_menu"]) == "Y" {
 		processTemplate("menu"+json_template, configFile, "design/menu", e)
 		e.MessageList = append(e.MessageList, messages{Message: "* menu"})
@@ -234,7 +242,7 @@ func addField(en enrichments, fn string, tp string, df string, mand bool) []fiel
 		fn = strings.ToUpper(fn[:1]) + fn[1:]
 		//fmt.Println(fn)
 		fn = "SYS" + fn
-		noinput = "disabled=\"disabled\""
+		noinput = "hidden"
 		hidden = "hidden"
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
@@ -293,7 +301,7 @@ func processTemplate(w string, p string, destFolder string, e enrichments) {
 	logs.Information("Processing Template", w)
 
 	extn := ".go_tmp"
-	if core.ApplicationProperties["deliverto"] != "" {
+	if core.Properties["deliverto"] != "" {
 		extn = ".go"
 	}
 
@@ -358,7 +366,7 @@ func tableHeader() {
 	logs.Break()
 	logs.Header("Table Information")
 	logs.Break()
-	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s |", "Field Name", "Type", "Default", "SQL Field Name")
+	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand")
 	logs.Information(info, "")
 	logs.Break()
 }
@@ -460,9 +468,9 @@ func getFieldsFromDB(e enrichments, p map[string]string) enrichments {
 
 func genReleaseName() string {
 	return fmt.Sprintf("%s [r%s-%s]",
-		core.ApplicationProperties["releaseid"],
-		core.ApplicationProperties["releaselevel"],
-		core.ApplicationProperties["releasenumber"])
+		core.Properties["releaseid"],
+		core.Properties["releaselevel"],
+		core.Properties["releasenumber"])
 }
 
 func getHostName() string {
@@ -477,16 +485,16 @@ func getPWD() string {
 
 func data_out() string {
 	do := ""
-	if core.ApplicationProperties["deliverto"] != "" {
-		do = core.ApplicationProperties["deliverto"]
+	if core.Properties["deliverto"] != "" {
+		do = core.Properties["deliverto"]
 	} else {
-		do = getPWD() + core.ApplicationProperties["data_out"]
+		do = getPWD() + core.Properties["data_out"]
 	}
 	return do
 }
 
 func data_in() string {
-	return core.ApplicationProperties["data_in"]
+	return strings.TrimSpace(core.Properties["data_in"])
 }
 
 func headerBumpf() {
@@ -497,14 +505,14 @@ func headerBumpf() {
 	logs.Break()
 
 	logs.Header("Application")
-	logs.Information("Name", core.ApplicationProperties["appname"])
+	logs.Information("Name", core.Properties["appname"])
 	logs.Information("Host Name", getHostName())
 
 	logs.Information("Server Release", genReleaseName())
 	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
 
-	logs.Information("Licence", core.ApplicationProperties["licname"])
-	logs.Information("Lic URL", core.ApplicationProperties["liclink"])
+	logs.Information("Licence", core.Properties["licname"])
+	logs.Information("Lic URL", core.Properties["liclink"])
 	logs.Header("Runtime")
 	logs.Information("GO Version", runtime.Version())
 	logs.Information("Operating System", runtime.GOOS)
@@ -550,6 +558,7 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e.PropertiesName = ""
 	e.UsesAdaptor = false
+
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
 	} else {
@@ -589,6 +598,7 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	e.CanNew = true
 	e.CanSave = true
 	e.CanList = true
+	e.CanExport = false
 
 	if strings.ToUpper(props["can_view"]) == "N" {
 		e.CanView = false
@@ -609,6 +619,10 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	}
 	if strings.ToUpper(props["can_list"]) == "N" {
 		e.CanList = false
+	}
+
+	if strings.ToUpper(props["can_export"]) == "Y" {
+		e.CanExport = true
 	}
 
 	//spew.Dump(e)

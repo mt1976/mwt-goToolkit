@@ -18,7 +18,6 @@ import (
 	"html/template"
 	"net/http"
 
-	{{if .UsesAdaptor}}adaptor "{{.ProjectRepo}}adaptor"{{end}}
 	core    "{{.ProjectRepo}}core"
 	dao     "{{.ProjectRepo}}dao"
 	dm      "{{.ProjectRepo}}datamodel"
@@ -180,10 +179,6 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue("{{.FieldName}}")
 	{{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-
-	// Alternative Leave this to an adaptor
-	// adaptor.{{.ObjectName}}_XMLExport(item)
-
 
 	dao.{{.ObjectName}}_Store(item)	
 

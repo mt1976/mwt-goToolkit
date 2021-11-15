@@ -14,16 +14,15 @@ package dao
 // Who & Where		  : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 import (
-	"fmt"
 	"log"
-	"os"
-	"os/user"
-	"time"
+	"fmt"
 
 	"github.com/google/uuid"
 	core "{{.ProjectRepo}}core"
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
+	logs   "{{.ProjectRepo}}logs"
+	{{if .UsesAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
 )
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
@@ -58,31 +57,29 @@ func {{.ObjectName}}_Delete(id string) {
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 
-	// TODO Implement Store Function for {{.ObjectName}}
-	fmt.Println(r)
+	logs.Warning(fmt.Sprintf("%s", r))
+
+	if len(r.{{.SQLSearchID}}) == 0 {
+		r.{{.SQLSearchID}}= {{.ObjectNameLower}}_NewID(r)
+	}
+
+{{if .UsesAdaptor}}
+
+	adaptor.{{.ObjectName}}_Delete(r.{{.SQLSearchID}})
+	adaptor.{{.ObjectName}}_Update(r)
+
+{{else}}
 
 
-//TODO Deal with the if its Application or null add this bit, otherwise dont.
+//Deal with the if its Application or null add this bit, otherwise dont.
 		//fmt.Println(credentialStore)
-	createDate := time.Now().Format(core.DATETIMEFORMATUSER)
-	if len(r.SYSCreated) == 0 {
-		r.SYSCreated = createDate
-	}
 
-	currentUserID, _ := user.Current()
-	userID := currentUserID.Name
-	host, _ := os.Hostname()
-
-	if len(r.AppInternalID) == 0 {
-		r.AppInternalID = new{{.ObjectNameLower}}StoreID()
-		r.SYSCreated = createDate
-		r.SYSWho = userID
-		r.SYSHost = host
-	}
-
-	r.SYSUpdated = createDate
-//TODO Deal with the if its Application or null add this bit, otherwise dont.
-
+	r.SYSCreated = Audit_Update(r.SYSCreated, Audit_TimeStamp())
+	r.SYSCreatedBy = Audit_Update(r.SYSCreatedBy, Audit_User())
+	r.SYSCreatedHost = Audit_Update(r.SYSCreatedHost,Audit_Host())
+	r.SYSUpdated = Audit_Update("", Audit_TimeStamp())
+	r.SYSUpdatedBy = Audit_Update("",Audit_User())
+	r.SYSUpdatedHost = Audit_Update("",Audit_Host())
 
 	ts := SQLData{}
 
@@ -94,9 +91,9 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	tsql = tsql + " VALUES (" + values(ts) + ")"
 
 	{{.ObjectName}}_Delete(r.{{.SQLSearchID}})
-
 	das.Execute(tsql)
 
+{{end}}
 	return nil
 }
 
@@ -126,7 +123,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	return noitems, recList, recItem, nil
 }
 
-func new{{.ObjectNameLower}}StoreID() string {
+func {{.ObjectNameLower}}_NewID(r dm.{{.ObjectName}}) string {
 	id := uuid.New().String()
 	return id
 }
