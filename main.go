@@ -292,7 +292,7 @@ func processTemplate(w string, p string, destFolder string, e enrichments) {
 		extn = ".go"
 	}
 
-	if destFolder == "catalog" {
+	if destFolder == "design/catalog" {
 		extn = ".nfo"
 	}
 
