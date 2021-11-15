@@ -187,7 +187,6 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	dao.{{.ObjectName}}_Store(item)	
 
 	http.Redirect(w, r, Template_Redirect, http.StatusFound)
-
 }
 
 //{{.ObjectName}}_HandlerNew is the handler used process the creation of an {{.ObjectName}}
@@ -219,7 +218,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		// Post Import Actions - END
 	}
 
-	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
+	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateNew, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)
 
 }

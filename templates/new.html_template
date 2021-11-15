@@ -1,17 +1,3 @@
-<!----------------------------------------------------------------
-Automatically generated  "/html/{{ .ObjectName}}_New.html"
-----------------------------------------------------------------
-Object               : {{.ObjectName}}
-Endpoint Root        : {{.EndpointRoot}}
-Search QueryString   : {{.QueryString}}
-Search QueryField    : {{.QueryField}}
-----------------------------------------------------------------
-Template Generator   : {{.Version}}
-----------------------------------------------------------------
-Date & Time          : {{.Date}} at {{.Time}}
-Who & Where          : {{.Who}} on {{.Host}}
-For Project          : {{.ProjectRepo}}
------------------------------------------------------------------->
 <head>
   <!-- START OF INSERTS -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -66,7 +52,7 @@ For Project          : {{.ProjectRepo}}
   <!-- DO NOT CHANGE -->
 
   <div class="container-fluid">
-    <form action="/{{.ObjectName}}_Save?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
+    <form action="/{{.ObjectName}}Save?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
       <div class="card">
         <div class="card-header font-weight-bold">
           <div class="row">
@@ -75,7 +61,7 @@ For Project          : {{.ProjectRepo}}
             </div>
             <div class="col">
               <div class="btn-group float-right">
-                <button type="submit" value="" class="btn btn-outline-warning"><i class="fas fa-pen"  method="POST" formaction="/{{.ObjectName}}_Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}_Save/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Edit</button>
+                <button type="submit" value="" class="btn btn-outline-warning"><i class="fas fa-save"  method="POST" formaction="/{{.ObjectName}}Save&{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Save</button>
                 <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
               </div>
             </div>
@@ -85,7 +71,7 @@ For Project          : {{.ProjectRepo}}
 {{range .FieldsList}}            <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}" {{.Hidden}}>{{.FieldName}}</label>
-                <input type="{{.FieldName}}" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="" {{.Hidden}}>
+                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="" {{.Hidden}}>
               </div>
             </div>
 {{end}}        </div>

@@ -83,13 +83,15 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	r.SYSUpdated = createDate
 //TODO Deal with the if its Application or null add this bit, otherwise dont.
 
-	tsql := "INSERT INTO" + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
-	tsql = tsql + " ("
-	{{range .FieldsList}}   tsql = tsql + dm.{{$.ObjectName}}_{{.FieldName}} + ", " 
-	{{end}}tsql = tsql + ") "
-	tsql = tsql + " VALUES (" 
-	{{range .FieldsList}}   tsql = tsql + sq(r.{{.FieldName}}) + ", " 
-	{{end}}tsql = tsql + ")"
+
+	ts := SQLData{}
+
+{{range .FieldsList}}	ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}})
+{{end}}	
+
+	tsql := "INSERT INTO " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql = tsql + " (" + fields(ts) + ")"
+	tsql = tsql + " VALUES (" + values(ts) + ")"
 
 	{{.ObjectName}}_Delete(r.AppInternalID)
 

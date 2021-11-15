@@ -4,8 +4,6 @@ github.com/alexedwards/scs/v2 v2.4.0 h1:XfnMamKnvp1muJVNr1WzikQTclopsBXWZtzz0NBj
 github.com/alexedwards/scs/v2 v2.4.0/go.mod h1:ToaROZxyKukJKT/xLcVQAChi5k6+Pn1Gvmdl7h3RRj8=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
-github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
-github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/denisenkom/go-mssqldb v0.9.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
 github.com/denisenkom/go-mssqldb v0.11.0 h1:9rHa233rhdOyrz2GcP9NM+gi2psgJZ4GWDpL/7ND8HI=
 github.com/denisenkom/go-mssqldb v0.11.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
@@ -18,8 +16,9 @@ github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31/go.mod h1:9qhdPWwVn
 github.com/leekchan/accounting v1.0.0 h1:+Wd7dJ//dFPa28rc1hjyy+qzCbXPMR91Fb6F1VGTQHg=
 github.com/leekchan/accounting v1.0.0/go.mod h1:3timm6YPhY3YDaGxl0q3eaflX0eoSx3FXn7ckHe4tO0=
 github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
-github.com/lib/pq v1.2.0 h1:LXpIM/LZ5xGFhOpXAQUIMM1HdyqzVYM13zNdjCEEcA0=
 github.com/lib/pq v1.2.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+github.com/lib/pq v1.10.1 h1:6VXZrLU0jHBYyAqrSPa+MgPfnSvTPuMgK+k0o5kVFWo=
+github.com/lib/pq v1.10.1/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/mt1976/templatebuiler v0.0.0-20211114204411-1a8699b77688 h1:bwTRPsGiJk4Y1EEECkyOwKmlR05t/V5rB3XmM+9aOQ4=
 github.com/mt1976/templatebuiler v0.0.0-20211114204411-1a8699b77688/go.mod h1:0NmY2SMtL5T3G3K+cm/SrEI+r4DKsE4qA7LfPFWqdxA=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

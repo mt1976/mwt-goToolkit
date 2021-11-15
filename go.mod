@@ -14,8 +14,8 @@ require (
 
 require (
 	github.com/cockroachdb/apd v1.1.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
+	github.com/lib/pq v1.10.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
