@@ -15,9 +15,6 @@ package jobs
 // ----------------------------------------------------------------
 
 import (
-	"fmt"
-	"log"
-
 	application "{{.ProjectRepo}}application"
 	core        "{{.ProjectRepo}}core"
 	dm          "{{.ProjectRepo}}datamodel"
