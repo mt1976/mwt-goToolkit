@@ -30,8 +30,8 @@ import (
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 
 	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
-	count, recordList, _, _ := fetchData(tsql)
-	return count, recordList, nil
+	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
+	return count, {{.ObjectNameLower}}List, nil
 }
 
 // {{.ObjectName}}_GetByID() returns a single {{.ObjectName}} record
@@ -40,8 +40,8 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
 
-	_, _, recordItem, _ := fetchData(tsql)
-	return 1, recordItem, nil
+	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
+	return 1, {{.ObjectNameLower}}Item, nil
 }
 
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
@@ -93,15 +93,15 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	tsql = tsql + " (" + fields(ts) + ")"
 	tsql = tsql + " VALUES (" + values(ts) + ")"
 
-	{{.ObjectName}}_Delete(r.AppInternalID)
+	{{.ObjectName}}_Delete(r.{{.SQLSearchID}})
 
 	das.Execute(tsql)
 
 	return nil
 }
 
-// fetchData read all employees
-func fetchData(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error) {
+// {{.ObjectNameLower}}_Fetch read all employees
+func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error) {
 
 	var recItem dm.{{.ObjectName}}
 	var recList []dm.{{.ObjectName}}

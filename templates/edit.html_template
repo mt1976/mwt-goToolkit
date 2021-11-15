@@ -52,7 +52,7 @@
   <!-- DO NOT CHANGE -->
 
   <div class="container-fluid">
-    <form action="/{{.ObjectName}}Save?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
+    <form action="/{{.ObjectName}}Save?{{.QueryString}}={{.QueryField}}" method="GET" class="form">
       <div class="card">
         <div class="card-header font-weight-bold">
           <div class="row">
@@ -61,7 +61,7 @@
             </div>
             <div class="col">
               <div class="btn-group float-right">
-                <button type="submit" value="" class="btn btn-outline-warning"><i class="fas fa-save"  method="POST" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Save</button>
+                <button type="submit" value="" class="btn btn-outline-warning"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Save</button>
                 <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
               </div>
             </div>
@@ -71,7 +71,7 @@
 {{range .FieldsList}}            <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}">{{.FieldName}}</label>
-                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.FieldName}}">
+                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
               </div>
             </div>
 {{end}}        </div>

@@ -79,6 +79,8 @@ type fields struct {
 	TemplateField string
 	Disabled      string
 	Hidden        string
+	ValueID       string
+	IsMandatory   bool
 }
 
 type messages struct {
@@ -217,7 +219,7 @@ func wrap(in string) string {
 	return "{{." + in + "}}"
 }
 
-func addField(en enrichments, fn string, tp string, df string) []fields {
+func addField(en enrichments, fn string, tp string, df string, mand bool) []fields {
 
 	origfn := fn
 
@@ -237,7 +239,7 @@ func addField(en enrichments, fn string, tp string, df string) []fields {
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
-	info := fmt.Sprintf("| %-25s | %-10s | %10s | %-25s |", fn, tp, df, origfn)
+	info := fmt.Sprintf("| %-25s | %-10s | %10s | %-25s | %5t |", fn, tp, df, origfn, mand)
 	tplField := "{{." + fn + "}}"
 	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
 		Type:          tp,
@@ -246,7 +248,9 @@ func addField(en enrichments, fn string, tp string, df string) []fields {
 		Formatted:     info,
 		TemplateField: tplField,
 		Disabled:      noinput,
-		Hidden:        hidden})
+		Hidden:        hidden,
+		ValueID:       wrap(fn),
+		IsMandatory:   mand})
 	logs.Information(info, "")
 
 	return en.FieldsList
@@ -341,7 +345,7 @@ func processHTMLTemplate(w string, p string, destFolder string, e enrichments) {
 		logs.Error("Create file: ", err)
 		return
 	}
-
+	//spew.Dump(e)
 	err2 := t.Execute(f, e)
 	if err2 != nil {
 		logs.Error("Process Template", err2)
@@ -381,7 +385,11 @@ func ReadCsvFile(filePath string, e enrichments) enrichments {
 			panic(err)
 		}
 
-		e.FieldsList = addField(e, record[0], record[1], record[2])
+		colMand := false
+		if record[3] == "true" {
+			colMand = true
+		}
+		e.FieldsList = addField(e, record[0], record[1], record[2], colMand)
 
 	}
 	logs.Break()
@@ -410,13 +418,20 @@ func getFieldsFromDB(e enrichments, p map[string]string) enrichments {
 	for _, row := range results {
 		colName := row["COLUMN_NAME"].(string)
 		colType := row["TYPE_NAME"].(string)
-		//fmt.Printf("colName: %v %v\n", colName, colType)
+		colMand := false
+		if row["IS_NULLABLE"].(string) == "NO" {
+			colMand = true
+		}
+		//fmt.Printf("colName: %v %v %v %t\n", colName, colType, row["IS_NULLABLE"], colMand)
+		if colName == "ID" {
+			colMand = true
+		}
 		colDefault := ""
 		switch colType {
 		case "varchar", "nvarchar", "char", "nchar", "text", "ntext":
 			colDefault = ""
 			colType = "String"
-		case "int", "bigint", "smallint", "tinyint", "bit":
+		case "int", "bigint", "smallint", "tinyint":
 			colDefault = "0"
 			colType = "Int"
 		case "decimal", "numeric":
@@ -431,11 +446,14 @@ func getFieldsFromDB(e enrichments, p map[string]string) enrichments {
 		case "int identity":
 			colDefault = "0"
 			colType = "Int"
+		case "bit":
+			colDefault = "True"
+			colType = "Bool"
 		default:
 			colType = "String"
 			colDefault = ""
 		}
-		e.FieldsList = addField(e, colName, colType, colDefault)
+		e.FieldsList = addField(e, colName, colType, colDefault, colMand)
 	}
 	return e
 }
@@ -519,7 +537,7 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.QueryString = props["querystring"]
 	e.QueryField = "{{." + props["queryfield"] + "}}"
 	if props["endpointroot"] == "" {
-		e.EndpointRoot = e.ObjectNameLower
+		e.EndpointRoot = e.ObjectName
 	} else {
 		e.EndpointRoot = props["endpointroot"]
 	}

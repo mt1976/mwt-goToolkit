@@ -71,7 +71,7 @@
 {{range .FieldsList}}            <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}">{{.FieldName}}</label>
-                <input type="text" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled="disabled" value="{{.FieldName}}">
+                <input type="text" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled="disabled" value="{{.ValueID}}">
               </div>
             </div>
 {{end}}        </div>
