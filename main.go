@@ -104,17 +104,35 @@ func main() {
 
 	core.Initialise()
 
-	headerBumpf()
+	displayApplicationHeader()
 
 	logs.Break()
 	logs.Header("Searching for work...")
 	logs.Break()
 
-	paths := getFiles(data_in())
+	pwd, _ := os.Getwd()
+
+	clItem := ""
+	//log.Println(os.Args[1:], len(os.Args[1:]))
+	//log.Println(os.Args[len(os.Args)-1], len(os.Args[len(os.Args)-1]))
+	if len(os.Args[len(os.Args)-1]) > 1 {
+		clItem = pwd + data_in() + "/" + os.Args[len(os.Args)-1]
+	}
+	//log.Println(clItem)
+
+	var paths []string
+	if clItem == "" {
+		// Get list of files from a folder
+		logs.Information("Searching...", data_in())
+		paths = seekTableDefinitions(data_in())
+		logs.Success("Found Files in " + data_in())
+	} else {
+		logs.Information("CL Specified", clItem+".cfg")
+		paths = append(paths, clItem+".cfg")
+	}
 
 	noFiles := len(paths)
 
-	logs.Success("Found Files in " + data_in())
 	logs.Information("Found ", fmt.Sprintf("%d %s %s", noFiles, " files in ", data_in()))
 
 	// loop through files from Paths
@@ -126,7 +144,7 @@ func main() {
 		fileExtension := paths[i][len(paths[i])-4:]
 		//fmt.Println(fileExtension) // gives "lo"
 		if fileExtension == ".cfg" {
-			processConfigFile(paths[i])
+			processTableDefinition(paths[i])
 		}
 	}
 	logs.Break()
@@ -134,7 +152,26 @@ func main() {
 	logs.Break()
 }
 
-func processConfigFile(configFile string) {
+//Get list of files from a folder
+func seekTableDefinitions(dir string) []string {
+	logs.Information("Searching...", "")
+	dir = getPWD() + dir + "/"
+	//logs.Information("In Queue Path", dir)
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var paths []string
+	for _, file := range files {
+		if !file.IsDir() {
+			paths = append(paths, filepath.Join(dir, file.Name()))
+			logs.Information("Found File", file.Name())
+		}
+	}
+	return paths
+}
+
+func processTableDefinition(configFile string) {
 	logs.Information("Processing", configFile)
 	//	logs.Information("Populate", "Replacement Values")
 
@@ -146,86 +183,283 @@ func processConfigFile(configFile string) {
 	if props["use"] == "db" {
 		// Do nothing for now
 		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
-		e = getFieldsFromDB(e, props)
+		e = getFieldDefinitions_DB(e, props)
 	} else {
 		logs.Information("Getting List of fields from CSV", csvPath)
-		e = ReadCsvFile(csvPath, e)
+		e = getFieldDefinitions_CSV(csvPath, e)
 	}
 
 	logs.Break()
 	logs.Header("Generating Files")
 	logs.Break()
 
-	if strings.ToUpper(props["create_dao"]) == "Y" {
-		processTemplate("dao"+go_template, configFile, "dao", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* dao"})
+	generateCodeArtifact("application", props, configFile, e)
+	generateCodeArtifact("adaptor", props, configFile, e)
+	generateCodeArtifact("dao", props, configFile, e)
+	generateCodeArtifact("datamodel", props, configFile, e)
+	generateCodeArtifact("job", props, configFile, e)
+	generateCodeArtifact("menu", props, configFile, e)
+	generateHTMLArtifacts("html", props, configFile, e)
+	generateCodeArtifact("catalog", props, configFile, e)
+}
+
+func generateCodeArtifact(a string, props map[string]string, configFile string, e enrichments) {
+	if strings.ToUpper(props["create_"+a]) == "Y" || a == "catalog" {
+		processCodeArtifact(a, configFile, a, e)
+		e.MessageList = append(e.MessageList, messages{Message: "* " + a})
 	} else {
-		logs.Information("Skipping", "dao")
+		logs.Information("Skipping", a)
+	}
+}
+
+func processCodeArtifact(w string, p string, destFolder string, e enrichments) {
+	logs.Information("Processing Template", w)
+
+	in_extn := ".go_template"
+	out_extn := ".go_tmp"
+	if core.Properties["deliverto"] != "" {
+		out_extn = ".go"
 	}
 
-	if strings.ToUpper(props["create_application"]) == "Y" {
-		processTemplate("application"+go_template, configFile, "application", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* application"})
-	} else {
-		logs.Information("Skipping", "application")
+	if destFolder == "catalog" {
+		destFolder = "design/catalog"
+		out_extn = ".nfo"
+		in_extn = ".nfo_template"
 	}
 
-	if strings.ToUpper(props["create_datamodel"]) == "Y" {
-		processTemplate("datamodel"+go_template, configFile, "datamodel", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* datamodel"})
-	} else {
-		logs.Information("Skipping", "datamodel")
+	if destFolder == "menu" {
+		destFolder = "design/menu"
+		out_extn = ".json"
+		in_extn = ".json_template"
 	}
 
-	if strings.ToUpper(props["create_job"]) == "Y" {
-		processTemplate("job"+go_template, configFile, "jobs", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* job"})
-	} else {
-		logs.Information("Skipping", "job")
+	if destFolder == "html" {
+		in_extn = ".html_template"
 	}
 
-	if e.UsesAdaptor {
-		processTemplate("adaptor"+go_template, configFile, "adaptor", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* adaptor"})
-	} else {
-		logs.Information("Skipping", "adaptor")
+	if destFolder == "application" {
+		out_extn = "_core.go"
 	}
 
-	if strings.ToUpper(props["create_menu"]) == "Y" {
-		processTemplate("menu"+json_template, configFile, "design/menu", e)
-		e.MessageList = append(e.MessageList, messages{Message: "* menu"})
-	} else {
-		logs.Information("Skipping", "menu")
+	//spew.Dump(replacements)
+	fp := e.Path + "/templates/" + w + in_extn
+
+	t, err := template.ParseFiles(fp)
+	if err != nil {
+		logs.Error("Load Template :", err)
 	}
+
+	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + out_extn)
+	if err != nil {
+		logs.Error("Create file: ", err)
+		return
+	}
+
+	err2 := t.Execute(f, e)
+	if err2 != nil {
+		logs.Error("Process Template", err2)
+	}
+	f.Close()
+	logs.Success(f.Name() + " Generated")
+}
+
+func generateHTMLArtifacts(a string, props map[string]string, configFile string, e enrichments) {
 
 	if strings.ToUpper(props["create_html"]) == "Y" {
 		if e.CanList {
-			processHTMLTemplate("list", configFile, "html", e)
-			e.MessageList = append(e.MessageList, messages{Message: "* html -> list"})
+			generateHTMLArtifact("list", configFile, "html", e)
+		} else {
+			logs.Warning("Listing is not enabled for this object")
 		}
+
 		if e.CanView {
-			processHTMLTemplate("view", configFile, "html", e)
-			e.MessageList = append(e.MessageList, messages{Message: "* html -> view"})
+			generateHTMLArtifact("view", configFile, "html", e)
+		} else {
+			logs.Warning("Viewing is not enabled for this object")
 		}
+
 		if e.CanEdit {
-			processHTMLTemplate("edit", configFile, "html", e)
-			e.MessageList = append(e.MessageList, messages{Message: "* html -> edit"})
+			generateHTMLArtifact("edit", configFile, "html", e)
+		} else {
+			logs.Warning("Editing is not enabled for this object")
 		}
+
 		if e.CanNew {
-			processHTMLTemplate("new", configFile, "html", e)
-			e.MessageList = append(e.MessageList, messages{Message: "* html -> new"})
+			generateHTMLArtifact("new", configFile, "html", e)
+		} else {
+			logs.Warning("Creating is not enabled for this object")
+		}
+
+		if !e.CanExport {
+			logs.Warning("Exporting is not enabled for this object")
 		}
 
 	} else {
 		logs.Information("Skipping", "html")
 	}
-
-	processTemplate("catalog"+nfo_template, configFile, "design/catalog", e)
-	e.MessageList = append(e.MessageList, messages{Message: "* catalog"})
 }
 
-func wrap(in string) string {
-	return "{{." + in + "}}"
+func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) {
+	logs.Information("Processing Template", w+html_template)
+
+	userAction := strings.ToUpper(w[:1]) + w[1:]
+
+	//spew.Dump(replacements)
+	fp := e.Path + "/templates/" + w + html_template
+
+	t, err := template.ParseFiles(fp)
+	if err != nil {
+		logs.Error("Load Template", err)
+	}
+
+	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + userAction + ".html")
+	if err != nil {
+		logs.Error("Create file: ", err)
+		return
+	}
+	//spew.Dump(e)
+	err2 := t.Execute(f, e)
+	if err2 != nil {
+		logs.Error("Process Template", err2)
+	}
+	f.Close()
+	e.MessageList = append(e.MessageList, messages{Message: "* html -> " + userAction})
+	logs.Success(f.Name() + " Generated")
+}
+
+func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
+	// Load a csv file.
+	//logs.Information("Read CSV", filePath)
+	f, _ := os.Open(filePath)
+	//logs.Information("File Open", filePath)
+	// Create a new reader.
+	r := csv.NewReader(f)
+	//logs.Information("New Reader", filePath)
+	displayTableHeader()
+	for {
+		record, err := r.Read()
+		//fmt.Printf("record: %v\n", record)
+		// Stop at EOF.
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			logs.Fatal("Read CSV", err)
+			panic(err)
+		}
+
+		colMand := false
+		if record[3] == "true" {
+			colMand = true
+		}
+		e.FieldsList = addField(e, record[0], record[1], record[2], colMand)
+
+	}
+	logs.Break()
+	return e
+}
+
+func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
+	// Open Database Connection
+	db, err := core.GlobalsDatabaseConnect(p)
+	if err != nil {
+		logs.Error("Database Connection", err)
+	}
+	//fmt.Printf("db: %v\n", db)
+
+	tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
+
+	logs.Information("SQL", tsql)
+	results, noFields, err := das.Query(db, tsql)
+	//fmt.Printf("results: %v\n", results)
+	//fmt.Printf("noFields: %v\n", noFields)
+	//spew.Dump(results)
+	if noFields == 0 {
+		logs.Error("No Fields Found", err)
+	}
+	displayTableHeader()
+	for _, row := range results {
+		colName := row["COLUMN_NAME"].(string)
+		colType := row["TYPE_NAME"].(string)
+		colMand := false
+		if row["IS_NULLABLE"].(string) == "NO" {
+			colMand = true
+		}
+
+		//logs.Message("found", fmt.Sprintf("name %v type %v nullable %v mandatory %t\n", colName, colType, row["IS_NULLABLE"], colMand))
+		if colName == "ID" {
+			colMand = true
+		}
+		colDefault := ""
+		switch colType {
+		case "varchar", "nvarchar", "char", "nchar", "text", "ntext":
+			colDefault = ""
+			colType = "String"
+		case "int", "bigint", "smallint", "tinyint", "int64":
+			colDefault = "0"
+			colType = "Int"
+		case "decimal", "numeric":
+			colDefault = "0.00"
+			colType = "Float"
+		case "datetime", "smalldatetime", "date", "time", "datetime2", "datetimeoffset":
+			colDefault = ""
+			colType = "Time"
+		case "float", "real", "money", "smallmoney":
+			colDefault = "0.00"
+			colType = "Float"
+		case "int identity":
+			colDefault = "0"
+			colType = "Int"
+		case "bigint identity":
+			colDefault = "0"
+			colType = "Int"
+		case "bit":
+			colDefault = "True"
+			colType = "Bool"
+		default:
+			colType = "String"
+			colDefault = ""
+		}
+		e.FieldsList = addField(e, colName, colType, colDefault, colMand)
+	}
+	return e
+}
+
+func displayApplicationHeader() {
+
+	logs.Break()
+
+	logs.Header("Application Information")
+	logs.Break()
+
+	logs.Header("Application")
+	logs.Information("Name", core.Properties["appname"])
+	logs.Information("Host Name", getHostName())
+
+	logs.Information("Server Release", genReleaseName())
+	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
+
+	logs.Information("Licence", core.Properties["licname"])
+	logs.Information("Lic URL", core.Properties["liclink"])
+	logs.Header("Runtime")
+	logs.Information("GO Version", runtime.Version())
+	logs.Information("Operating System", runtime.GOOS)
+
+	logs.Information("Working Directory", getPWD())
+	logs.Information("User", getUsername())
+	logs.Header("Connectivity")
+	logs.Information("Default Input", data_in())
+	logs.Information("Default Output", data_out())
+}
+
+func displayTableHeader() {
+	logs.Break()
+	logs.Header("Table Information")
+	logs.Break()
+	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand")
+	logs.Information(info, "")
+	logs.Break()
 }
 
 func addField(en enrichments, fn string, tp string, df string, mand bool) []fields {
@@ -266,266 +500,6 @@ func addField(en enrichments, fn string, tp string, df string, mand bool) []fiel
 	logs.Information(info, "")
 
 	return en.FieldsList
-}
-
-//Get list of files from a folder
-func getFiles(dir string) []string {
-	logs.Information("Searching...", "")
-	dir = getPWD() + dir + "/"
-	//logs.Information("In Queue Path", dir)
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var paths []string
-	for _, file := range files {
-		if !file.IsDir() {
-			paths = append(paths, filepath.Join(dir, file.Name()))
-			logs.Information("Found File", file.Name())
-		}
-	}
-	return paths
-}
-
-func getUsername() string {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return usr.Username
-}
-
-func genUUID() string {
-	id := uuid.New()
-	//fmt.Printf("github.com/google/uuid:         %s\n", id.String())
-	return id.String()
-}
-
-func processTemplate(w string, p string, destFolder string, e enrichments) {
-	logs.Information("Processing Template", w)
-
-	extn := ".go_tmp"
-	if core.Properties["deliverto"] != "" {
-		extn = ".go"
-	}
-
-	if destFolder == "design/catalog" {
-		extn = ".nfo"
-	}
-
-	if destFolder == "design/menu" {
-		extn = ".json"
-	}
-
-	//spew.Dump(replacements)
-	fp := e.Path + "/templates/" + w
-
-	t, err := template.ParseFiles(fp)
-	if err != nil {
-		logs.Error("Load Template", err)
-	}
-
-	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + extn)
-	if err != nil {
-		logs.Error("Create file: ", err)
-		return
-	}
-
-	err2 := t.Execute(f, e)
-	if err2 != nil {
-		logs.Error("Process Template", err2)
-	}
-	f.Close()
-	logs.Success(f.Name() + " Generated")
-}
-
-func processHTMLTemplate(w string, p string, destFolder string, e enrichments) {
-	logs.Information("Processing Template", w+html_template)
-
-	fileNamePrefix := strings.ToUpper(w[:1]) + w[1:]
-
-	//spew.Dump(replacements)
-	fp := e.Path + "/templates/" + w + html_template
-
-	t, err := template.ParseFiles(fp)
-	if err != nil {
-		logs.Error("Load Template", err)
-	}
-
-	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + fileNamePrefix + ".html")
-	if err != nil {
-		logs.Error("Create file: ", err)
-		return
-	}
-	//spew.Dump(e)
-	err2 := t.Execute(f, e)
-	if err2 != nil {
-		logs.Error("Process Template", err2)
-	}
-	f.Close()
-	logs.Success(f.Name() + " Generated")
-}
-
-func tableHeader() {
-	logs.Break()
-	logs.Header("Table Information")
-	logs.Break()
-	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand")
-	logs.Information(info, "")
-	logs.Break()
-}
-
-func ReadCsvFile(filePath string, e enrichments) enrichments {
-	// Load a csv file.
-	//logs.Information("Read CSV", filePath)
-	f, _ := os.Open(filePath)
-	//logs.Information("File Open", filePath)
-	// Create a new reader.
-	r := csv.NewReader(f)
-	//logs.Information("New Reader", filePath)
-	tableHeader()
-	for {
-		record, err := r.Read()
-		//fmt.Printf("record: %v\n", record)
-		// Stop at EOF.
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			logs.Fatal("Read CSV", err)
-			panic(err)
-		}
-
-		colMand := false
-		if record[3] == "true" {
-			colMand = true
-		}
-		e.FieldsList = addField(e, record[0], record[1], record[2], colMand)
-
-	}
-	logs.Break()
-	return e
-}
-
-func getFieldsFromDB(e enrichments, p map[string]string) enrichments {
-	// Open Database Connection
-	db, err := core.GlobalsDatabaseConnect(p)
-	if err != nil {
-		logs.Error("Database Connection", err)
-	}
-	//fmt.Printf("db: %v\n", db)
-
-	tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
-
-	logs.Information("SQL", tsql)
-	results, noFields, err := das.Query(db, tsql)
-	//fmt.Printf("results: %v\n", results)
-	//fmt.Printf("noFields: %v\n", noFields)
-	//spew.Dump(results)
-	if noFields == 0 {
-		logs.Error("No Fields Found", err)
-	}
-	tableHeader()
-	for _, row := range results {
-		colName := row["COLUMN_NAME"].(string)
-		colType := row["TYPE_NAME"].(string)
-		colMand := false
-		if row["IS_NULLABLE"].(string) == "NO" {
-			colMand = true
-		}
-		//fmt.Printf("colName: %v %v %v %t\n", colName, colType, row["IS_NULLABLE"], colMand)
-		if colName == "ID" {
-			colMand = true
-		}
-		colDefault := ""
-		switch colType {
-		case "varchar", "nvarchar", "char", "nchar", "text", "ntext":
-			colDefault = ""
-			colType = "String"
-		case "int", "bigint", "smallint", "tinyint":
-			colDefault = "0"
-			colType = "Int"
-		case "decimal", "numeric":
-			colDefault = "0.00"
-			colType = "Float"
-		case "datetime", "smalldatetime", "date", "time", "datetime2", "datetimeoffset":
-			colDefault = ""
-			colType = "Time"
-		case "float", "real", "money", "smallmoney":
-			colDefault = "0.00"
-			colType = "Float"
-		case "int identity":
-			colDefault = "0"
-			colType = "Int"
-		case "bit":
-			colDefault = "True"
-			colType = "Bool"
-		default:
-			colType = "String"
-			colDefault = ""
-		}
-		e.FieldsList = addField(e, colName, colType, colDefault, colMand)
-	}
-	return e
-}
-
-func genReleaseName() string {
-	return fmt.Sprintf("%s [r%s-%s]",
-		core.Properties["releaseid"],
-		core.Properties["releaselevel"],
-		core.Properties["releasenumber"])
-}
-
-func getHostName() string {
-	host, _ := os.Hostname()
-	return host
-}
-
-func getPWD() string {
-	thisPwd, _ := os.Getwd()
-	return thisPwd
-}
-
-func data_out() string {
-	do := ""
-	if core.Properties["deliverto"] != "" {
-		do = core.Properties["deliverto"]
-	} else {
-		do = getPWD() + core.Properties["data_out"]
-	}
-	return do
-}
-
-func data_in() string {
-	return strings.TrimSpace(core.Properties["data_in"])
-}
-
-func headerBumpf() {
-
-	logs.Break()
-
-	logs.Header("Application Information")
-	logs.Break()
-
-	logs.Header("Application")
-	logs.Information("Name", core.Properties["appname"])
-	logs.Information("Host Name", getHostName())
-
-	logs.Information("Server Release", genReleaseName())
-	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
-
-	logs.Information("Licence", core.Properties["licname"])
-	logs.Information("Lic URL", core.Properties["liclink"])
-	logs.Header("Runtime")
-	logs.Information("GO Version", runtime.Version())
-	logs.Information("Operating System", runtime.GOOS)
-
-	logs.Information("Working Directory", getPWD())
-	logs.Information("User", getUsername())
-	logs.Header("Connectivity")
-	logs.Information("Default Input", data_in())
-	logs.Information("Default Output", data_out())
 }
 
 func setupEnrichment(props map[string]string) enrichments {
@@ -632,4 +606,53 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	//spew.Dump(e)
 
 	return e
+}
+
+func wrap(in string) string {
+	return "{{." + in + "}}"
+}
+
+func getUsername() string {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return usr.Username
+}
+
+func genUUID() string {
+	id := uuid.New()
+	//fmt.Printf("github.com/google/uuid:         %s\n", id.String())
+	return id.String()
+}
+
+func genReleaseName() string {
+	return fmt.Sprintf("%s [r%s-%s]",
+		core.Properties["releaseid"],
+		core.Properties["releaselevel"],
+		core.Properties["releasenumber"])
+}
+
+func getHostName() string {
+	host, _ := os.Hostname()
+	return host
+}
+
+func getPWD() string {
+	thisPwd, _ := os.Getwd()
+	return thisPwd
+}
+
+func data_out() string {
+	do := ""
+	if core.Properties["deliverto"] != "" {
+		do = core.Properties["deliverto"]
+	} else {
+		do = getPWD() + core.Properties["data_out"]
+	}
+	return do
+}
+
+func data_in() string {
+	return strings.TrimSpace(core.Properties["data_in"])
 }

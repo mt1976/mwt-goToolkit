@@ -1,20 +1,20 @@
 // ----------------------------------------------------------------
-// Automatically generated  "/application/template.go"
+// Automatically generated  "/application/sector.go"
 // ----------------------------------------------------------------
 // Package              : main
-// Object 			    : Template
-// Endpoint Root 	    : Template
-// Search QueryString   : TemplateID
+// Object 			    : Sector
+// Endpoint Root 	    : Sector
+// Search QueryString   : ID
 // From   			    : 
 // ----------------------------------------------------------------
 // Database Information
 // ----------------------------------------------------------------
-// SQL Table Name       : template
-// SQL Table Search Col : ID
+// SQL Table Name       : sienaSector
+// SQL Table Search Col : Code
 // ----------------------------------------------------------------
 // Template Generator   : RussetAlbatross [r0-21.11.01]
 // ----------------------------------------------------------------
-// Date & Time		    : 15/11/2021 at 21:56:45
+// Date & Time		    : 18/11/2021 at 12:11:14
 // Who & Where		    : matttownsend on silicon.local
 // For Project          : github.com/mt1976/mwt-go-dev/
 // ----------------------------------------------------------------
@@ -23,29 +23,12 @@
 // *---------------------------+------------+------------+---------------------------*
 // | Field Name                | Type       | Default    |SQL Field Name             |
 // *---------------------------+------------+------------+---------------------------*
-// | SYSId                     | Int        |          0 | _id                       |  true |
-// | FIELD1                    | String     |            | FIELD1                    | false |
-// | FIELD2                    | String     |            | FIELD2                    | false |
-// | SYSCreated                | String     |            | _created                  | false |
-// | SYSCreatedBy              | String     |            | _createdBy                | false |
-// | SYSCreatedHost            | String     |            | _createdHost              | false |
-// | SYSUpdated                | String     |            | _updated                  | false |
-// | SYSUpdatedHost            | String     |            | _updatedHost              | false |
-// | SYSUpdatedBy              | String     |            | _updatedBy                | false |
-// | ID                        | String     |            | ID                        |  true |
+// | Code                      | String     |            | Code                      |  true |
+// | Name                      | String     |            | Name                      | false |
 // *---------------------------+------------+------------+---------------------------*
 // ----------------------------------------------------------------
 // Artifacts Generated
 // ----------------------------------------------------------------
-// * dao
-// * application
-// * datamodel
-// * job
-// * menu
-// * html -> list
-// * html -> view
-// * html -> edit
-// * html -> new
 // ----------------------------------------------------------------
 // End of File
 // ----------------------------------------------------------------

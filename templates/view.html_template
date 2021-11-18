@@ -64,6 +64,7 @@
               {{if .CanEdit}}
                 <button type="submit" value="" class="btn btn-warning"><i class="fas fa-pen"  method="POST" formaction="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Edit</button>
               {{end}}  
+                <button id="print" type="button" class="btn btn-outline-info" onclick="window.print()"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
                 <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
               </div>
             </div>

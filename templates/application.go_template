@@ -176,7 +176,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 
 	//item.AppInternalID = r.FormValue("AppInternalID")
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue("{{.FieldName}}")
+	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
 	{{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 

@@ -15,5 +15,11 @@
 # vendor/
 *.go_tmp
 *.gotmp 
+/data/out/adaptor/*
+/data/out/application/*
+/data/out/dao/*
+/data/out/datamodel/*
 /data/out/html/*
-/data/in/*
+/data/out/jobs/*
+/data/out/design/menu/*
+/data/in/temp/*
