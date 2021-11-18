@@ -197,7 +197,7 @@ func processTableDefinition(configFile string) {
 	generateCodeArtifact("adaptor", props, configFile, e)
 	generateCodeArtifact("dao", props, configFile, e)
 	generateCodeArtifact("datamodel", props, configFile, e)
-	generateCodeArtifact("job", props, configFile, e)
+	generateCodeArtifact("jobs", props, configFile, e)
 	generateCodeArtifact("menu", props, configFile, e)
 	generateHTMLArtifacts("html", props, configFile, e)
 	generateCodeArtifact("catalog", props, configFile, e)
