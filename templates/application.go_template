@@ -44,6 +44,11 @@ type {{.ObjectNameLower}}_Page struct {
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{.FieldName}} string
 	{{end}}
+
+
+	{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}{{.FieldName}}_List	[]dm.{{.LookupObject}}{{end}}{{end}}
+	{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 }
 
@@ -112,13 +117,16 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
 		AppInternalID:		     rD.AppInternalID,
+	}
+
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-		{{range .FieldsList}}{{.FieldName}}: rD.{{.FieldName}},
-		{{end}}
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup,_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
+pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
+{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
-	}
 
 	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)
@@ -146,14 +154,18 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
 		AppInternalID:          rD.AppInternalID,
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-		{{range .FieldsList}}	{{.FieldName}}: rD.{{.FieldName}},
-		{{end}}
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//Post Import Actions - START
-
-		// Post Import Actions - END
 	}
+
+		// 
+		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup,_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
+pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
+_,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
+{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+		//
+
 
 	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateEdit, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)
@@ -203,16 +215,17 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		AppInternalID:   "NEW",
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-		{{range .FieldsList}}	{{.FieldName}}: "{{.Default}}",
-		{{end}}
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//
-		// Post Import Actions - START
-
-		// Post Import Actions - END
+		AppInternalID:   "NEW",	
 	}
+
+		// 
+		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
+{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = ""
+{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}pageDetail.{{.FieldName}} = ""
+_,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
+{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+		//
 
 	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateNew, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)

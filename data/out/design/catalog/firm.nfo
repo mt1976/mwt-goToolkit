@@ -1,0 +1,41 @@
+// ----------------------------------------------------------------
+// Automatically generated  "/application/firm.go"
+// ----------------------------------------------------------------
+// Package              : main
+// Object 			    : Firm
+// Endpoint Root 	    : Firm
+// Search QueryString   : FirmName
+// From   			    : 
+// ----------------------------------------------------------------
+// Database Information
+// ----------------------------------------------------------------
+// SQL Table Name       : sienaFirm
+// SQL Table Search Col : FirmName
+// ----------------------------------------------------------------
+// Template Generator   : RussetAlbatross [r0-21.11.01]
+// ----------------------------------------------------------------
+// Date & Time		    : 19/11/2021 at 14:09:41
+// Who & Where		    : matttownsend on silicon.local
+// For Project          : github.com/mt1976/mwt-go-dev/
+// ----------------------------------------------------------------
+// Fields Generated
+// ----------------------------------------------------------------
+// *---------------------------+------------+------------+---------------------------*
+// | Field Name                | Type       | Default    |SQL Field Name             |
+// *---------------------------+------------+------------+---------------------------*
+// | FirmName                  | String     |            | FirmName                  |  true |  true | false |            |           %!(EXTRA string=)
+// | FullName                  | String     |            | FullName                  | false |  true | false |            |           %!(EXTRA string=)
+// | Country                   | String     |            | Country                   | false |  true | false |            |           %!(EXTRA string=)
+// | Sector                    | String     |            | Sector                    | false |  true | false |            |           %!(EXTRA string=)
+// | SectorName                | String     |            | SectorName                | false |  true | false |            |           %!(EXTRA string=)
+// | CountryName               | String     |            | CountryName               | false |  true | false |            |           %!(EXTRA string=)
+// | Sector_Enri               | String     |            | Sector_Enri               | false | false |  true | Sector     | Sector    %!(EXTRA string=Name)
+// | HairStyle_Enri            | String     |       SB&S | HairStyle_Enri            |  true | false | false |            |           %!(EXTRA string=)
+// | Country_Enri              | String     |            | Country_Enri              | false | false |  true | Country    | Country   %!(EXTRA string=Name)
+// *---------------------------+------------+------------+---------------------------*
+// ----------------------------------------------------------------
+// Artifacts Generated
+// ----------------------------------------------------------------
+// ----------------------------------------------------------------
+// End of File
+// ----------------------------------------------------------------

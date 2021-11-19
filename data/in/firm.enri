@@ -1,0 +1,3 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,Sector,Sector,Sector,Name,true,false,,Code
+Lookup,Country,Country,Country,Name,false,,,Code

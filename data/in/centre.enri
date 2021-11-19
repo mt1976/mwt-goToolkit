@@ -1,0 +1,2 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,Country,Country,Country,Name,false,,,Code

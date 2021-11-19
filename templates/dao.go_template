@@ -43,6 +43,18 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	return 1, {{.ObjectNameLower}}Item, nil
 }
 
+{{if .HasReverseLookup}}// {{.ObjectName}}_GetByReverseLookup(id string) returns a single {{.ObjectName}} record
+func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, error) {
+
+	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql = tsql + " WHERE {{.ReverseLookup}} = '" + id + "'"
+
+	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
+	return 1, {{.ObjectNameLower}}Item, nil
+}{{end}}
+
+
+
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_Delete(id string) {
 
@@ -113,10 +125,8 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
     recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLSearchID}},"")
-{{range .FieldsList}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}")
+{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{end}}
 {{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//Post Import Actions
-
 		//Add to the list
 		recList = append(recList, recItem)
 	}

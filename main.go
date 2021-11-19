@@ -69,6 +69,8 @@ type enrichments struct {
 	PropertiesName     string
 	UsesAdaptor        bool
 	CanExport          bool
+	HasReverseLookup   bool
+	ReverseLookup      string
 }
 
 type fields struct {
@@ -83,6 +85,13 @@ type fields struct {
 	ValueID       string
 	IsMandatory   bool
 	IsUserField   bool
+	IsBaseField   bool
+	IsLookup      bool
+	LookupObject  string
+	LookupField   string
+	LookupValue   string
+	RangeHTML     string
+	WrapFieldName string
 }
 
 type messages struct {
@@ -179,6 +188,7 @@ func processTableDefinition(configFile string) {
 	e := setupEnrichment(props)
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
+	enriPath := getPWD() + data_in() + "/" + e.ObjectName + ".enri"
 
 	if props["use"] == "db" {
 		// Do nothing for now
@@ -187,6 +197,12 @@ func processTableDefinition(configFile string) {
 	} else {
 		logs.Information("Getting List of fields from CSV", csvPath)
 		e = getFieldDefinitions_CSV(csvPath, e)
+	}
+
+	if strings.ToUpper(props["hasenrichments"]) == "Y" {
+		logs.Break()
+		logs.Information("Getting Enrichment Fields from enri", csvPath)
+		e = getEnrichmentFields_CSV(enriPath, e)
 	}
 
 	logs.Break()
@@ -335,7 +351,7 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 	// Create a new reader.
 	r := csv.NewReader(f)
 	//logs.Information("New Reader", filePath)
-	displayTableHeader()
+	displayTableHeader("Table")
 	for {
 		record, err := r.Read()
 		//fmt.Printf("record: %v\n", record)
@@ -378,7 +394,7 @@ func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
 	if noFields == 0 {
 		logs.Error("No Fields Found", err)
 	}
-	displayTableHeader()
+	displayTableHeader("Table")
 	for _, row := range results {
 		colName := row["COLUMN_NAME"].(string)
 		colType := row["TYPE_NAME"].(string)
@@ -453,51 +469,18 @@ func displayApplicationHeader() {
 	logs.Information("Default Output", data_out())
 }
 
-func displayTableHeader() {
+func displayTableHeader(in string) {
 	logs.Break()
-	logs.Header("Table Information")
+	logs.Header(in + " Information")
 	logs.Break()
-	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand")
+	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s | %5s | %5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand", "Base", "Look⬆", "LbObject", "LK field", "lkVal")
 	logs.Information(info, "")
 	logs.Break()
 }
 
 func addField(en enrichments, fn string, tp string, df string, mand bool) []fields {
 
-	origfn := fn
-
-	//if first charachter of fieldName is _ then replace _ with SYS
-
-	noinput := ""
-	hidden := ""
-	userField := true
-
-	if string(fn[0]) == "_" {
-		//Convert fn to Title Case
-		fn = strings.Replace(fn, "_", "", -1)
-		fn = strings.ToUpper(fn[:1]) + fn[1:]
-		//fmt.Println(fn)
-		fn = "SYS" + fn
-		noinput = "hidden"
-		hidden = "hidden"
-		userField = false
-	}
-	fn = strings.ToUpper(fn[:1]) + fn[1:]
-
-	info := fmt.Sprintf("| %-25s | %-10s | %10s | %-25s | %5t |", fn, tp, df, origfn, mand)
-	tplField := "{{." + fn + "}}"
-	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
-		Type:          tp,
-		Default:       df,
-		FieldSQL:      origfn,
-		Formatted:     info,
-		TemplateField: tplField,
-		Disabled:      noinput,
-		Hidden:        hidden,
-		ValueID:       wrap(fn),
-		IsMandatory:   mand,
-		IsUserField:   userField})
-	logs.Information(info, "")
+	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "")
 
 	return en.FieldsList
 }
@@ -547,6 +530,13 @@ func setupEnrichment(props map[string]string) enrichments {
 	e = setupTemplateEnrichment(e, props)
 
 	e = setupPermissions(e, props)
+
+	e.HasReverseLookup = false
+	e.ReverseLookup = ""
+	if props["reverselookup"] != "" {
+		e.HasReverseLookup = true
+		e.ReverseLookup = props["reverselookup"]
+	}
 
 	return e
 }
@@ -655,4 +645,103 @@ func data_out() string {
 
 func data_in() string {
 	return strings.TrimSpace(core.Properties["data_in"])
+}
+
+func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
+
+	//logs.Information("Read CSV", filePath)
+	f, _ := os.Open(filePath)
+	//logs.Information("File Open", filePath)
+	// Create a new reader.
+	r := csv.NewReader(f)
+	//logs.Information("New Reader", filePath)
+	displayTableHeader("Enrichment")
+	for {
+		record, err := r.Read()
+		//fmt.Printf("record: %v\n", record)
+		// Stop at EOF.
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			logs.Fatal("Read CSV", err)
+			panic(err)
+		}
+		if record[0] == "Type" && record[1] == "Field" {
+			logs.Information("Found", "Enrichments")
+		} else {
+			colMand := false
+			if record[6] == "true" {
+				colMand = true
+			}
+
+			isLookup := false
+			lkObject := ""
+			lkKeyField := ""
+			lkValueField := ""
+			lkRange := ""
+			lkCodeField := ""
+			if record[0] == "Lookup" {
+				isLookup = true
+				lkObject = record[2]
+				lkKeyField = record[3]
+				lkValueField = record[4]
+				lkCodeField = record[8]
+				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Enri_List", wrap(lkCodeField), wrap(lkValueField))
+			}
+
+			//fmt.Printf("record: %v\n", record)
+			//fmt.Printf("colMand: %v\n", colMand)
+			en.FieldsList = addComplexField(en, record[1]+"_Enri", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
+		}
+	}
+	logs.Break()
+	return en
+}
+
+func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string) []fields {
+
+	origfn := fn
+
+	//if first charachter of fieldName is _ then replace _ with SYS
+
+	noinput := ""
+	hidden := ""
+	userField := true
+
+	if string(fn[0]) == "_" {
+		//Convert fn to Title Case
+		fn = strings.Replace(fn, "_", "", -1)
+		fn = strings.ToUpper(fn[:1]) + fn[1:]
+		//fmt.Println(fn)
+		fn = "SYS" + fn
+		noinput = "hidden"
+		hidden = "hidden"
+		userField = false
+	}
+	fn = strings.ToUpper(fn[:1]) + fn[1:]
+
+	info := fmt.Sprintf("| %-25s | %-10s | %10s | %-25s | %5t | %5t | %5t | %-10s | %-10s | %-10s | %-10s", fn, tp, df, origfn, mand, baseField, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
+	tplField := "{{." + fn + "}}"
+	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
+		Type:          tp,
+		Default:       df,
+		FieldSQL:      origfn,
+		Formatted:     info,
+		TemplateField: tplField,
+		Disabled:      noinput,
+		Hidden:        hidden,
+		ValueID:       wrap(fn),
+		IsMandatory:   mand,
+		IsUserField:   userField,
+		IsBaseField:   baseField,
+		IsLookup:      isLookup,
+		LookupObject:  lkObject,
+		LookupField:   lkKeyField,
+		LookupValue:   lkValueField,
+		RangeHTML:     lkRange})
+	logs.Information(info, "")
+
+	return en.FieldsList
 }

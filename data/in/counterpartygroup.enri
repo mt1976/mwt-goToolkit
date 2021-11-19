@@ -1,0 +1,3 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,Country,Country,CountryCode,Name,true,true,,Name
+Lookup,Parent,CounterpartyGroup,SuperGroup,Name,true,true,,Name
