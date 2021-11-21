@@ -1,17 +1,15 @@
 package jobs
 // ----------------------------------------------------------------
-// Automatically generated  "/application/{{.ObjectNameLower}}.go"
+// Automatically generated  "/jobs/{{.ObjectNameLower}}.go"
 // ----------------------------------------------------------------
-// Package            : jobs
-// Object 			  : {{.ObjectName}}
-// Endpoint Root 	  : {{.EndpointRoot}}
-// Search QueryString : {{.QueryString}}
-// From   			  : {{.SourceName}}
+// Package              : jobs
+// Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
+// Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
+// For Project          : {{.ProjectRepo}}
 // ----------------------------------------------------------------
-// Template Generator : {{.Version}}
-// ----------------------------------------------------------------
-// Date & Time		  : {{.Date}} at {{.Time}}
-// Who & Where		  : {{.Who}} on {{.Host}}
+// Template Generator   : {{.Version}}
+// Date & Time		    : {{.Date}} at {{.Time}}
+// Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 
 import (

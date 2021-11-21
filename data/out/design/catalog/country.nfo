@@ -1,18 +1,18 @@
 ----------------------------------------------------------------
-Automatically generated  "/design/catalog/sector.nfo"
+Automatically generated  "/design/catalog/country.nfo"
 ----------------------------------------------------------------
 Package              : n/a
-Object 			     : Sector (sector)
-Endpoint 	         : Sector (Sector)
+Object 			     : Country (country)
+Endpoint 	         : Country (Code)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
 Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:21
+Date & Time		     : 20/11/2021 at 16:24:20
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
-SQL Table Name       : sienaSector
+SQL Table Name       : sienaCountry
 SQL Table Search Col : Code
 ----------------------------------------------------------------
 Fields Generated
@@ -22,20 +22,23 @@ Fields Generated
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
 | Code                                | String     |            | true  | true   | false |                 |            |            | 
 | Name                                | String     |            | false | true   | false |                 |            |            | 
+| ShortCode                           | String     |            | false | true   | false |                 |            |            | 
+| EU_EEA                              | Bool       | True       | false | true   | false |                 |            |            | 
+| HolidaysWeekend                     | String     |            | false | true   | false |                 |            |            | 
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/sector_core.go_tmp)
-* adaptor (/adaptor/sector.go_tmp)
-* dao (/dao/sector.go_tmp)
-* datamodel (/datamodel/sector.go_tmp)
-* menu (/design/menu/sector.json)
-* html -> List (/html/Sector_List.html)
-* html -> View (/html/Sector_View.html)
-* html -> Edit (/html/Sector_Edit.html)
-* html -> New (/html/Sector_New.html)
-* catalog (/design/catalog/sector.nfo)
+* application (/application/country_core.go_tmp)
+* adaptor (/adaptor/country.go_tmp)
+* dao (/dao/country.go_tmp)
+* datamodel (/datamodel/country.go_tmp)
+* menu (/design/menu/country.json)
+* html -> List (/html/Country_List.html)
+* html -> View (/html/Country_View.html)
+* html -> Edit (/html/Country_Edit.html)
+* html -> New (/html/Country_New.html)
+* catalog (/design/catalog/country.nfo)
 ----------------------------------------------------------------
 End of File
 ----------------------------------------------------------------

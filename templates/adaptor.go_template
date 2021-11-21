@@ -1,4 +1,16 @@
 package adaptor
+// ----------------------------------------------------------------
+// Automatically generated  "/adaptor/{{.ObjectNameLower}}.go"
+// ----------------------------------------------------------------
+// Package              : adaptor
+// Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
+// Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
+// For Project          : {{.ProjectRepo}}
+// ----------------------------------------------------------------
+// Template Generator   : {{.Version}}
+// Date & Time		    : {{.Date}} at {{.Time}}
+// Who & Where		    : {{.Who}} on {{.Host}}
+// ----------------------------------------------------------------
 
 import (
 	//"encoding/xml"

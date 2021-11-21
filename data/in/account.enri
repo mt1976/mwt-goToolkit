@@ -1,0 +1,6 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,CCY,Currency,CCY,Name,true,false,,CCYpoo
+Lookup,Book,Book,Book,FullName,false,,,Bookpoo
+Lookup,Portfolio,Portfolio,Portfolio,Description1,false,,,Portfoliopoo
+Lookup,Centre,Centre,Centre,Name,false,,,Namecenpo
+Lookup,Firm,Firm,Firm,FullName,false,,,Namefirpoo

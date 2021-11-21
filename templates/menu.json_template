@@ -1,17 +1,3 @@
-// ----------------------------------------------------------------
-// Automatically generated  "/application/{{.ObjectNameLower}}.go"
-// ----------------------------------------------------------------
-// Package            : dao
-// Object 			  : {{.ObjectName}}
-// Endpoint Root 	  : {{.EndpointRoot}}
-// Search QueryString : {{.QueryString}}
-// From   			  : {{.SourceName}}
-// ----------------------------------------------------------------
-// Template Generator : {{.Version}}
-// ----------------------------------------------------------------
-// Date & Time		  : {{.Date}} at {{.Time}}
-// Who & Where		  : {{.Who}} on {{.Host}}
-// ----------------------------------------------------------------
 {{if .CanList}}
     {
       "ID": "{{.UUID}}",
@@ -23,5 +9,4 @@
     }
     ,
     {{else}}
-//No Menu Item is Required as you cannot list {{.ObjectName}}
 {{end}}

@@ -27,7 +27,7 @@
   <!-- END OF INSERTS -->
   <!-- ADDITION STYLES IN SPECIFIC INSTANCES -->
 
-  <title>{{.Title}}&nbsp;[{{.PageTitle}}]</title>
+  <title>{{.PageTitle}}</title>
 
 </head>
 
@@ -114,6 +114,11 @@
                       {{if .CanEdit}}
                         <button type="submit" value="" class="btn btn-warning btn-sm" formaction="/{{.ObjectName}}Edit?{{.QueryString}}={{.QueryField}}" method="POST">
                           <i class="fas fa-pen" style="font-size: 22px"></i>
+                        </button>
+                        {{end}}
+                        {{if .CanDelete}}
+                        <button type="submit" value="" class="btn btn-danger btn-sm" formaction="/{{.ObjectName}}Delete?{{.QueryString}}={{.QueryField}}" method="POST">
+                          <i class="fas fa-trash-alt" style="font-size: 22px"></i>
                         </button>
                         {{end}}
                       </div>

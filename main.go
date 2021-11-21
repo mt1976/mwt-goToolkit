@@ -17,9 +17,9 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
+	"github.com/mt1976/templateBuilder/das"
+	"github.com/mt1976/templateBuilder/logs"
 	core "github.com/mt1976/templatebuiler/core"
-	"github.com/mt1976/templatebuiler/das"
-	logs "github.com/mt1976/templatebuiler/logs"
 )
 
 type enrichments struct {
@@ -30,6 +30,7 @@ type enrichments struct {
 	EndpointRoot       string
 	QueryString        string
 	QueryField         string
+	QueryFieldID       string
 	SourceName         string
 	Version            string
 	Date               string
@@ -71,6 +72,7 @@ type enrichments struct {
 	CanExport          bool
 	HasReverseLookup   bool
 	ReverseLookup      string
+	IsSpecial          bool
 }
 
 type fields struct {
@@ -99,10 +101,12 @@ type messages struct {
 }
 
 const (
-	go_template   = ".go_template"
-	html_template = ".html_template"
-	json_template = ".json_template"
-	nfo_template  = ".nfo_template"
+	go_template        = ".go_template"
+	html_template      = ".html_template"
+	json_template      = ".json_template"
+	nfo_template       = ".nfo_template"
+	tableLayout        = "| %-35s | %-10s | %-10s | %-5s | %-5s  | %-5s | %-15s | %-10s | %-10s | "
+	tableContentLayout = "| %-35s | %-10s | %-10s | %-5t | %-5t  | %-5t | %-15s | %-10s | %-10s | "
 )
 
 func main() {
@@ -181,7 +185,7 @@ func seekTableDefinitions(dir string) []string {
 }
 
 func processTableDefinition(configFile string) {
-	logs.Information("Processing", configFile)
+	logs.Processing(configFile)
 	//	logs.Information("Populate", "Replacement Values")
 
 	props := core.Config_Get(configFile)
@@ -200,36 +204,43 @@ func processTableDefinition(configFile string) {
 	}
 
 	if strings.ToUpper(props["hasenrichments"]) == "Y" {
-		logs.Break()
-		logs.Information("Getting Enrichment Fields from enri", csvPath)
+		//logs.Break()
+		//	logs.Information("Getting Enrichment Fields from enri", csvPath)
 		e = getEnrichmentFields_CSV(enriPath, e)
 	}
 
-	logs.Break()
 	logs.Header("Generating Files")
 	logs.Break()
 
-	generateCodeArtifact("application", props, configFile, e)
-	generateCodeArtifact("adaptor", props, configFile, e)
-	generateCodeArtifact("dao", props, configFile, e)
-	generateCodeArtifact("datamodel", props, configFile, e)
-	generateCodeArtifact("jobs", props, configFile, e)
-	generateCodeArtifact("menu", props, configFile, e)
-	generateHTMLArtifacts("html", props, configFile, e)
-	generateCodeArtifact("catalog", props, configFile, e)
+	e = generateCodeArtifact("application", props, configFile, e)
+
+	e = generateCodeArtifact("adaptor", props, configFile, e)
+
+	e = generateCodeArtifact("dao", props, configFile, e)
+
+	e = generateCodeArtifact("datamodel", props, configFile, e)
+
+	e = generateCodeArtifact("jobs", props, configFile, e)
+
+	e = generateCodeArtifact("menu", props, configFile, e)
+
+	e = generateHTMLArtifacts("html", props, configFile, e)
+
+	e = generateCodeArtifact("catalog", props, configFile, e)
+
 }
 
-func generateCodeArtifact(a string, props map[string]string, configFile string, e enrichments) {
+func generateCodeArtifact(a string, props map[string]string, configFile string, e enrichments) enrichments {
 	if strings.ToUpper(props["create_"+a]) == "Y" || a == "catalog" {
-		processCodeArtifact(a, configFile, a, e)
-		e.MessageList = append(e.MessageList, messages{Message: "* " + a})
+		e = processCodeArtifact(a, configFile, a, e)
 	} else {
-		logs.Information("Skipping", a)
+		logs.Skipping(a)
 	}
+	return e
 }
 
-func processCodeArtifact(w string, p string, destFolder string, e enrichments) {
-	logs.Information("Processing Template", w)
+func processCodeArtifact(w string, p string, destFolder string, e enrichments) enrichments {
+	logs.Processing(w)
 
 	in_extn := ".go_template"
 	out_extn := ".go_tmp"
@@ -254,7 +265,7 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) {
 	}
 
 	if destFolder == "application" {
-		out_extn = "_core.go"
+		out_extn = "_core" + out_extn
 	}
 
 	//spew.Dump(replacements)
@@ -264,59 +275,62 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) {
 	if err != nil {
 		logs.Error("Load Template :", err)
 	}
-
-	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectCamelCase + out_extn)
+	dest := "/" + destFolder + "/" + e.ObjectCamelCase + out_extn
+	f, err := os.Create(data_out() + dest)
 	if err != nil {
 		logs.Error("Create file: ", err)
-		return
+		return e
 	}
+
+	e.MessageList = append(e.MessageList, messages{Message: "* " + w + " (" + dest + ")"})
 
 	err2 := t.Execute(f, e)
 	if err2 != nil {
 		logs.Error("Process Template", err2)
 	}
 	f.Close()
-	logs.Success(f.Name() + " Generated")
+	logs.Created(f.Name())
+	return e
 }
 
-func generateHTMLArtifacts(a string, props map[string]string, configFile string, e enrichments) {
-
+func generateHTMLArtifacts(a string, props map[string]string, configFile string, e enrichments) enrichments {
 	if strings.ToUpper(props["create_html"]) == "Y" {
 		if e.CanList {
-			generateHTMLArtifact("list", configFile, "html", e)
+			e = generateHTMLArtifact("list", configFile, "html", e)
 		} else {
-			logs.Warning("Listing is not enabled for this object")
+			logs.Skipping("Listing is not enabled for this object")
 		}
 
 		if e.CanView {
-			generateHTMLArtifact("view", configFile, "html", e)
+			e = generateHTMLArtifact("view", configFile, "html", e)
 		} else {
-			logs.Warning("Viewing is not enabled for this object")
+			logs.Skipping("Viewing is not enabled for this object")
 		}
 
 		if e.CanEdit {
-			generateHTMLArtifact("edit", configFile, "html", e)
+			e = generateHTMLArtifact("edit", configFile, "html", e)
 		} else {
-			logs.Warning("Editing is not enabled for this object")
+			logs.Skipping("Editing is not enabled for this object")
 		}
 
 		if e.CanNew {
-			generateHTMLArtifact("new", configFile, "html", e)
+			e = generateHTMLArtifact("new", configFile, "html", e)
 		} else {
-			logs.Warning("Creating is not enabled for this object")
+			logs.Skipping("Creating is not enabled for this object")
 		}
 
 		if !e.CanExport {
-			logs.Warning("Exporting is not enabled for this object")
+			logs.Skipping("Exporting is not enabled for this object")
 		}
 
 	} else {
-		logs.Information("Skipping", "html")
+		logs.Skipping("html")
 	}
+	return e
 }
 
-func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) {
-	logs.Information("Processing Template", w+html_template)
+func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) enrichments {
+	logs.Processing(w + html_template)
 
 	userAction := strings.ToUpper(w[:1]) + w[1:]
 
@@ -327,11 +341,11 @@ func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) 
 	if err != nil {
 		logs.Error("Load Template", err)
 	}
-
-	f, err := os.Create(data_out() + "/" + destFolder + "/" + e.ObjectName + "_" + userAction + ".html")
+	dest := "/" + destFolder + "/" + e.ObjectName + "_" + userAction + ".html"
+	f, err := os.Create(data_out() + dest)
 	if err != nil {
 		logs.Error("Create file: ", err)
-		return
+		return e
 	}
 	//spew.Dump(e)
 	err2 := t.Execute(f, e)
@@ -339,8 +353,9 @@ func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) 
 		logs.Error("Process Template", err2)
 	}
 	f.Close()
-	e.MessageList = append(e.MessageList, messages{Message: "* html -> " + userAction})
-	logs.Success(f.Name() + " Generated")
+	e.MessageList = append(e.MessageList, messages{Message: "* html -> " + userAction + " (" + dest + ")"})
+	logs.Created(f.Name())
+	return e
 }
 
 func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
@@ -386,7 +401,7 @@ func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
 
 	tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
 
-	logs.Information("SQL", tsql)
+	//logs.Query(tsql)
 	results, noFields, err := das.Query(db, tsql)
 	//fmt.Printf("results: %v\n", results)
 	//fmt.Printf("noFields: %v\n", noFields)
@@ -460,20 +475,20 @@ func displayApplicationHeader() {
 	logs.Information("Lic URL", core.Properties["liclink"])
 	logs.Header("Runtime")
 	logs.Information("GO Version", runtime.Version())
-	logs.Information("Operating System", runtime.GOOS)
+	logs.Information("Operating System", runtime.GOOS+" ("+runtime.GOARCH+")")
 
-	logs.Information("Working Directory", getPWD())
+	logs.Default("Working Directory", getPWD())
 	logs.Information("User", getUsername())
 	logs.Header("Connectivity")
-	logs.Information("Default Input", data_in())
-	logs.Information("Default Output", data_out())
+	logs.Default("Input", data_in())
+	logs.Default("Output", data_out())
 }
 
 func displayTableHeader(in string) {
 	logs.Break()
 	logs.Header(in + " Information")
 	logs.Break()
-	info := fmt.Sprintf("| %-25s | %-10s | %-10s | %-25s | %-5s | %5s | %5s |", "Field Name", "Type", "Default", "SQL Field Name", "Mand", "Base", "Look⬆", "LbObject", "LK field", "lkVal")
+	info := fmt.Sprintf(tableLayout, "Field Name", "Type", "Default", "Mand", "Base", "Look⬆", "⬆ Object", "⬆ Field", "⬇ Value")
 	logs.Information(info, "")
 	logs.Break()
 }
@@ -505,6 +520,7 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.SQLSearchID = strings.TrimSpace(props["sqlsearchid"])
 	e.QueryString = props["querystring"]
 	e.QueryField = "{{." + props["queryfield"] + "}}"
+	e.QueryFieldID = props["queryfield"]
 	if props["endpointroot"] == "" {
 		e.EndpointRoot = e.ObjectName
 	} else {
@@ -536,6 +552,11 @@ func setupEnrichment(props map[string]string) enrichments {
 	if props["reverselookup"] != "" {
 		e.HasReverseLookup = true
 		e.ReverseLookup = props["reverselookup"]
+	}
+
+	e.IsSpecial = false
+	if strings.ToUpper(props["isspecial"]) == "Y" {
+		e.IsSpecial = true
 	}
 
 	return e
@@ -655,7 +676,7 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 	// Create a new reader.
 	r := csv.NewReader(f)
 	//logs.Information("New Reader", filePath)
-	displayTableHeader("Enrichment")
+	//displayTableHeader("Enrichment")
 	for {
 		record, err := r.Read()
 		//fmt.Printf("record: %v\n", record)
@@ -665,11 +686,11 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 		}
 
 		if err != nil {
-			logs.Fatal("Read CSV", err)
+			logs.Fatal("Read Enri", err)
 			panic(err)
 		}
 		if record[0] == "Type" && record[1] == "Field" {
-			logs.Information("Found", "Enrichments")
+			//logs.Information("Found", "Enrichments")
 		} else {
 			colMand := false
 			if record[6] == "true" {
@@ -688,12 +709,12 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 				lkKeyField = record[3]
 				lkValueField = record[4]
 				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Enri_List", wrap(lkCodeField), wrap(lkValueField))
+				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Imple_List", wrap(lkCodeField), wrap(lkValueField))
 			}
 
 			//fmt.Printf("record: %v\n", record)
 			//fmt.Printf("colMand: %v\n", colMand)
-			en.FieldsList = addComplexField(en, record[1]+"_Enri", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
+			en.FieldsList = addComplexField(en, record[1]+"_Impl", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
 		}
 	}
 	logs.Break()
@@ -722,7 +743,7 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
-	info := fmt.Sprintf("| %-25s | %-10s | %10s | %-25s | %5t | %5t | %5t | %-10s | %-10s | %-10s | %-10s", fn, tp, df, origfn, mand, baseField, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
+	info := fmt.Sprintf(tableContentLayout, fn, tp, df, mand, baseField, isLookup, lkObject, lkKeyField, lkValueField)
 	tplField := "{{." + fn + "}}"
 	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
 		Type:          tp,

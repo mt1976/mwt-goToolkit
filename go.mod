@@ -10,6 +10,7 @@ require (
 	github.com/jimlawless/cfg v0.0.0-20160326141742-136e0c264d31
 	github.com/leekchan/accounting v1.0.0
 	github.com/mt1976/templatebuiler v0.0.0-20211114204411-1a8699b77688
+	golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1
 )
 
 require (
@@ -20,4 +21,5 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
 )

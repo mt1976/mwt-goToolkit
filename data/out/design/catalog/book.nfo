@@ -1,45 +1,47 @@
 ----------------------------------------------------------------
-Automatically generated  "/design/catalog/firm.nfo"
+Automatically generated  "/design/catalog/book.nfo"
 ----------------------------------------------------------------
 Package              : n/a
-Object 			     : Firm (firm)
-Endpoint 	         : Firm (FirmName)
+Object 			     : Book (book)
+Endpoint 	         : Book (Book)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
 Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 21/11/2021 at 01:07:38
+Date & Time		     : 20/11/2021 at 16:24:18
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
-SQL Table Name       : sienaFirm
-SQL Table Search Col : FirmName
+SQL Table Name       : sienaBook
+SQL Table Search Col : BookName
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
 | Field Name                          | Type       | Default    | Mand  |  Base  | LookP | Object          | Key        | Value      |  
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| FirmName                            | String     |            | true  | true   | false |                 |            |            | 
+| BookName                            | String     |            | true  | true   | false |                 |            |            | 
 | FullName                            | String     |            | false | true   | false |                 |            |            | 
-| Country                             | String     |            | false | true   | false |                 |            |            | 
-| Sector                              | String     |            | false | true   | false |                 |            |            | 
-| Sector_Impl                         | String     |            | false | false  | true  | Sector          | Sector     | Name       | 
-| Country_Impl                        | String     |            | false | false  | true  | Country         | Country    | Name       | 
+| PLManage                            | String     |            | false | true   | false |                 |            |            | 
+| PLTransfer                          | String     |            | false | true   | false |                 |            |            | 
+| DerivePL                            | Bool       | True       | false | true   | false |                 |            |            | 
+| CostOfCarry                         | Bool       | True       | false | true   | false |                 |            |            | 
+| CostOfFunding                       | Bool       | True       | false | true   | false |                 |            |            | 
+| LotAllocationMethod                 | String     |            | false | true   | false |                 |            |            | 
+| InternalId                          | Int        | 0          | true  | true   | false |                 |            |            | 
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/firm_core.go_tmp)
-* adaptor (/adaptor/firm.go_tmp)
-* dao (/dao/firm.go_tmp)
-* datamodel (/datamodel/firm.go_tmp)
-* menu (/design/menu/firm.json)
-* html -> List (/html/Firm_List.html)
-* html -> View (/html/Firm_View.html)
-* html -> Edit (/html/Firm_Edit.html)
-* html -> New (/html/Firm_New.html)
-* catalog (/design/catalog/firm.nfo)
+* application (/application/book_core.go_tmp)
+* adaptor (/adaptor/book.go_tmp)
+* dao (/dao/book.go_tmp)
+* datamodel (/datamodel/book.go_tmp)
+* menu (/design/menu/book.json)
+* html -> List (/html/Book_List.html)
+* html -> View (/html/Book_View.html)
+* html -> Edit (/html/Book_Edit.html)
+* catalog (/design/catalog/book.nfo)
 ----------------------------------------------------------------
 End of File
 ----------------------------------------------------------------

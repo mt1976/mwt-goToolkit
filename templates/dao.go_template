@@ -1,23 +1,22 @@
 package dao
-
 // ----------------------------------------------------------------
 // Automatically generated  "/dao/{{.ObjectNameLower}}.go"
 // ----------------------------------------------------------------
 // Package            : dao
-// Object 			  : {{.ObjectName}}
-// Endpoint Root 	  : {{.EndpointRoot}}
-// Search QueryString : {{.QueryString}}
+// Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
+// Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
+// For Project          : {{.ProjectRepo}}
 // ----------------------------------------------------------------
-// Template Generator : {{.Version}}
+// Template Generator   : {{.Version}}
+// Date & Time		    : {{.Date}} at {{.Time}}
+// Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
-// Date & Time		  : {{.Date}} at {{.Time}}
-// Who & Where		  : {{.Who}} on {{.Host}}
-// ----------------------------------------------------------------
+
 import (
 	"log"
 	"fmt"
 
-	"github.com/google/uuid"
+	{{if not .IsSpecial}}"github.com/google/uuid"{{end}}
 	core "{{.ProjectRepo}}core"
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
@@ -53,8 +52,6 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 	return 1, {{.ObjectNameLower}}Item, nil
 }{{end}}
 
-
-
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_Delete(id string) {
 
@@ -71,8 +68,8 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 
 	logs.Warning(fmt.Sprintf("%s", r))
 
-	if len(r.{{.SQLSearchID}}) == 0 {
-		r.{{.SQLSearchID}}= {{.ObjectNameLower}}_NewID(r)
+	if len(r.{{.QueryFieldID}}) == 0 {
+		r.{{.QueryFieldID}} = {{.ObjectName}}_NewID(r)
 	}
 
 {{if .UsesAdaptor}}
@@ -102,7 +99,7 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	tsql = tsql + " (" + fields(ts) + ")"
 	tsql = tsql + " VALUES (" + values(ts) + ")"
 
-	{{.ObjectName}}_Delete(r.{{.SQLSearchID}})
+	{{.ObjectName}}_Delete(r.{{.QueryFieldID}})
 	das.Execute(tsql)
 
 {{end}}
@@ -124,7 +121,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.SQLSearchID}},"")
+    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.QueryFieldID}},"")
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{end}}
 {{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list
@@ -133,8 +130,21 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	return noitems, recList, recItem, nil
 }
 
-func {{.ObjectNameLower}}_NewID(r dm.{{.ObjectName}}) string {
-	id := uuid.New().String()
+func {{.ObjectName}}_NewID(r dm.{{.ObjectName}}) string {
+	
+	{{if .IsSpecial}}
+
+		// {{.ObjectNameLower}}_NewIDImpl should be specified in dao/{{.ObjectName}}_Impl.go
+		// to provide the implementation for the special case.
+		// override should return id - override function should be defined as
+		// {{.ObjectNameLower}}_NewIDImpl(r dm.{{.ObjectName}}) string {...}
+		//
+		id := {{.ObjectNameLower}}_NewIDImpl(r)
+	
+	{{else}}
+			id := uuid.New().String()
+
+	{{end}}
 	return id
 }
 // ----------------------------------------------------------------

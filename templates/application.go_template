@@ -2,16 +2,14 @@ package application
 // ----------------------------------------------------------------
 // Automatically generated  "/application/{{.ObjectNameLower}}.go"
 // ----------------------------------------------------------------
-// Package            : application
-// Object 			  : {{.ObjectName}}
-// Endpoint Root 	  : {{.EndpointRoot}}
-// Search QueryString : {{.QueryString}}
-// From   			  : {{.SourceName}}
+// Package              : application
+// Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
+// Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
+// For Project          : {{.ProjectRepo}}
 // ----------------------------------------------------------------
-// Template Generator : {{.Version}}
-// ----------------------------------------------------------------
-// Date & Time		  : {{.Date}} at {{.Time}}
-// Who & Where		  : {{.Who}} on {{.Host}}
+// Template Generator   : {{.Version}}
+// Date & Time		    : {{.Date}} at {{.Time}}
+// Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 
 import (
@@ -25,7 +23,7 @@ import (
 )
 
 //{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
-type {{.ObjectNameLower}}_PageList struct {
+type {{.ObjectName}}_PageList struct {
 	UserMenu         []dm.AppMenuItem
 	UserRole         string
 	Title            string
@@ -35,7 +33,7 @@ type {{.ObjectNameLower}}_PageList struct {
 }
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
-type {{.ObjectNameLower}}_Page struct {
+type {{.ObjectName}}_Page struct {
 	UserMenu    []dm.AppMenuItem
 	UserRole    string
 	Title       string
@@ -44,11 +42,8 @@ type {{.ObjectNameLower}}_Page struct {
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{.FieldName}} string
 	{{end}}
-
-
 	{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}{{.FieldName}}_List	[]dm.{{.LookupObject}}{{end}}{{end}}
 	{{end}}
-
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 }
 
@@ -65,6 +60,15 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{end}}
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{end}}
 	logs.Publish("{{.PropertiesName}}", dm.{{.ObjectName}}_Title)
+	{{if .IsSpecial}}
+	// {{.ObjectNameLower}}_PublishImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
+	// to provide the implementation for the special case.
+	// override function should be defined as
+	// {{.ObjectNameLower}}_PublishImpl(mux http.ServeMux) {...}
+	// TODO - this is a temporary hack to get the special case working
+	// Add to main.go >>> {{.ObjectNameLower}}_PublishImpl(mux)
+	
+	{{end}}
 }
 
 //{{.ObjectName}}_HandlerList is the handler for the list page
@@ -83,7 +87,7 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
 
 
-	pageDetail := {{.ObjectNameLower}}_PageList{
+	pageDetail := {{.ObjectName}}_PageList{
 		Title:            core.ApplicationProperties["appname"],
 		PageTitle:        PageTitle(dm.{{.ObjectName}}_Title, core.Action_List),
 		ItemsOnPage: noItems,
@@ -111,7 +115,7 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 
-	pageDetail := {{.ObjectNameLower}}_Page{
+	pageDetail := {{.ObjectName}}_Page{
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
@@ -127,6 +131,16 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
+
+{{if .IsSpecial}}
+	// {{.ObjectNameLower}}_HandlerViewImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
+	// to provide the implementation for the special case.
+	// override should return mux - override function should be defined as
+	// func {{.ObjectNameLower}}_HandlerViewImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
+	pageDetail = {{.ObjectNameLower}}_HandlerViewImpl(pageDetail)
+{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+
 
 	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)
@@ -148,7 +162,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 	
-	pageDetail := {{.ObjectNameLower}}_Page{
+	pageDetail := {{.ObjectName}}_Page{
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
@@ -165,7 +179,14 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
-
+{{if .IsSpecial}}
+	// {{.ObjectNameLower}}_HandlerEditImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
+	// to provide the implementation for the special case.
+	// override should return mux - override function should be defined as
+	// func {{.ObjectNameLower}}_HandlerEditImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
+	pageDetail = {{.ObjectNameLower}}_HandlerEditImpl(pageDetail)
+{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateEdit, core.GetUserRole(r)))
 	t.Execute(w, pageDetail)
@@ -182,7 +203,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Code Continues Below
 
 	w.Header().Set("Content-Type", "text/html")
-	logs.Servicing(r.URL.Path+r.FormValue("ID"))
+	logs.Servicing(r.URL.Path+r.FormValue("{{.QueryFieldID}}"))
 
 	var item dm.{{.ObjectName}}
 
@@ -190,6 +211,14 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
 	{{end}}
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+{{if .IsSpecial}}
+	// {{.ObjectNameLower}}_HandlerSaveImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
+	// to provide the implementation for the special case.
+	// override should return mux - override function should be defined as
+	// func {{.ObjectNameLower}}_HandlerSaveImpl(item dm.{{.ObjectName}}) dm.{{.ObjectName}} {return item}
+	item = {{.ObjectNameLower}}_HandlerSaveImpl(item)
+{{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	dao.{{.ObjectName}}_Store(item)	
@@ -210,7 +239,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	core.ServiceMessage(inUTL)
 
-	pageDetail := {{.ObjectNameLower}}_Page{
+	pageDetail := {{.ObjectName}}_Page{
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
