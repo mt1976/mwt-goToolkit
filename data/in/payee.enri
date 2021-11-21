@@ -1,0 +1,6 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,Country,Country,Country,Name,false,,,Code
+Lookup,Firm,Firm,KeyCounterpartyFirm,FullName,false,false,,FirmName
+Lookup,Centre,Centre,KeyCounterpartyCentre,Name,false,false,,Code
+Lookup,Currency,Currency,KeyCurrency,Name,false,false,,Code
+
