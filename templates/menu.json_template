@@ -5,7 +5,7 @@
       "Glyph": "{{.ObjectGlyph}}",
       "HREF": "/{{.EndpointRoot}}List",
       "OnClick": "",
-      "TextClass": ""
+      "TextClass": "{{.ObjectTextClass}}"
     }
     ,
     {{else}}

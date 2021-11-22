@@ -3,10 +3,13 @@ package logs
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/TwiN/go-color"
 	colour "github.com/TwiN/go-color"
+	"github.com/davecgh/go-spew/spew"
+	viper "github.com/spf13/viper"
 	"golang.org/x/term"
 )
 
@@ -35,6 +38,7 @@ const (
 	log_Processing    = "Processing"
 	log_Query         = "Query"
 	log_Result        = "Result"
+	log_Storing       = "Storing"
 
 	ColorReset        = "\033[0m"
 	ColorRed          = "\033[31m"
@@ -57,7 +61,20 @@ const (
 	Character_Created = "💾"
 	Character_Query   = "🔎"
 	Character_Result  = "?"
+	Character_Storing = "📀"
 )
+
+type Config struct {
+	Verbose     string `mapstructure:"VERBOSE"`
+	VerboseMode bool
+}
+
+var CFG Config
+
+func init() {
+	CFG, _ = getConfig()
+	spew.Dump(CFG)
+}
 
 func Poke(w string, v string) {
 	msg_raw(log_Poke, w, v, colour.Yellow)
@@ -140,19 +157,31 @@ func Accessing(w string) {
 
 func Query(w string) {
 	//msg_info(w, v)
-	msg_raw(log_Query, w, Character_Query, colour.White)
+	if CFG.VerboseMode {
+		msg_raw(log_Query, w, Character_Query, colour.White)
+	}
+}
 
+func Storing(t string, w string) {
+	//msg_info(w, v)
+	if CFG.VerboseMode {
+
+		msg_raw(log_Storing, t+" "+w, Character_Storing, colour.Yellow)
+	}
 }
 
 func Result(w string, r string) {
 	//msg_info(w, v)
-	msg_raw(log_Result, w, Character_Query+" = "+colour.Bold+r, colour.White)
-
+	if CFG.VerboseMode {
+		msg_raw(log_Result, w, Character_Query+" = "+colour.Bold+r, colour.White)
+	}
 }
 
 func Database(w string, v string) {
 	//msg_info(w, v)
-	msg_raw(log_Database, w, v, colour.Green)
+	if CFG.VerboseMode {
+		msg_raw(log_Database, w, v, colour.Green)
+	}
 
 }
 
@@ -221,4 +250,30 @@ func Header(s string) {
 
 func Clear() {
 	fmt.Print("\033[H\033[2J")
+}
+
+func getConfig() (config Config, err error) {
+	// get current os directory path
+	pwd, _ := os.Getwd()
+
+	fmt.Println(pwd)
+	viper.AddConfigPath(pwd + "/config/")
+	viper.SetConfigName("logs")
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	err = viper.Unmarshal(&config)
+	spew.Dump(config)
+	if config.Verbose == "true" {
+		config.VerboseMode = true
+	} else {
+		config.VerboseMode = false
+	}
+	return
 }

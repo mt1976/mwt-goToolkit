@@ -27,6 +27,7 @@ type enrichments struct {
 	ObjectNameLower    string
 	ObjectCamelCase    string
 	ObjectGlyph        string
+	ObjectTextClass    string
 	EndpointRoot       string
 	QueryString        string
 	QueryField         string
@@ -530,6 +531,7 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e.Path = getPWD()
 	e.ObjectGlyph = props["objectglyph"]
+	e.ObjectTextClass = props["textclass"]
 	e.ProjectRepo = props["projectrepo"] + "/"
 	e.UUID = genUUID()
 
