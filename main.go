@@ -400,8 +400,8 @@ func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
 	}
 	//fmt.Printf("db: %v\n", db)
 
-	tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
-
+	//tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
+	tsql := fmt.Sprintf("EXEC sp_columns '%s'", p["sqltablename"])
 	//logs.Query(tsql)
 	results, noFields, err := das.Query(db, tsql)
 	//fmt.Printf("results: %v\n", results)
