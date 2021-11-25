@@ -121,7 +121,6 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-    recItem.AppInternalID = get_String(rec, dm.{{$.ObjectName}}_{{.QueryFieldID}},"")
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{end}}
 {{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list

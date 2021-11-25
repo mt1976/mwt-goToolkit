@@ -38,7 +38,6 @@ type {{.ObjectName}}_Page struct {
 	UserRole    string
 	Title       string
 	PageTitle   string
-	AppInternalID  string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{.FieldName}} string
 	{{end}}
@@ -120,7 +119,6 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		AppInternalID:		     rD.AppInternalID,
 	}
 
 		// 
@@ -167,7 +165,6 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		AppInternalID:          rD.AppInternalID,
 	}
 
 		// 
@@ -206,8 +203,6 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	logs.Servicing(r.URL.Path+r.FormValue("{{.QueryFieldID}}"))
 
 	var item dm.{{.ObjectName}}
-
-	//item.AppInternalID = r.FormValue("AppInternalID")
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
 	{{end}}
@@ -244,7 +239,6 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    core.GetUserRole(r),
-		AppInternalID:   "NEW",	
 	}
 
 		// 
