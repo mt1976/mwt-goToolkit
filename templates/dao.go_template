@@ -21,7 +21,7 @@ import (
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
-	{{if .UsesAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
+	{{if .UsesAdaptor}}{{if .CanSave}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}{{end}}
 )
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
@@ -31,6 +31,19 @@ func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	return count, {{.ObjectNameLower}}List, nil
 }
+
+{{if .OffersLookup}}
+// {{.ObjectName}}_GetLookup() returns a lookup list of all {{.ObjectName}} items in lookup format
+func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
+
+	var returnList []dm.Lookup_Item
+	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList()
+	for i := 0; i < count; i++ {
+		returnList = append(returnList, dm.Lookup_Item{ID: {{.ObjectNameLower}}List[i].{{.LookupID}}, Name: {{.ObjectNameLower}}List[i].{{.LookupName}}})
+	}
+	return returnList
+}
+{{end}}
 
 // {{.ObjectName}}_GetByID() returns a single {{.ObjectName}} record
 func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
@@ -63,11 +76,12 @@ func {{.ObjectName}}_Delete(id string) {
 	das.Execute(tsql)
 }
 
+
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 
 	logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
-
+{{if .CanSave}}
 	if len(r.{{.QueryFieldID}}) == 0 {
 		r.{{.QueryFieldID}} = {{.ObjectName}}_NewID(r)
 	}
@@ -103,7 +117,9 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}}) error {
 	das.Execute(tsql)
 
 {{end}}
+{{end}}
 	return nil
+
 }
 
 // {{.ObjectNameLower}}_Fetch read all employees

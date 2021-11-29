@@ -74,6 +74,9 @@ type enrichments struct {
 	HasReverseLookup   bool
 	ReverseLookup      string
 	IsSpecial          bool
+	OffersLookup       bool
+	LookupID           string
+	LookupName         string
 }
 
 type fields struct {
@@ -559,6 +562,13 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.IsSpecial = false
 	if strings.ToUpper(props["isspecial"]) == "Y" {
 		e.IsSpecial = true
+	}
+
+	e.OffersLookup = false
+	if strings.ToUpper(props["offerslookup"]) == "Y" {
+		e.OffersLookup = true
+		e.LookupID = props["lookupid"]
+		e.LookupName = props["lookupname"]
 	}
 
 	return e
