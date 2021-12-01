@@ -13,7 +13,7 @@ package application
 // ----------------------------------------------------------------
 
 import (
-	"html/template"
+	
 	"net/http"
 
 	core    "{{.ProjectRepo}}core"
@@ -66,7 +66,6 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	// {{.ObjectNameLower}}_PublishImpl(mux http.ServeMux) {...}
 	// TODO - this is a temporary hack to get the special case working
 	// Add to main.go >>> {{.ObjectNameLower}}_PublishImpl(mux)
-	
 	{{end}}
 }
 
@@ -85,7 +84,6 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	var returnList []dm.{{.ObjectName}}
 	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
 
-
 	pageDetail := {{.ObjectName}}_PageList{
 		Title:            core.ApplicationProperties["appname"],
 		PageTitle:        PageTitle(dm.{{.ObjectName}}_Title, core.Action_List),
@@ -95,8 +93,8 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 		UserRole:         core.GetUserRole(r),
 	}
 
-	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateList, core.GetUserRole(r)))
-	t.Execute(w, pageDetail)
+		ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
+
 }
 
 //{{.ObjectName}}_HandlerView is the handler used to View a page
@@ -140,8 +138,8 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 
-	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateView, core.GetUserRole(r)))
-	t.Execute(w, pageDetail)
+		ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
+
 
 }
 
@@ -185,8 +183,8 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
-	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateEdit, core.GetUserRole(r)))
-	t.Execute(w, pageDetail)
+		ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
+
 
 }
 
@@ -250,8 +248,7 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
-	t, _ := template.ParseFiles(core.GetTemplateID(dm.{{.ObjectName}}_TemplateNew, core.GetUserRole(r)))
-	t.Execute(w, pageDetail)
+		ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
 
 }
 

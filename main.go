@@ -77,6 +77,9 @@ type enrichments struct {
 	OffersLookup       bool
 	LookupID           string
 	LookupName         string
+	TemplateHeader     string
+	TemplateFooter     string
+	TemplateScripts    string
 }
 
 type fields struct {
@@ -571,6 +574,10 @@ func setupEnrichment(props map[string]string) enrichments {
 		e.LookupName = props["lookupname"]
 	}
 
+	e.TemplateHeader = wrapTemplate("header")
+	e.TemplateFooter = wrapTemplate("footer")
+	e.TemplateScripts = wrapTemplate("scripts")
+
 	return e
 }
 
@@ -633,6 +640,14 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 
 func wrap(in string) string {
 	return "{{." + in + "}}"
+}
+
+func wrapTemplate(in string) string {
+	return "{{template " + enquote(in) + " .}}"
+}
+
+func enquote(in string) string {
+	return "\"" + in + "\""
 }
 
 func getUsername() string {
