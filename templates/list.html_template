@@ -1,29 +1,6 @@
 {{.TemplateHeader}}
 
 <body>
-
-
-  <!-- DO NOT CHANGE - APP USES CENTRAL NAVIGATION -->
-  <div class="row nav-row">
-    <span onclick="openNav()"><i class="fas fa-atom fa-2x hamburger" style="padding:0;margin-left:.5rem;margin-right:.5rem"></i></span>
-    <div class="nav-title"><a href="" onclick="/home/" class="nav-title">{{.PageTitle}}</a></div>
-  </div>
-  <div id="mySidenav" class="sidenav">
-  <div class="nav-tile">{{.MenuHeader}}</div>
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    {{.RangeUserMenuStart}}
-    <a class="" href="{{.MenuHREF}}" onclick="{{.MenuOnClick}}">
-      <div class="row">
-        <div class="dd-img">
-          <i class="{{.MenuGlyph}} {{.MenuTextClass}}"></i>
-        </div>
-        <div class="dd-text {{.MenuTextClass}}">{{.MenuText}}</div>
-      </div>
-    </a>
-    {{.RangeEnd}}
-    </div>
-  <!-- DO NOT CHANGE -->
-
 <div class="container-fluid">
       <div class="card border-primary">
         <form action="/home" method="POST">
