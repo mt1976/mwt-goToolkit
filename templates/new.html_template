@@ -11,10 +11,10 @@
             <div class="col">
               <div class="btn-group float-right">
               {{if .CanSave}}
-                <button type="submit" value="" class="btn btn-danger"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save&{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"></i>&nbsp;&nbsp;Save</button>
+                <button type="submit" value="" class="btn btn-danger"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save&{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"></i>&nbsp;&nbsp;Save</button>
               {{end}}
-                <button id="print" type="button" class="btn btn-outline-info" onclick="window.print()"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
-                <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
+                <button id="print" type="button" class="btn btn-outline-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
+                <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
               </div>
             </div>
           </div>
@@ -30,7 +30,7 @@
 {{range .FieldsList}}{{if not .IsBaseField}}             <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="form-control"><option name="!{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
+                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="form-control" {{.Disabled}}><option name="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
                 <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
                 {{end}}
               </div>

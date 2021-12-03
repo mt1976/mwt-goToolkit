@@ -73,7 +73,7 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 
@@ -101,7 +101,7 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
@@ -123,8 +123,8 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 {{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup,_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
-pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
+pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
@@ -147,7 +147,7 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
 func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
@@ -169,8 +169,8 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 {{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup,_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
-pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup.{{.LookupValue}}
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
+pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
@@ -192,7 +192,7 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
@@ -223,7 +223,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
@@ -256,7 +256,7 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
 	if !(core.SessionValidate(w, r)) {
-		core.LogoutHandler(w, r)
+		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below

@@ -200,6 +200,8 @@ func processTableDefinition(configFile string) {
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
 	enriPath := getPWD() + data_in() + "/" + e.ObjectName + ".enri"
+	logs.Information("CSV Path", csvPath)
+	logs.Information("Enri Path", enriPath)
 
 	if props["use"] == "db" {
 		// Do nothing for now
@@ -391,7 +393,11 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 		if record[3] == "true" {
 			colMand = true
 		}
-		e.FieldsList = addField(e, record[0], record[1], record[2], colMand)
+		noInput := false
+		if record[4] == "true" {
+			noInput = true
+		}
+		e.FieldsList = addField(e, record[0], record[1], record[2], colMand, noInput)
 
 	}
 	logs.Break()
@@ -459,7 +465,7 @@ func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
 			colType = "String"
 			colDefault = ""
 		}
-		e.FieldsList = addField(e, colName, colType, colDefault, colMand)
+		e.FieldsList = addField(e, colName, colType, colDefault, colMand, false)
 	}
 	return e
 }
@@ -500,9 +506,9 @@ func displayTableHeader(in string) {
 	logs.Break()
 }
 
-func addField(en enrichments, fn string, tp string, df string, mand bool) []fields {
+func addField(en enrichments, fn string, tp string, df string, mand bool, noInput bool) []fields {
 
-	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "")
+	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput)
 
 	return en.FieldsList
 }
@@ -736,19 +742,24 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 				lkKeyField = record[3]
 				lkValueField = record[4]
 				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Imple_List", wrap(lkCodeField), wrap(lkValueField))
+				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Impl_List", wrap(lkCodeField), wrap(lkValueField))
 			}
-
-			//fmt.Printf("record: %v\n", record)
+			noInput := true
+			if record[5] == "true" {
+				noInput = false
+			}
+			fmt.Printf("record: %v\n", record)
+			fmt.Printf("record[5]: %v\n", record[5])
+			fmt.Printf("noInput: %v\n", noInput)
 			//fmt.Printf("colMand: %v\n", colMand)
-			en.FieldsList = addComplexField(en, record[1]+"_Impl", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange)
+			en.FieldsList = addComplexField(en, record[1]+"_Impl", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput)
 		}
 	}
 	logs.Break()
 	return en
 }
 
-func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string) []fields {
+func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool) []fields {
 
 	origfn := fn
 
@@ -767,6 +778,10 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 		noinput = "hidden"
 		hidden = "hidden"
 		userField = false
+	}
+
+	if noinp {
+		noinput = "disabled"
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
