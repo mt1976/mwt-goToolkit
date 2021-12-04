@@ -15,7 +15,7 @@ package datamodel
 
 //Centre is cheese
 type {{.ObjectName}} struct {
-	AppInternalID string  // Special field for internal use only
+
 {{range .FieldsList}}{{.FieldName}}        string
 {{end}}
 }

@@ -1,0 +1,4 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,LkCodeKey
+Lookup,Loader,DataLoader,Loader,Name,true,false,,Id
+Lookup,LoaderDescription,DataLoader,Loader,Description,false,false,,Id
+Lookup,LoaderType,DataLoader,Loader,Type,false,false,,Id

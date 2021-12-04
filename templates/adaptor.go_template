@@ -40,7 +40,7 @@ func {{.ObjectName}}_Delete(id string) error {
 func {{.ObjectName}}_Update(item dm.{{.ObjectName}}) error {
 	var er error
 
-	message:= "Implement {{.ObjectName}}_Update: " + item.{{.SQLSearchID}}
+	message:= "Implement {{.ObjectName}}_Update: " + item.{{.QueryFieldID}}
 
 	// Implement {{.ObjectName}}_Update_Impl in {{.ObjectNameLower}}_Impl.go
 	// Uncomment the line below to use the implementation
