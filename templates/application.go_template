@@ -72,7 +72,7 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 //{{.ObjectName}}_HandlerList is the handler for the list page
 func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
@@ -90,7 +90,7 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 		ItemsOnPage: noItems,
 		ItemList:  returnList,
 		UserMenu:         UserMenu_Get(r),
-		UserRole:         core.GetUserRole(r),
+		UserRole:         Session_GetUserRole(r),
 	}
 
 		ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
@@ -100,7 +100,7 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 //{{.ObjectName}}_HandlerView is the handler used to View a page
 func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
@@ -116,7 +116,7 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
-		UserRole:    core.GetUserRole(r),
+		UserRole:    Session_GetUserRole(r),
 	}
 
 		// 
@@ -146,7 +146,7 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupVa
 //{{.ObjectName}}_HandlerEdit is the handler used generate the Edit page
 func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
@@ -162,7 +162,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
-		UserRole:    core.GetUserRole(r),
+		UserRole:    Session_GetUserRole(r),
 	}
 
 		// 
@@ -191,7 +191,7 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 //{{.ObjectName}}_HandlerSave is the handler used process the saving of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
@@ -222,7 +222,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 //{{.ObjectName}}_HandlerNew is the handler used process the creation of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
@@ -236,7 +236,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		Title:       core.ApplicationProperties["appname"],
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
-		UserRole:    core.GetUserRole(r),
+		UserRole:    Session_GetUserRole(r),
 	}
 
 		// 
@@ -255,7 +255,7 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 //{{.ObjectName}}_HandlerDelete is the handler used process the deletion of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
-	if !(core.SessionValidate(w, r)) {
+	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
