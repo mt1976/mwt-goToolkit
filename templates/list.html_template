@@ -151,5 +151,5 @@ $(document).ready(function(){
 
 {{end}}
   <!-- SCRIPTS DO NOT CHANGE -->
-
+{{.TemplateFooter}}
 </body>
