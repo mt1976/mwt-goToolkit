@@ -24,6 +24,7 @@ import (
 
 //{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
 type {{.ObjectName}}_PageList struct {
+	SessionInfo      dm.SessionInfo
 	UserMenu         []dm.AppMenuItem
 	UserRole         string
 	Title            string
@@ -34,10 +35,11 @@ type {{.ObjectName}}_PageList struct {
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
 type {{.ObjectName}}_Page struct {
-	UserMenu    []dm.AppMenuItem
-	UserRole    string
-	Title       string
-	PageTitle   string
+	SessionInfo      dm.SessionInfo
+	UserMenu    	 []dm.AppMenuItem
+	UserRole    	 string
+	Title       	 string
+	PageTitle   	 string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{.FieldName}} string
 	{{end}}
@@ -85,15 +87,17 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
 
 	pageDetail := {{.ObjectName}}_PageList{
-		Title:            core.ApplicationProperties["appname"],
+		Title:            CardTitle(dm.{{.ObjectName}}_Title, core.Action_List),
 		PageTitle:        PageTitle(dm.{{.ObjectName}}_Title, core.Action_List),
-		ItemsOnPage: noItems,
-		ItemList:  returnList,
+		ItemsOnPage: 	  noItems,
+		ItemList:         returnList,
 		UserMenu:         UserMenu_Get(r),
 		UserRole:         Session_GetUserRole(r),
 	}
-
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
+	
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+	
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
 
 }
 
@@ -113,7 +117,7 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -137,9 +141,9 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupVa
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
-
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
 
 }
 
@@ -159,7 +163,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 	
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -183,7 +187,9 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
 
 
 }
@@ -233,7 +239,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	core.ServiceMessage(inUTL)
 
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -248,7 +254,9 @@ _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
 
 }
 

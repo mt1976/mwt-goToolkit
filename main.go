@@ -80,6 +80,8 @@ type enrichments struct {
 	TemplateHeader     string
 	TemplateFooter     string
 	TemplateScripts    string
+	TemplateAudit      string
+	TitleText          string
 }
 
 type fields struct {
@@ -549,9 +551,11 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e.PropertiesName = ""
 	e.UsesAdaptor = false
+	e.TemplateAudit = ""
 
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
+		e.TemplateAudit = wrapTemplate("audit")
 	} else {
 		e.PropertiesName = props["propertiesoverride"]
 		e.UsesAdaptor = true
