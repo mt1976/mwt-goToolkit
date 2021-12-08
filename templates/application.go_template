@@ -41,7 +41,7 @@ type {{.ObjectName}}_Page struct {
 	Title       	 string
 	PageTitle   	 string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	{{.FieldName}} string
+	{{range .FieldsList}}{{if not .IsOverride}}	{{.FieldName}} string{{end}}
 	{{end}}
 	{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}{{.FieldName}}_List	[]dm.{{.LookupObject}}{{end}}{{end}}
 	{{end}}
@@ -126,7 +126,10 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
@@ -172,7 +175,10 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
@@ -208,7 +214,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 
 	var item dm.{{.ObjectName}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
+	{{range .FieldsList}}	{{if not .IsOverride}}item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}){{end}}
 	{{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 {{if .IsSpecial}}
@@ -220,7 +226,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
-	dao.{{.ObjectName}}_Store(item)	
+	dao.{{.ObjectName}}_Store(item,r)	
 
 	http.Redirect(w, r, {{.ObjectName}}_Redirect, http.StatusFound)
 }
@@ -248,7 +254,10 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = ""
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = ""
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}pageDetail.{{.FieldName}} = ""
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
