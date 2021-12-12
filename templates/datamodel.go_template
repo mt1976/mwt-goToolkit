@@ -28,6 +28,7 @@ const (
 	///
 	/// Handler Defintions
 	///
+	{{.ObjectName}}_Template     = "{{.ObjectName}}"
 	{{.ObjectName}}_TemplateList = "{{.ObjectName}}_List"
 	{{.ObjectName}}_TemplateView = "{{.ObjectName}}_View"
 	{{.ObjectName}}_TemplateEdit = "{{.ObjectName}}_Edit"
@@ -35,6 +36,7 @@ const (
 	///
 	/// Handler Monitor Paths
 	///
+	{{.ObjectName}}_Path       = "/API/{{.ObjectName}}/"
 	{{.ObjectName}}_PathList   = "/{{.ObjectName}}List/"
 	{{.ObjectName}}_PathView   = "/{{.ObjectName}}View/"
 	{{.ObjectName}}_PathEdit   = "/{{.ObjectName}}Edit/"

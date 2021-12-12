@@ -14,6 +14,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
@@ -68,6 +69,7 @@ type enrichments struct {
 	CanNew             bool
 	CanDelete          bool
 	CanList            bool
+	CanAPI             bool
 	PropertiesName     string
 	UsesAdaptor        bool
 	CanExport          bool
@@ -200,6 +202,9 @@ func processTableDefinition(configFile string) {
 	//	logs.Information("Populate", "Replacement Values")
 
 	props := core.Config_Get(configFile)
+
+	fmt.Printf("props: %v\n", props)
+
 	e := setupEnrichment(props)
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
@@ -211,7 +216,13 @@ func processTableDefinition(configFile string) {
 		// Do nothing for now
 		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
 		e = getFieldDefinitions_DB(e, props)
+		e.SourceName = "APP"
 	} else {
+		if props["propertiesoverride"] == "special" {
+			e.SourceName = "STATE"
+		} else {
+			e.SourceName = "SIENA"
+		}
 		logs.Information("Getting List of fields from CSV", csvPath)
 		e = getFieldDefinitions_CSV(csvPath, e)
 	}
@@ -228,6 +239,10 @@ func processTableDefinition(configFile string) {
 	e = generateCodeArtifact("application", props, configFile, e)
 
 	//e = generateCodeArtifact("adaptor", props, configFile, e)
+
+	if e.CanAPI {
+		e = generateCodeArtifact("api", props, configFile, e)
+	}
 
 	e = generateCodeArtifact("dao", props, configFile, e)
 
@@ -265,6 +280,12 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 		destFolder = "design/catalog"
 		out_extn = ".nfo"
 		in_extn = ".nfo_template"
+	}
+
+	if destFolder == "api" {
+		destFolder = "application"
+		out_extn = "_api.go"
+		in_extn = ".go_template"
 	}
 
 	if destFolder == "menu" {
@@ -380,9 +401,12 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 	r := csv.NewReader(f)
 	//logs.Information("New Reader", filePath)
 	displayTableHeader("Table")
+
 	for {
 		record, err := r.Read()
+
 		//fmt.Printf("record: %v\n", record)
+
 		// Stop at EOF.
 		if err == io.EOF {
 			break
@@ -400,6 +424,9 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 		noInput := false
 		if record[4] == "true" {
 			noInput = true
+		}
+		if record[0] == "Name" && record[1] == "Type" {
+			continue
 		}
 		e.FieldsList = addField(e, record[0], record[1], record[2], colMand, noInput)
 
@@ -526,6 +553,7 @@ func addField(en enrichments, fn string, tp string, df string, mand bool, noInpu
 func setupEnrichment(props map[string]string) enrichments {
 	e := enrichments{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
+	logs.Information("Object Name", e.ObjectName)
 	e.ObjectName = strings.Title(e.ObjectName)
 	e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
 	e.ObjectNameLower = strings.ToLower(e.ObjectName)
@@ -560,13 +588,18 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.PropertiesName = ""
 	e.UsesAdaptor = false
 	e.TemplateAudit = ""
-
+	e.IsSpecial = false
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
 		e.TemplateAudit = wrapTemplate("audit")
 	} else {
-		e.PropertiesName = props["propertiesoverride"]
 		e.UsesAdaptor = true
+		if props["propertiesoverride"] == "special" {
+			e.PropertiesName = "Application"
+			e.IsSpecial = true
+		} else {
+			e.PropertiesName = props["propertiesoverride"]
+		}
 	}
 
 	e = setupTemplateEnrichment(e, props)
@@ -580,10 +613,10 @@ func setupEnrichment(props map[string]string) enrichments {
 		e.ReverseLookup = props["reverselookup"]
 	}
 
-	e.IsSpecial = false
-	if strings.ToUpper(props["isspecial"]) == "Y" {
-		e.IsSpecial = true
-	}
+	// e.IsSpecial = false
+	// if strings.ToUpper(props["isspecial"]) == "Y" {
+	// 	e.IsSpecial = true
+	// }
 
 	e.OffersLookup = false
 	if strings.ToUpper(props["offerslookup"]) == "Y" {
@@ -595,7 +628,7 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.TemplateHeader = wrapTemplate("header")
 	e.TemplateFooter = wrapTemplate("footer")
 	e.TemplateScripts = wrapTemplate("scripts")
-
+	spew.Dump(e)
 	return e
 }
 
@@ -625,6 +658,7 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	e.CanSave = true
 	e.CanList = true
 	e.CanExport = false
+	e.CanAPI = false
 
 	if strings.ToUpper(props["can_view"]) == "N" {
 		e.CanView = false
@@ -649,6 +683,10 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 
 	if strings.ToUpper(props["can_export"]) == "Y" {
 		e.CanExport = true
+	}
+
+	if strings.ToUpper(props["can_api"]) == "Y" {
+		e.CanAPI = true
 	}
 
 	//spew.Dump(e)

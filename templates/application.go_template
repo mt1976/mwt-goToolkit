@@ -54,21 +54,15 @@ const (
 
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
-	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{end}}
-	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{end}}
-	{{if .CanEdit}}mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit){{end}}
-	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{end}}
-	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{end}}
-	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{end}}
+	{{if .CanAPI}}mux.HandleFunc(dm.{{.ObjectName}}_Path, {{.ObjectName}}_Handler){{else}}//No API{{end}}
+	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{else}}//Cannot List via GUI{{end}}
+	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{else}}//Cannot View via GUI{{end}}
+	{{if .CanEdit}}mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit){{else}}//Cannot Edit via GUI{{end}}
+	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{else}}//Cannot Create via GUI{{end}}
+	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{else}}//Cannot Save via GUI{{end}}
+	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
 	logs.Publish("{{.PropertiesName}}", dm.{{.ObjectName}}_Title)
-	{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_PublishImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override function should be defined as
-	// {{.ObjectNameLower}}_PublishImpl(mux http.ServeMux) {...}
-	// TODO - this is a temporary hack to get the special case working
-	// Add to main.go >>> {{.ObjectNameLower}}_PublishImpl(mux)
-	{{end}}
+    {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceName}}"){{else}}//No API{{end}}
 }
 
 //{{.ObjectName}}_HandlerList is the handler for the list page
@@ -135,13 +129,7 @@ pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupVa
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerViewImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerViewImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
-	pageDetail = {{.ObjectNameLower}}_HandlerViewImpl(pageDetail)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
@@ -183,14 +171,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerEditImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerEditImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
-	pageDetail = {{.ObjectNameLower}}_HandlerEditImpl(pageDetail)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
@@ -216,14 +197,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 	{{range .FieldsList}}	{{if not .IsOverride}}item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}){{end}}
 	{{end}}
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerSaveImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerSaveImpl(item dm.{{.ObjectName}}) dm.{{.ObjectName}} {return item}
-	item = {{.ObjectNameLower}}_HandlerSaveImpl(item)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	dao.{{.ObjectName}}_Store(item,r)	
