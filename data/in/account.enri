@@ -4,3 +4,7 @@ Lookup,Book,Book,Book,FullName,false,,,Bookpoo
 Lookup,Portfolio,Portfolio,Portfolio,Description1,false,,,Portfoliopoo
 Lookup,Centre,Centre,Centre,Name,false,,,Namecenpo
 Lookup,Firm,Firm,Firm,FullName,false,,,Namefirpoo
+Extra,DealtCA,,,,false,false,,
+Extra,AgainstCA,,,,false,false,,
+Extra,LedgerCA,,,,false,false,,
+Extra,CashBalanceCA,,,,false,false,,
