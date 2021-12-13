@@ -6,8 +6,8 @@ Object 			     : Template (template)
 Endpoint 	         : Template (TemplateID)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
-Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:22
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 08/12/2021 at 09:17:03
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
@@ -30,6 +30,9 @@ Fields Generated
 | SYSUpdatedHost                      | String     |            | false | true   | false |                 |            |            | 
 | SYSUpdatedBy                        | String     |            | false | true   | false |                 |            |            | 
 | ID                                  | String     |            | true  | true   | false |                 |            |            | 
+| ExtraField_Impl                     | String     |            | false | false  | false |                 |            |            | 
+| ExtraField2_Impl                    | String     |            | false | false  | false |                 |            |            | 
+| FIELD2                              | String     |            | false | false  | false |                 |            |            | 
 *-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
 ----------------------------------------------------------------
 Artifacts Generated

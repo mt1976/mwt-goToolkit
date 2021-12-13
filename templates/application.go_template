@@ -24,6 +24,7 @@ import (
 
 //{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
 type {{.ObjectName}}_PageList struct {
+	SessionInfo      dm.SessionInfo
 	UserMenu         []dm.AppMenuItem
 	UserRole         string
 	Title            string
@@ -34,12 +35,13 @@ type {{.ObjectName}}_PageList struct {
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
 type {{.ObjectName}}_Page struct {
-	UserMenu    []dm.AppMenuItem
-	UserRole    string
-	Title       string
-	PageTitle   string
+	SessionInfo      dm.SessionInfo
+	UserMenu    	 []dm.AppMenuItem
+	UserRole    	 string
+	Title       	 string
+	PageTitle   	 string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	{{.FieldName}} string
+	{{range .FieldsList}}{{if not .IsOverride}}	{{.FieldName}} string{{end}}
 	{{end}}
 	{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}{{.FieldName}}_List	[]dm.{{.LookupObject}}{{end}}{{end}}
 	{{end}}
@@ -52,21 +54,15 @@ const (
 
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
-	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{end}}
-	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{end}}
-	{{if .CanEdit}}mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit){{end}}
-	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{end}}
-	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{end}}
-	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{end}}
+	{{if .CanAPI}}mux.HandleFunc(dm.{{.ObjectName}}_Path, {{.ObjectName}}_Handler){{else}}//No API{{end}}
+	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{else}}//Cannot List via GUI{{end}}
+	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{else}}//Cannot View via GUI{{end}}
+	{{if .CanEdit}}mux.HandleFunc(dm.{{.ObjectName}}_PathEdit, {{.ObjectName}}_HandlerEdit){{else}}//Cannot Edit via GUI{{end}}
+	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{else}}//Cannot Create via GUI{{end}}
+	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{else}}//Cannot Save via GUI{{end}}
+	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
 	logs.Publish("{{.PropertiesName}}", dm.{{.ObjectName}}_Title)
-	{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_PublishImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override function should be defined as
-	// {{.ObjectNameLower}}_PublishImpl(mux http.ServeMux) {...}
-	// TODO - this is a temporary hack to get the special case working
-	// Add to main.go >>> {{.ObjectNameLower}}_PublishImpl(mux)
-	{{end}}
+    {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceName}}"){{else}}//No API{{end}}
 }
 
 //{{.ObjectName}}_HandlerList is the handler for the list page
@@ -85,15 +81,17 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
 
 	pageDetail := {{.ObjectName}}_PageList{
-		Title:            core.ApplicationProperties["appname"],
+		Title:            CardTitle(dm.{{.ObjectName}}_Title, core.Action_List),
 		PageTitle:        PageTitle(dm.{{.ObjectName}}_Title, core.Action_List),
-		ItemsOnPage: noItems,
-		ItemList:  returnList,
+		ItemsOnPage: 	  noItems,
+		ItemList:         returnList,
 		UserMenu:         UserMenu_Get(r),
 		UserRole:         Session_GetUserRole(r),
 	}
-
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
+	
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+	
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
 
 }
 
@@ -113,7 +111,7 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_View),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -122,24 +120,21 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerViewImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerViewImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
-	pageDetail = {{.ObjectNameLower}}_HandlerViewImpl(pageDetail)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
-
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
 
 }
 
@@ -159,7 +154,7 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
 	
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -168,22 +163,20 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
 pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerEditImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerEditImpl(pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {return pageDetail}
-	pageDetail = {{.ObjectNameLower}}_HandlerEditImpl(pageDetail)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
 
 
 }
@@ -202,19 +195,12 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 
 	var item dm.{{.ObjectName}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
+	{{range .FieldsList}}	{{if not .IsOverride}}item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}){{end}}
 	{{end}}
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-{{if .IsSpecial}}
-	// {{.ObjectNameLower}}_HandlerSaveImpl should be specified in application/{{.ObjectNameLower}}_Impl.go
-	// to provide the implementation for the special case.
-	// override should return mux - override function should be defined as
-	// func {{.ObjectNameLower}}_HandlerSaveImpl(item dm.{{.ObjectName}}) dm.{{.ObjectName}} {return item}
-	item = {{.ObjectNameLower}}_HandlerSaveImpl(item)
-{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
-	dao.{{.ObjectName}}_Store(item)	
+	dao.{{.ObjectName}}_Store(item,r)	
 
 	http.Redirect(w, r, {{.ObjectName}}_Redirect, http.StatusFound)
 }
@@ -233,7 +219,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	core.ServiceMessage(inUTL)
 
 	pageDetail := {{.ObjectName}}_Page{
-		Title:       core.ApplicationProperties["appname"],
+		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
@@ -242,13 +228,18 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		// 
 		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = ""
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+{{end}}{{end}}
+{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = ""
+{{end}}{{end}}
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 {{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}pageDetail.{{.FieldName}} = ""
 _,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
 {{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
-		ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
+	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
 
 }
 

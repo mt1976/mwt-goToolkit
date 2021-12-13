@@ -14,6 +14,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
@@ -68,6 +69,7 @@ type enrichments struct {
 	CanNew             bool
 	CanDelete          bool
 	CanList            bool
+	CanAPI             bool
 	PropertiesName     string
 	UsesAdaptor        bool
 	CanExport          bool
@@ -80,6 +82,8 @@ type enrichments struct {
 	TemplateHeader     string
 	TemplateFooter     string
 	TemplateScripts    string
+	TemplateAudit      string
+	TitleText          string
 }
 
 type fields struct {
@@ -96,6 +100,8 @@ type fields struct {
 	IsUserField   bool
 	IsBaseField   bool
 	IsLookup      bool
+	IsOverride    bool
+	IsExtra       bool
 	LookupObject  string
 	LookupField   string
 	LookupValue   string
@@ -108,12 +114,12 @@ type messages struct {
 }
 
 const (
-	go_template        = ".go_template"
-	html_template      = ".html_template"
-	json_template      = ".json_template"
-	nfo_template       = ".nfo_template"
-	tableLayout        = "| %-35s | %-10s | %-10s | %-5s | %-5s  | %-5s | %-15s | %-10s | %-10s | "
-	tableContentLayout = "| %-35s | %-10s | %-10s | %-5t | %-5t  | %-5t | %-15s | %-10s | %-10s | "
+	go_template   = ".go_template"
+	html_template = ".html_template"
+	json_template = ".json_template"
+	nfo_template  = ".nfo_template"
+	tableHeader   = "| %-35s | %-10s | %-10s | %-2s | %-2s | %-2s | %-2s | %-2s | %-15s | %-24s | %-24s |"
+	tableRow      = "| %-35s | %-10s | %-10s | %-2s | %-2s | %-2s | %-2s | %-2s | %-15s | %-24s | %-24s |"
 )
 
 func main() {
@@ -196,6 +202,9 @@ func processTableDefinition(configFile string) {
 	//	logs.Information("Populate", "Replacement Values")
 
 	props := core.Config_Get(configFile)
+
+	fmt.Printf("props: %v\n", props)
+
 	e := setupEnrichment(props)
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
@@ -207,7 +216,13 @@ func processTableDefinition(configFile string) {
 		// Do nothing for now
 		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
 		e = getFieldDefinitions_DB(e, props)
+		e.SourceName = "APP"
 	} else {
+		if props["propertiesoverride"] == "special" {
+			e.SourceName = "STATE"
+		} else {
+			e.SourceName = "SIENA"
+		}
 		logs.Information("Getting List of fields from CSV", csvPath)
 		e = getFieldDefinitions_CSV(csvPath, e)
 	}
@@ -223,7 +238,11 @@ func processTableDefinition(configFile string) {
 
 	e = generateCodeArtifact("application", props, configFile, e)
 
-	e = generateCodeArtifact("adaptor", props, configFile, e)
+	//e = generateCodeArtifact("adaptor", props, configFile, e)
+
+	if e.CanAPI {
+		e = generateCodeArtifact("api", props, configFile, e)
+	}
 
 	e = generateCodeArtifact("dao", props, configFile, e)
 
@@ -254,13 +273,19 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 	in_extn := ".go_template"
 	out_extn := ".go_tmp"
 	if core.Properties["deliverto"] != "" {
-		out_extn = ".go"
+		out_extn = "_core.go"
 	}
 
 	if destFolder == "catalog" {
 		destFolder = "design/catalog"
 		out_extn = ".nfo"
 		in_extn = ".nfo_template"
+	}
+
+	if destFolder == "api" {
+		destFolder = "application"
+		out_extn = "_api.go"
+		in_extn = ".go_template"
 	}
 
 	if destFolder == "menu" {
@@ -273,9 +298,9 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 		in_extn = ".html_template"
 	}
 
-	if destFolder == "application" {
-		out_extn = "_core" + out_extn
-	}
+	//if destFolder == "application" {
+	//	out_extn = "_core" + out_extn
+	//	}
 
 	//spew.Dump(replacements)
 	fp := e.Path + "/templates/" + w + in_extn
@@ -376,9 +401,12 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 	r := csv.NewReader(f)
 	//logs.Information("New Reader", filePath)
 	displayTableHeader("Table")
+
 	for {
 		record, err := r.Read()
+
 		//fmt.Printf("record: %v\n", record)
+
 		// Stop at EOF.
 		if err == io.EOF {
 			break
@@ -396,6 +424,9 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 		noInput := false
 		if record[4] == "true" {
 			noInput = true
+		}
+		if record[0] == "Name" && record[1] == "Type" {
+			continue
 		}
 		e.FieldsList = addField(e, record[0], record[1], record[2], colMand, noInput)
 
@@ -501,14 +532,20 @@ func displayTableHeader(in string) {
 	logs.Break()
 	logs.Header(in + " Information")
 	logs.Break()
-	info := fmt.Sprintf(tableLayout, "Field Name", "Type", "Default", "Mand", "Base", "Look⬆", "⬆ Object", "⬆ Field", "⬇ Value")
+	logs.Information("Md ", "Mandatory")
+	logs.Information("Cr ", "Core Fields")
+	logs.Information("Ex ", "Extra Fields")
+	logs.Information("Ov ", "Override of a Core Field")
+	logs.Information("Lkp", "Lookup Field")
+	logs.Break()
+	info := fmt.Sprintf(tableHeader, "Field Name", "Type", "Default", "Md", "Cr", "Ex", "Ov", "L⬆", "⬆ Object", "⬆ Field", "⬇ Value")
 	logs.Information(info, "")
 	logs.Break()
 }
 
 func addField(en enrichments, fn string, tp string, df string, mand bool, noInput bool) []fields {
 
-	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput)
+	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false)
 
 	return en.FieldsList
 }
@@ -516,6 +553,7 @@ func addField(en enrichments, fn string, tp string, df string, mand bool, noInpu
 func setupEnrichment(props map[string]string) enrichments {
 	e := enrichments{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
+	logs.Information("Object Name", e.ObjectName)
 	e.ObjectName = strings.Title(e.ObjectName)
 	e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
 	e.ObjectNameLower = strings.ToLower(e.ObjectName)
@@ -549,12 +587,19 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e.PropertiesName = ""
 	e.UsesAdaptor = false
-
+	e.TemplateAudit = ""
+	e.IsSpecial = false
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
+		e.TemplateAudit = wrapTemplate("audit")
 	} else {
-		e.PropertiesName = props["propertiesoverride"]
 		e.UsesAdaptor = true
+		if props["propertiesoverride"] == "special" {
+			e.PropertiesName = "Application"
+			e.IsSpecial = true
+		} else {
+			e.PropertiesName = props["propertiesoverride"]
+		}
 	}
 
 	e = setupTemplateEnrichment(e, props)
@@ -568,10 +613,10 @@ func setupEnrichment(props map[string]string) enrichments {
 		e.ReverseLookup = props["reverselookup"]
 	}
 
-	e.IsSpecial = false
-	if strings.ToUpper(props["isspecial"]) == "Y" {
-		e.IsSpecial = true
-	}
+	// e.IsSpecial = false
+	// if strings.ToUpper(props["isspecial"]) == "Y" {
+	// 	e.IsSpecial = true
+	// }
 
 	e.OffersLookup = false
 	if strings.ToUpper(props["offerslookup"]) == "Y" {
@@ -583,7 +628,7 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.TemplateHeader = wrapTemplate("header")
 	e.TemplateFooter = wrapTemplate("footer")
 	e.TemplateScripts = wrapTemplate("scripts")
-
+	spew.Dump(e)
 	return e
 }
 
@@ -613,6 +658,7 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	e.CanSave = true
 	e.CanList = true
 	e.CanExport = false
+	e.CanAPI = false
 
 	if strings.ToUpper(props["can_view"]) == "N" {
 		e.CanView = false
@@ -637,6 +683,10 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 
 	if strings.ToUpper(props["can_export"]) == "Y" {
 		e.CanExport = true
+	}
+
+	if strings.ToUpper(props["can_api"]) == "Y" {
+		e.CanAPI = true
 	}
 
 	//spew.Dump(e)
@@ -731,35 +781,60 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 			}
 
 			isLookup := false
+			isExtra := false
+			isOverride := false
 			lkObject := ""
 			lkKeyField := ""
 			lkValueField := ""
 			lkRange := ""
 			lkCodeField := ""
+
+			//log.Println(record[0])
+			suffix := "_Unknown"
 			if record[0] == "Lookup" {
+				suffix = "_Lookup"
 				isLookup = true
+
 				lkObject = record[2]
 				lkKeyField = record[3]
 				lkValueField = record[4]
 				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Impl_List", wrap(lkCodeField), wrap(lkValueField))
+				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrap(lkCodeField), wrap(lkValueField))
 			}
+
+			if record[0] == "Extra" {
+				isExtra = true
+				suffix = "_Extra"
+			}
+
+			if record[0] == "Override" {
+				isOverride = true
+				suffix = ""
+			}
+
+			//log.Println(isLookup, isExtra, isOverride)
+
 			noInput := true
 			if record[5] == "true" {
 				noInput = false
 			}
-			fmt.Printf("record: %v\n", record)
-			fmt.Printf("record[5]: %v\n", record[5])
-			fmt.Printf("noInput: %v\n", noInput)
+			//fmt.Printf("record: %v\n", record)
+			//fmt.Printf("record[5]: %v\n", record[5])
+			//fmt.Printf("noInput: %v\n", noInput)
 			//fmt.Printf("colMand: %v\n", colMand)
-			en.FieldsList = addComplexField(en, record[1]+"_Impl", "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput)
+
+			en.FieldsList = addComplexField(en, record[1]+suffix, "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride)
 		}
 	}
 	logs.Break()
 	return en
 }
 
-func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool) []fields {
+func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool) []fields {
+
+	// log parameters
+
+	//log.Println("addComplexField:"+fn+" "+tp+" "+df+" "+strconv.FormatBool(mand)+" "+strconv.FormatBool(baseField)+" "+strconv.FormatBool(isLookup)+" "+lkObject+" "+lkKeyField+" "+lkValueField+" "+lkRange+" "+strconv.FormatBool(noinp), strconv.FormatBool(isExtra), strconv.FormatBool(isOverride))
 
 	origfn := fn
 
@@ -785,7 +860,7 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
-	info := fmt.Sprintf(tableContentLayout, fn, tp, df, mand, baseField, isLookup, lkObject, lkKeyField, lkValueField)
+	info := fmt.Sprintf(tableRow, fn, tp, df, tf(mand), tf(baseField), tf(isExtra), tf(isOverride), tf(isLookup), lkObject, lkKeyField, lkValueField)
 	tplField := "{{." + fn + "}}"
 	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
 		Type:          tp,
@@ -803,8 +878,18 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 		LookupObject:  lkObject,
 		LookupField:   lkKeyField,
 		LookupValue:   lkValueField,
-		RangeHTML:     lkRange})
+		RangeHTML:     lkRange,
+		IsExtra:       isExtra,
+		IsOverride:    isOverride})
+
 	logs.Information(info, "")
 
 	return en.FieldsList
+}
+
+func tf(in bool) string {
+	if in {
+		return "Y"
+	}
+	return ""
 }
