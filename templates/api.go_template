@@ -112,8 +112,8 @@ func {{.ObjectNameLower}}_MethodPost(w http.ResponseWriter, r *http.Request) {
 	var t dm.{{.ObjectName}}
 	err := decoder.Decode(&t)
 	if err != nil {
+		w.WriteHeader(int(http.StatusNotFound))
 		panic(err)
-			w.WriteHeader(int(http.StatusNotFound))
 	} else {
 		w.WriteHeader(int(http.StatusOK))
 	}

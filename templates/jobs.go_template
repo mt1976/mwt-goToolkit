@@ -14,35 +14,42 @@ package jobs
 
 import (
 	application "{{.ProjectRepo}}application"
-	core        "{{.ProjectRepo}}core"
 	dm          "{{.ProjectRepo}}datamodel"
 	logs        "{{.ProjectRepo}}logs"
 	cron        "github.com/robfig/cron/v3"
 )
 
+// {{.ObjectName}}Job defines the job properties, name, period etc..
 func {{.ObjectName}}_Job() dm.JobDefinition {
-	var j dm.JobDefinition
-	j.ID = "{{.ObjectName}}"
-	j.Name = "{{.ObjectName}}"
-	j.Period = "10 1 * * *"
-	j.Description = "{{.ObjectName}} processing"
-	j.Type = core.Monitor
+	// ----------------------------------------------------------------
+	// Job Definition
+	// Create a new job definition in the {{.ObjectName}}_Impl.go file called {{.ObjectName}}_JobImpl()
+	// ----------------------------------------------------------------
+	// j.ID = "{{.ObjectName}}"
+	// j.Name = "{{.ObjectName}}"
+	// j.Period = "10 1 * * *"
+	// j.Description = "{{.ObjectName}} processing"
+	// j.Type = core.Monitor
+	j:= {{.ObjectName}}_JobImpl()
 	return j
 }
 
 func {{.ObjectName}}_Register(c *cron.Cron) {
-	application.RegisterSchedule({{.ObjectName}}_Job())
+	application.Schedule_Register({{.ObjectName}}_Job())
 	c.AddFunc({{.ObjectName}}_Job().Period, func() { {{.ObjectName}}_Run() })
 }
 
-// RunJobRollover is a Rollover function
+// {{.ObjectName}}_Run initiates and runs the job as per the period.
 func {{.ObjectName}}_Run() {
 	logs.StartJob({{.ObjectName}}_Job().Name)
 	message := ""
 	/// CONTENT STARTS
-	
-
+	// Create a func in the {{.ObjectName}}_Impl.go file called {{.ObjectName}}_RunImpl() that returns string,error	
+	message,err := {{.ObjectName}}_RunImpl()
+	if err != nil {
+		logs.Warning(err.Error())
+	}
 	/// CONTENT ENDS
-	application.UpdateSchedule({{.ObjectName}}_Job(), message)
+	application.Schedule_Update({{.ObjectName}}_Job(), message)
 	logs.EndJob({{.ObjectName}}_Job().Name)
 }
