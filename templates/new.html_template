@@ -1,17 +1,17 @@
 {{.TemplateHeader}}
 <body>
   <div class="container-fluid">
-    <form action="/{{.ObjectName}}Save?{{.QueryString}}={{.QueryField}}" method="GET" class="form">
+    <form action="/{{.ObjectName}}Save/" method="GET" class="form">
       <div class="card">
         <div class="card-header font-weight-bold">
           <div class="row">
             <div class="col">
-              {{.Title}}&nbsp;:&nbsp;<code>{{.QueryField}}</code>
+              {{.Title}}&nbsp;:&nbsp;<code>NEW</code>
             </div>
             <div class="col">
               <div class="btn-group float-right">
               {{if .CanSave}}
-                <button type="submit" value="" class="btn btn-danger"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save&{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"></i>&nbsp;&nbsp;Save</button>
+                <button type="submit" value="" class="btn btn-danger"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save/" onclick="/{{.ObjectName}}Save/" title="Save {{.FriendlyName}}"></i>&nbsp;&nbsp;Save</button>
               {{end}}
                 <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
                 <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
@@ -23,7 +23,7 @@
 {{range .FieldsList}}{{if .IsBaseField}}            <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
+                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
               </div>
             </div>
 {{end}}{{end}}

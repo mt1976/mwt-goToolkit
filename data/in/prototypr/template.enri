@@ -1,0 +1,4 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Extra,ExtraField,,,,false,false,,
+Extra,ExtraField2,,,,false,false,,
+Override,FIELD2,,,,false,false,,
