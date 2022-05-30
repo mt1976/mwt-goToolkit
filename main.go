@@ -799,7 +799,7 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 				lkKeyField = record[3]
 				lkValueField = record[4]
 				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option name=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrap(lkCodeField), wrap(lkValueField))
+				lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrap(lkCodeField), wrap(lkValueField))
 			}
 
 			if record[0] == "Extra" {

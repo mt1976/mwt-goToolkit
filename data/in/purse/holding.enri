@@ -1,0 +1,7 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Lookup,Type,HoldingType,Type,Name,true,false,,Code
+Lookup,Portfolio,Portfolio,Portfolio,Name,true,false,,Code
+Override,Type,,,,false,false,,
+Override,Portfolio,,,,false,false,,
+Lookup,Instrument,Watchlist,Code,Name,true,false,,Code
+Override,Instrument,,,,false,false,,

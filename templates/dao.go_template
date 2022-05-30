@@ -120,6 +120,12 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
     var err error
 
+// If there are fields below, create the methods in dao\{{$.ObjectName}}_Impl.go
+{{range .FieldsList}}{{if .IsExtra}}   r.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_ExtraStore (r){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  r.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_OverrideStore (r){{end}}
+{{end}}
+
+
 	logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 
 	if len(r.{{.QueryFieldID}}) == 0 {
@@ -148,7 +154,7 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
 	ts := SQLData{}
 
-{{range .FieldsList}}{{if not .IsOverride}}{{if not .IsExtra}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}}){{end}}{{end}}
+{{range .FieldsList}}{{if not .IsOverride}}{{if not .IsExtra}}{{if not .IsLookup}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}}){{end}}{{end}}{{end}}
 {{end}}	
 
 	tsql := "INSERT INTO " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
@@ -183,7 +189,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{else}}{{end}}
 {{end}}// If there are fields below, create the methods in dao\{{$.ObjectName}}_Impl.go
 {{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}} (recItem){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_Override (recItem){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_OverrideFetch (recItem){{end}}
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list

@@ -30,7 +30,7 @@
 {{range .FieldsList}}{{if not .IsBaseField}}             <div class="row">
               <div class="col-sm">
                 <label for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="form-control" {{.Disabled}}><option name="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
+                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="form-control" {{.Disabled}}><option value="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
                 <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
                 {{end}}
               </div>
