@@ -1,33 +1,32 @@
 {{.TemplateHeader}}
 {{.TemplateBody}}
 
+<div class="container-fluid" style="margin-top: 4.5rem;">
       <div class="card">
        
             <div class="card-header font-weight-bold">
               <div class="row d-flex">
                 <div class="col d-flex"><h3>{{.Title}}</h3></div>
                 <div class="col d-flex justify-content-end">
-                  <form action="/home" method="POST">
-                    <div class="btn-group">
-                    {{if .CanNew}}<button type="submit" value="" class="btn btn-primary" formaction="/{{.ObjectName}}New" method="POST" title="Create a new {{.FriendlyName}}"><i class="fas fa-plus"></i>&nbsp;&nbsp;New</button>{{end}}
-                    {{if .CanExport}}<button id="export" type="button" class="btn btn-info"><i class="fas fa-file-csv" title="Export {{.FriendlyName}} as CSV"></i>&nbsp;&nbsp;Export</button>{{end}}
-                    <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
-                    <button id="close" type="button" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times"></i>&nbsp;&nbsp;Cancel</button>
-                    </div>
-                  </form>
+                  <div class="btn-group">
+                  {{if .CanNew}}<button type="submit" value="" class="btn btn-primary" formaction="/{{.ObjectName}}New" method="POST" title="Create a new {{.FriendlyName}}"><i class="fas fa-plus"></i>&nbsp;&nbsp;New</button>{{end}}
+                  {{if .CanExport}}<button id="export" type="button" class="btn btn-info"><i class="fas fa-file-csv" title="Export {{.FriendlyName}} as CSV"></i>&nbsp;&nbsp;Export</button>{{end}}
+                  <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
+                  <button id="close" type="button" class="btn btn-outline-secondary" onclick="history.back()" title="Back"><i class="fas fa-times"></i>&nbsp;&nbsp;Cancel</button>
+                  </div>
                 </div>
               </div>
             </div>
               <div class="card-body">
                   <div class="datatable table-hover table-responsive table-hover">
-                    <table class="table" id="ListTable">
+                    <table class="table" id="List_Table">
                       <thead class="thead-light">
                         <tr>
                           {{range .FieldsList}}{{if .IsUserField}}{{if .IsBaseField}}<th class="text-center">{{.FieldName}}</th>{{end}}{{end}}
                           {{end}}<th class="text-right"><div class="d-flex justify-content-center">Actions</div></th>
                         </tr>
                       </thead>
-                      <tbody id="filterTable">
+                      <tbody id=filterTable>
                         {{.RangeItemList}}
                         <tr>
                           {{range .FieldsList}}{{if .IsUserField}}{{if .IsBaseField}}<td class="align-middle">{{.TemplateField}}</td>{{end}}{{end}}
@@ -49,6 +48,7 @@
               </div>
         </form>
       </div>
+</div>
 
 {{.TemplateUserFooter}}
 {{if .CanExport}}{{.TemplateExportControls}}{{end}}

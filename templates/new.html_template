@@ -1,44 +1,41 @@
 {{.TemplateHeader}}
-<body>
-  <div class="container-fluid">
+{{.TemplateBody}}
     <form action="/{{.ObjectName}}Save/" method="GET" class="form">
       <div class="card">
-        <div class="card-header font-weight-bold">
+        <div class="card-header">
           <div class="row">
-            <div class="col">
-              {{.Title}}&nbsp;:&nbsp;<code>NEW</code>
-            </div>
-            <div class="col">
+            <div class="col h3">{{.Title}}</div>
+            <div class="col d-flex justify-content-end">
               <div class="btn-group float-right">
               {{if .CanSave}}
                 <button type="submit" value="" class="btn btn-danger"><i class="fas fa-save"  method="GET" formaction="/{{.ObjectName}}Save/" onclick="/{{.ObjectName}}Save/" title="Save {{.FriendlyName}}"></i>&nbsp;&nbsp;Save</button>
               {{end}}
                 <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
-                <button type="button" value="" class="btn btn-outline-secondary" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
+                <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
               </div>
             </div>
           </div>
         </div>
         <div class="card-body">
-{{range .FieldsList}}{{if .IsBaseField}}            <div class="row">
-              <div class="col-sm">
-                <label for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
+{{range .FieldsList}}{{if .IsBaseField}}            <div class="row mb-3">
+              <div class="form-outline">
                 <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
+                <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
               </div>
             </div>
 {{end}}{{end}}
-{{range .FieldsList}}{{if not .IsBaseField}}             <div class="row">
-              <div class="col-sm">
-                <label for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="form-control" {{.Disabled}}><option value="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
+{{range .FieldsList}}{{if not .IsBaseField}}             <div class="row mb-3">
+              
+                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}}><option value="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
                 <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
                 {{end}}
-              </div>
+                <label class="form-label select-label" for="{{.FieldName}}"}>{{.FieldName}}</label>
+      
             </div>
 {{end}}{{end}}     
         </div>
       </div>
     </form>
-  </div>
-  {{.TemplateFooter}}
-</body>
+  
+{{.TemplateUserFooter}}
+{{.TemplatePageFooter}}

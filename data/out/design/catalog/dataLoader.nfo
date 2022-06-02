@@ -1,19 +1,19 @@
 ----------------------------------------------------------------
-Automatically generated  "/design/catalog/watchlist.nfo"
+Automatically generated  "/design/catalog/dataloader.nfo"
 ----------------------------------------------------------------
 Package              : n/a
-Object 			     : Watchlist (watchlist)
-Endpoint 	         : Watchlist (Id)
-For Project          : github.com/mt1976/purse/
+Object 			     : DataLoader (dataloader)
+Endpoint 	         : DataLoader (Id)
+For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
 Template Generator   : delinquentDysprosium [r4-21.12.31]
-Date & Time		     : 18/01/2022 at 13:57:34
+Date & Time		     : 01/06/2022 at 16:43:41
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
-SQL Table Name       : watchlist
-SQL Table Search Col : id
+SQL Table Name       : loaderStore
+SQL Table Search Col : Id
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
@@ -26,33 +26,34 @@ Fields Generated
 | Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 | SYSId                               | Int        | 0          | Y  | Y  |    |    |    |                 |                          |                          |
-| Id                                  | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Code                                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Id                                  | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
 | Name                                | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Symbol                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Notes                               | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Description                         | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Filename                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Lastrun                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSCreated                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSWho                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSHost                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSUpdated                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Type                                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Instance                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Extension                           | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSCreatedBy                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| SYSCreatedHost                      | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| SYSUpdatedBy                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSUpdatedHost                      | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| SYSUpdatedBy                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| SYSCreatedHost                      | String     |            |    | Y  |    |    |    |                 |                          |                          |
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/watchlist.go_tmp)
-* api (/application/watchlist_api.go)
-* dao (/dao/watchlist.go_tmp)
-* datamodel (/datamodel/watchlist.go_tmp)
-* menu (/design/menu/watchlist.json)
-* html -> List (/html/Watchlist_List.html)
-* html -> View (/html/Watchlist_View.html)
-* html -> Edit (/html/Watchlist_Edit.html)
-* html -> New (/html/Watchlist_New.html)
-* catalog (/design/catalog/watchlist.nfo)
+* application (/application/dataLoader.go_tmp)
+* dao (/dao/dataLoader.go_tmp)
+* datamodel (/datamodel/dataLoader.go_tmp)
+* menu (/design/menu/dataLoader.json)
+* html -> List (/html/DataLoader_List.html)
+* html -> View (/html/DataLoader_View.html)
+* html -> Edit (/html/DataLoader_Edit.html)
+* catalog (/design/catalog/dataLoader.nfo)
 ----------------------------------------------------------------
 End of File
 ----------------------------------------------------------------

@@ -1,19 +1,19 @@
 ----------------------------------------------------------------
-Automatically generated  "/design/catalog/book.nfo"
+Automatically generated  "/design/catalog/counterpartyname.nfo"
 ----------------------------------------------------------------
 Package              : n/a
-Object 			     : Book (book)
-Endpoint 	         : Book (Book)
+Object 			     : CounterpartyName (counterpartyname)
+Endpoint 	         : CounterpartyName (ID)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
 Template Generator   : delinquentDysprosium [r4-21.12.31]
-Date & Time		     : 01/06/2022 at 16:43:36
+Date & Time		     : 01/06/2022 at 16:43:40
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
-SQL Table Name       : sienaBook
-SQL Table Search Col : BookName
+SQL Table Name       : sienaCounterpartyNameLookup
+SQL Table Search Col : CompID
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
@@ -25,28 +25,21 @@ Fields Generated
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 | Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
-| BookName                            | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| NameFirm                            | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| NameCentre                          | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
 | FullName                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| PLManage                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| PLTransfer                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| DerivePL                            | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
-| CostOfCarry                         | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
-| CostOfFunding                       | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
-| LotAllocationMethod                 | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| InternalId                          | Int        | 0          | Y  | Y  |    |    |    |                 |                          |                          |
+| CompID                              | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/book.go_tmp)
-* api (/application/book_api.go)
-* dao (/dao/book.go_tmp)
-* datamodel (/datamodel/book.go_tmp)
-* menu (/design/menu/book.json)
-* html -> List (/html/Book_List.html)
-* html -> View (/html/Book_View.html)
-* html -> Edit (/html/Book_Edit.html)
-* catalog (/design/catalog/book.nfo)
+* application (/application/counterpartyName.go_tmp)
+* dao (/dao/counterpartyName.go_tmp)
+* datamodel (/datamodel/counterpartyName.go_tmp)
+* menu (/design/menu/counterpartyName.json)
+* html -> List (/html/CounterpartyName_List.html)
+* html -> View (/html/CounterpartyName_View.html)
+* catalog (/design/catalog/counterpartyName.nfo)
 ----------------------------------------------------------------
 End of File
 ----------------------------------------------------------------

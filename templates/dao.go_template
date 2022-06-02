@@ -121,10 +121,9 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
     var err error
 
 // If there are fields below, create the methods in dao\{{$.ObjectName}}_Impl.go
-{{range .FieldsList}}{{if .IsExtra}}   r.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_ExtraStore (r){{end}}
+{{range .FieldsList}}{{if .IsExtra}}   {{$.ObjectNameLower}}_{{.FieldName}}_Store (r,r.{{.FieldName}}){{end}}
 {{end}}{{range .FieldsList}}{{if .IsOverride}}  r.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_OverrideStore (r){{end}}
 {{end}}
-
 
 	logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 

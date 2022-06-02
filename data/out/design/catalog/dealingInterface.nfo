@@ -6,8 +6,8 @@ Object 			     : DealingInterface (dealinginterface)
 Endpoint 	         : DealingInterface (Name)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
-Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:20
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 01/06/2022 at 16:43:42
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
@@ -17,39 +17,43 @@ SQL Table Search Col : Name
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Field Name                          | Type       | Default    | Mand  |  Base  | LookP | Object          | Key        | Value      |  
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Name                                | String     |            | true  | true   | false |                 |            |            | 
-| AcceptReducedAmount                 | Bool       | True       | false | true   | false |                 |            |            | 
-| QuoteAsIndicative                   | Bool       | True       | false | true   | false |                 |            |            | 
-| RateTimeOut                         | Int        | 0          | false | true   | false |                 |            |            | 
-| PropagationDelay                    | Int        | 0          | false | true   | false |                 |            |            | 
-| CheckLiquidity                      | Bool       | True       | false | true   | false |                 |            |            | 
-| ChangeQuoteDirection                | Bool       | True       | false | true   | false |                 |            |            | 
-| GenerateRejectedDeals               | Bool       | True       | false | true   | false |                 |            |            | 
-| SpotUpdatesForForwardQuotes         | Bool       | True       | false | true   | false |                 |            |            | 
-| SettlementInstructionStyle          | String     |            | false | true   | false |                 |            |            | 
-| CanRetractQuotes                    | Bool       | True       | false | true   | false |                 |            |            | 
-| CancelESPifNotPriced                | Bool       | True       | false | true   | false |                 |            |            | 
-| CancelRFQSifNotPriced               | Bool       | True       | false | true   | false |                 |            |            | 
-| CancelonDealingSuspended            | Bool       | True       | false | true   | false |                 |            |            | 
-| CreditCheckedatDI                   | Bool       | True       | false | true   | false |                 |            |            | 
-| DuplicateCheckonExternalRef         | Bool       | True       | false | true   | false |                 |            |            | 
-| LimitCheckQuote                     | Bool       | True       | false | true   | false |                 |            |            | 
-| LimitCheckonRFQDealSubmission       | Bool       | True       | false | true   | false |                 |            |            | 
-| ListenonLimits                      | Bool       | True       | false | true   | false |                 |            |            | 
-| MarginStyle                         | String     |            | false | true   | false |                 |            |            | 
-| UseRerouteDefinitionOnly            | Bool       | True       | false | true   | false |                 |            |            | 
-| BypassConfirmation                  | Bool       | True       | false | true   | false |                 |            |            | 
-| DIOnAcceptance                      | Bool       | True       | false | true   | false |                 |            |            | 
-| IgnoreESPAmountRules                | Bool       | True       | false | true   | false |                 |            |            | 
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
+* Md  = Mandatory
+* Cr  = Core Fields
+* Ex  = Extra Fields
+* Ov  = Override of a Core Field
+* Lkp = Lookup Field
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Name                                | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| AcceptReducedAmount                 | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| QuoteAsIndicative                   | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| RateTimeOut                         | Int        | 0          |    | Y  |    |    |    |                 |                          |                          |
+| PropagationDelay                    | Int        | 0          |    | Y  |    |    |    |                 |                          |                          |
+| CheckLiquidity                      | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| ChangeQuoteDirection                | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| GenerateRejectedDeals               | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| SpotUpdatesForForwardQuotes         | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| SettlementInstructionStyle          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| CanRetractQuotes                    | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CancelESPifNotPriced                | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CancelRFQSifNotPriced               | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CancelonDealingSuspended            | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CreditCheckedatDI                   | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| DuplicateCheckonExternalRef         | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| LimitCheckQuote                     | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| LimitCheckonRFQDealSubmission       | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| ListenonLimits                      | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| MarginStyle                         | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| UseRerouteDefinitionOnly            | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| BypassConfirmation                  | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| DIOnAcceptance                      | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| IgnoreESPAmountRules                | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/dealingInterface_core.go_tmp)
-* adaptor (/adaptor/dealingInterface.go_tmp)
+* application (/application/dealingInterface.go_tmp)
 * dao (/dao/dealingInterface.go_tmp)
 * datamodel (/datamodel/dealingInterface.go_tmp)
 * menu (/design/menu/dealingInterface.json)

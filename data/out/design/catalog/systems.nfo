@@ -1,18 +1,18 @@
 ----------------------------------------------------------------
-Automatically generated  "/design/catalog/cache.nfo"
+Automatically generated  "/design/catalog/systems.nfo"
 ----------------------------------------------------------------
 Package              : n/a
-Object 			     : Cache (cache)
-Endpoint 	         : Cache (ID)
+Object 			     : Systems (systems)
+Endpoint 	         : Systems (ID)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
 Template Generator   : delinquentDysprosium [r4-21.12.31]
-Date & Time		     : 01/06/2022 at 16:43:37
+Date & Time		     : 01/06/2022 at 16:43:48
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
-SQL Table Name       : cacheStore
+SQL Table Name       : systemStore
 SQL Table Search Col : Id
 ----------------------------------------------------------------
 Fields Generated
@@ -27,31 +27,36 @@ Fields Generated
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 | SYSId                               | Int        | 0          | Y  | Y  |    |    |    |                 |                          |                          |
 | Id                                  | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
-| Object                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Field                               | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Value                               | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Expiry                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Name                                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Staticin                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Staticout                           | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Txnin                               | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Txnout                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Fundscheckin                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Fundscheckout                       | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSCreated                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSWho                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSHost                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSUpdated                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
-| Source                              | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSCreatedBy                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSCreatedHost                      | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSUpdatedBy                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
 | SYSUpdatedHost                      | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| SWIFTin                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| SWIFTout                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
 *-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/cache.go_tmp)
-* dao (/dao/cache.go_tmp)
-* datamodel (/datamodel/cache.go_tmp)
-* menu (/design/menu/cache.json)
-* html -> List (/html/Cache_List.html)
-* html -> View (/html/Cache_View.html)
-* html -> Edit (/html/Cache_Edit.html)
-* catalog (/design/catalog/cache.nfo)
+* application (/application/systems.go_tmp)
+* dao (/dao/systems.go_tmp)
+* datamodel (/datamodel/systems.go_tmp)
+* menu (/design/menu/systems.json)
+* html -> List (/html/Systems_List.html)
+* html -> View (/html/Systems_View.html)
+* html -> Edit (/html/Systems_Edit.html)
+* html -> New (/html/Systems_New.html)
+* catalog (/design/catalog/systems.nfo)
 ----------------------------------------------------------------
 End of File
 ----------------------------------------------------------------

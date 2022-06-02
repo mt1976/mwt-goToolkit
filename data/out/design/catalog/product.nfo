@@ -6,8 +6,8 @@ Object 			     : Product (product)
 Endpoint 	         : Product (Code)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
-Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:21
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 01/06/2022 at 16:43:46
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
@@ -17,27 +17,32 @@ SQL Table Search Col : Code
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Field Name                          | Type       | Default    | Mand  |  Base  | LookP | Object          | Key        | Value      |  
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Code                                | String     |            | true  | true   | false |                 |            |            | 
-| Name                                | String     |            | false | true   | false |                 |            |            | 
-| Factor                              | Float      | 0.00       | false | true   | false |                 |            |            | 
-| MaxTermPrecedence                   | Bool       | True       | false | true   | false |                 |            |            | 
-| InternalId                          | Int        | 0          | true  | true   | false |                 |            |            | 
-| InternalDeleted                     | Time       |            | false | true   | false |                 |            |            | 
-| UpdatedTransactionId                | String     |            | false | true   | false |                 |            |            | 
-| UpdatedUserId                       | String     |            | false | true   | false |                 |            |            | 
-| UpdatedDateTime                     | Time       |            | false | true   | false |                 |            |            | 
-| DeletedTransactionId                | String     |            | false | true   | false |                 |            |            | 
-| DeletedUserId                       | String     |            | false | true   | false |                 |            |            | 
-| ChangeType                          | String     |            | false | true   | false |                 |            |            | 
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
+* Md  = Mandatory
+* Cr  = Core Fields
+* Ex  = Extra Fields
+* Ov  = Override of a Core Field
+* Lkp = Lookup Field
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Code                                | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Name                                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Factor                              | Float      | 0.00       |    | Y  |    |    |    |                 |                          |                          |
+| MaxTermPrecedence                   | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| InternalId                          | Int        | 0          | Y  | Y  |    |    |    |                 |                          |                          |
+| InternalDeleted                     | Time       |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedTransactionId                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedUserId                       | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedDateTime                     | Time       |            |    | Y  |    |    |    |                 |                          |                          |
+| DeletedTransactionId                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| DeletedUserId                       | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| ChangeType                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/product_core.go_tmp)
-* adaptor (/adaptor/product.go_tmp)
+* application (/application/product.go_tmp)
+* api (/application/product_api.go)
 * dao (/dao/product.go_tmp)
 * datamodel (/datamodel/product.go_tmp)
 * menu (/design/menu/product.json)

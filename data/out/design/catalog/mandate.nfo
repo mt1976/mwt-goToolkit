@@ -6,47 +6,53 @@ Object 			     : Mandate (mandate)
 Endpoint 	         : Mandate (Mandate)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
-Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:21
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 01/06/2022 at 16:43:45
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
 ----------------------------------------------------------------
 SQL Table Name       : sienaMandatedUser
-SQL Table Search Col : FirmName
+SQL Table Search Col : CompID
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Field Name                          | Type       | Default    | Mand  |  Base  | LookP | Object          | Key        | Value      |  
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| MandatedUserKeyCounterpartyFirm     | String     |            | true  | true   | false |                 |            |            | 
-| MandatedUserKeyCounterpartyCentre   | String     |            | true  | true   | false |                 |            |            | 
-| MandatedUserKeyUserName             | String     |            | true  | true   | false |                 |            |            | 
-| TelephoneNumber                     | String     |            | false | true   | false |                 |            |            | 
-| EmailAddress                        | String     |            | false | true   | false |                 |            |            | 
-| Active                              | Bool       | True       | false | true   | false |                 |            |            | 
-| FirstName                           | String     |            | false | true   | false |                 |            |            | 
-| Surname                             | String     |            | false | true   | false |                 |            |            | 
-| DateOfBirth                         | Time       |            | true  | true   | false |                 |            |            | 
-| Postcode                            | String     |            | false | true   | false |                 |            |            | 
-| NationalIDNo                        | String     |            | false | true   | false |                 |            |            | 
-| PassportNo                          | String     |            | false | true   | false |                 |            |            | 
-| Country                             | String     |            | false | true   | false |                 |            |            | 
-| CountryName                         | String     |            | false | true   | false |                 |            |            | 
-| FirmName                            | String     |            | false | true   | false |                 |            |            | 
-| CentreName                          | String     |            | false | true   | false |                 |            |            | 
-| Notify                              | Bool       | True       | false | true   | false |                 |            |            | 
-| SystemUser                          | String     |            | false | true   | false |                 |            |            | 
-| Country_Impl                        | String     |            | false | false  | true  | Country         | Country    | Name       | 
-| Firm_Impl                           | String     |            | false | false  | true  | Firm            | MandatedUserKeyCounterpartyFirm | FullName   | 
-| Centre_Impl                         | String     |            | false | false  | true  | Centre          | MandatedUserKeyCounterpartyCentre | Name       | 
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
+* Md  = Mandatory
+* Cr  = Core Fields
+* Ex  = Extra Fields
+* Ov  = Override of a Core Field
+* Lkp = Lookup Field
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| MandatedUserKeyCounterpartyFirm     | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| MandatedUserKeyCounterpartyCentre   | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| MandatedUserKeyUserName             | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| TelephoneNumber                     | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| EmailAddress                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Active                              | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| FirstName                           | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Surname                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| DateOfBirth                         | Time       |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Postcode                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| NationalIDNo                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| PassportNo                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Country                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| CountryName                         | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| FirmName                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| CentreName                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| Notify                              | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| SystemUser                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| CompID                              | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Country_Lookup                      | String     |            |    |    |    |    | Y  | Country         | Country                  | Name                     |
+| Firm_Lookup                         | String     |            |    |    |    |    | Y  | Firm            | MandatedUserKeyCounterpartyFirm | FullName                 |
+| Centre_Lookup                       | String     |            |    |    |    |    | Y  | Centre          | MandatedUserKeyCounterpartyCentre | Name                     |
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/mandate_core.go_tmp)
-* adaptor (/adaptor/mandate.go_tmp)
+* application (/application/mandate.go_tmp)
+* api (/application/mandate_api.go)
 * dao (/dao/mandate.go_tmp)
 * datamodel (/datamodel/mandate.go_tmp)
 * menu (/design/menu/mandate.json)

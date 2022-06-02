@@ -24,66 +24,70 @@ import (
 )
 
 type enrichments struct {
-	ObjectName         string
-	ObjectNameLower    string
-	ObjectCamelCase    string
-	ObjectGlyph        string
-	ObjectTextClass    string
-	EndpointRoot       string
-	QueryString        string
-	QueryField         string
-	QueryFieldID       string
-	SourceName         string
-	Version            string
-	Date               string
-	Time               string
-	Who                string
-	Host               string
-	FieldsList         []fields
-	FriendlyName       string
-	SQLTableName       string
-	SQLSearchID        string
-	SearchKey          string
-	SourceType         string
-	MessageList        []messages
-	Path               string
-	ProjectRepo        string
-	UUID               string
-	Title              string
-	PageTitle          string
-	UserMenu           string
-	MenuHeader         string
-	RangeUserMenuStart string
-	RangeEnd           string
-	MenuHREF           string
-	MenuOnClick        string
-	MenuGlyph          string
-	MenuTextClass      string
-	MenuText           string
-	ItemsOnPageWc      string
-	ItemList           string
-	RangeItemList      string
-	CanView            bool
-	CanEdit            bool
-	CanSave            bool
-	CanNew             bool
-	CanDelete          bool
-	CanList            bool
-	CanAPI             bool
-	PropertiesName     string
-	UsesAdaptor        bool
-	CanExport          bool
-	HasReverseLookup   bool
-	ReverseLookup      string
-	IsSpecial          bool
-	OffersLookup       bool
-	LookupID           string
-	LookupName         string
-	TemplateHeader     string
-	TemplateFooter     string
-	TemplateScripts    string
-	TemplateAudit      string
-	TitleText          string
+	ObjectName             string
+	ObjectNameLower        string
+	ObjectCamelCase        string
+	ObjectGlyph            string
+	ObjectTextClass        string
+	EndpointRoot           string
+	QueryString            string
+	QueryField             string
+	QueryFieldID           string
+	SourceName             string
+	Version                string
+	Date                   string
+	Time                   string
+	Who                    string
+	Host                   string
+	FieldsList             []fields
+	FriendlyName           string
+	SQLTableName           string
+	SQLSearchID            string
+	SearchKey              string
+	SourceType             string
+	MessageList            []messages
+	Path                   string
+	ProjectRepo            string
+	UUID                   string
+	Title                  string
+	PageTitle              string
+	UserMenu               string
+	MenuHeader             string
+	RangeUserMenuStart     string
+	RangeEnd               string
+	MenuHREF               string
+	MenuOnClick            string
+	MenuGlyph              string
+	MenuTextClass          string
+	MenuText               string
+	ItemsOnPageWc          string
+	ItemList               string
+	RangeItemList          string
+	CanView                bool
+	CanEdit                bool
+	CanSave                bool
+	CanNew                 bool
+	CanDelete              bool
+	CanList                bool
+	CanAPI                 bool
+	PropertiesName         string
+	UsesAdaptor            bool
+	CanExport              bool
+	HasReverseLookup       bool
+	ReverseLookup          string
+	IsSpecial              bool
+	OffersLookup           bool
+	LookupID               string
+	LookupName             string
+	TemplateHeader         string
+	TemplateUserFooter     string
+	TemplatePageFooter     string
+	TemplateScripts        string
+	TemplateAudit          string
+	TemplateBody           string
+	TemplateListControls   string
+	TemplateExportControls string
+	TitleText              string
 }
 
 type fields struct {
@@ -626,8 +630,12 @@ func setupEnrichment(props map[string]string) enrichments {
 	}
 
 	e.TemplateHeader = wrapTemplate("header")
-	e.TemplateFooter = wrapTemplate("footer")
+	e.TemplateUserFooter = wrapTemplate("userfooter")
+	e.TemplatePageFooter = wrapTemplate("pagefooter")
 	e.TemplateScripts = wrapTemplate("scripts")
+	e.TemplateBody = wrapTemplate("bodydefinition")
+	e.TemplateListControls = wrapTemplate("tablecontrols")
+	e.TemplateExportControls = wrapTemplate("exportcontrols")
 	spew.Dump(e)
 	return e
 }

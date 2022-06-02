@@ -6,8 +6,8 @@ Object 			     : DealType (dealtype)
 Endpoint 	         : DealType (DealTypeKey)
 For Project          : github.com/mt1976/mwt-go-dev/
 ----------------------------------------------------------------
-Template Generator   : cryptoidCalcium [r0-21.11.01]
-Date & Time		     : 20/11/2021 at 16:24:21
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 01/06/2022 at 16:43:43
 Who & Where		     : matttownsend on silicon.local
 ----------------------------------------------------------------
 Database Information
@@ -17,41 +17,45 @@ SQL Table Search Col : DealTypeKey
 ----------------------------------------------------------------
 Fields Generated
 ----------------------------------------------------------------
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| Field Name                          | Type       | Default    | Mand  |  Base  | LookP | Object          | Key        | Value      |  
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
-| DealTypeKey                         | String     |            | true  | true   | false |                 |            |            | 
-| DealTypeShortName                   | String     |            | false | true   | false |                 |            |            | 
-| HostKey                             | String     |            | false | true   | false |                 |            |            | 
-| IsActive                            | Bool       | True       | false | true   | false |                 |            |            | 
-| Interbook                           | Bool       | True       | false | true   | false |                 |            |            | 
-| BackOfficeLink                      | Bool       | True       | false | true   | false |                 |            |            | 
-| HasTicket                           | Bool       | True       | false | true   | false |                 |            |            | 
-| CurrencyOverride                    | Bool       | True       | false | true   | false |                 |            |            | 
-| CurrencyHolderCurrency              | String     |            | false | true   | false |                 |            |            | 
-| AllBooks                            | Bool       | True       | false | true   | false |                 |            |            | 
-| FundamentalDealTypeKey              | String     |            | false | true   | false |                 |            |            | 
-| RelatedDealType                     | String     |            | false | true   | false |                 |            |            | 
-| BookName                            | String     |            | false | true   | false |                 |            |            | 
-| ExportMethod                        | String     |            | false | true   | false |                 |            |            | 
-| DefaultUserLayoffBooks              | Bool       | True       | false | true   | false |                 |            |            | 
-| RFQ                                 | Bool       | True       | false | true   | false |                 |            |            | 
-| OBS                                 | Bool       | True       | false | true   | false |                 |            |            | 
-| KID                                 | Bool       | True       | false | true   | false |                 |            |            | 
-| InternalId                          | Int        | 0          | true  | true   | false |                 |            |            | 
-| InternalDeleted                     | Time       |            | false | true   | false |                 |            |            | 
-| UpdatedTransactionId                | String     |            | false | true   | false |                 |            |            | 
-| UpdatedUserId                       | String     |            | false | true   | false |                 |            |            | 
-| UpdatedDateTime                     | Time       |            | false | true   | false |                 |            |            | 
-| DeletedTransactionId                | String     |            | false | true   | false |                 |            |            | 
-| DeletedUserId                       | String     |            | false | true   | false |                 |            |            | 
-| ChangeType                          | String     |            | false | true   | false |                 |            |            | 
-*-------------------------------------+------------+------------+-------+--------+-------+-----------------+------------+------------*
+* Md  = Mandatory
+* Cr  = Core Fields
+* Ex  = Extra Fields
+* Ov  = Override of a Core Field
+* Lkp = Lookup Field
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| DealTypeKey                         | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| DealTypeShortName                   | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| HostKey                             | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| IsActive                            | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| Interbook                           | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| BackOfficeLink                      | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| HasTicket                           | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CurrencyOverride                    | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| CurrencyHolderCurrency              | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| AllBooks                            | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| FundamentalDealTypeKey              | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| RelatedDealType                     | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| BookName                            | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| ExportMethod                        | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| DefaultUserLayoffBooks              | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| RFQ                                 | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| OBS                                 | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| KID                                 | Bool       | True       |    | Y  |    |    |    |                 |                          |                          |
+| InternalId                          | Int        | 0          | Y  | Y  |    |    |    |                 |                          |                          |
+| InternalDeleted                     | Time       |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedTransactionId                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedUserId                       | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| UpdatedDateTime                     | Time       |            |    | Y  |    |    |    |                 |                          |                          |
+| DeletedTransactionId                | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| DeletedUserId                       | String     |            |    | Y  |    |    |    |                 |                          |                          |
+| ChangeType                          | String     |            |    | Y  |    |    |    |                 |                          |                          |
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
 ----------------------------------------------------------------
 Artifacts Generated
 ----------------------------------------------------------------
-* application (/application/dealType_core.go_tmp)
-* adaptor (/adaptor/dealType.go_tmp)
+* application (/application/dealType.go_tmp)
 * dao (/dao/dealType.go_tmp)
 * datamodel (/datamodel/dealType.go_tmp)
 * menu (/design/menu/dealType.json)
