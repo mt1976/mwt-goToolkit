@@ -118,27 +118,41 @@ func {{.ObjectNameLower}}_MethodPost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(int(http.StatusOK))
 	}
 	//spew.Dump(t)
+	{{if .CanSave}}
 	err = dao.{{.ObjectName}}_StoreSystem(t)
+	if err != nil {
+
+		//	panic(err)
+
+		w.WriteHeader(int(http.StatusNotFound))
+
+	} else {
+
+		w.WriteHeader(int(http.StatusOK))
+
+	}
+	{{else}}
+			w.WriteHeader(int(http.StatusMethodNotAllowed))
+	{{end}}
 	//logs.Processing("POST BACK")
 	//logs.Information("POST", err.Error())
-	if err != nil {
-		//	panic(err)
-		w.WriteHeader(int(http.StatusNotFound))
-	} else {
-		w.WriteHeader(int(http.StatusOK))
-	}
+	
 	//logs.Success("POST")
 }
 //Handles DELETE requests for {{.ObjectName}}
 func {{.ObjectNameLower}}_MethodDelete(w http.ResponseWriter, r *http.Request) {
 	//logs.Processing("DELETE")
-	deleteID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
 	//logs.Information("DELETE", deleteID)
+		w.Header().Set("Content-Type", "application/json")
+{{if .CanDelete}}
+	deleteID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
 
 	dao.{{.ObjectName}}_Delete(deleteID)
+		w.WriteHeader(int(http.StatusOK))
+{{else}}
+		w.WriteHeader(int(http.StatusMethodNotAllowed))
+{{end}}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(int(http.StatusOK))
 	//fmt.Printf("json_data: %v\n", json_data)
 
 	//logs.Success("DELETE")

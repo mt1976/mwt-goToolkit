@@ -1,0 +1,5 @@
+Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Extra,Cheese,,,,false,false,,
+Extra,Onion,,,,false,false,,
+Lookup,CheeseLKUP,Firm,Firm,FullName,false,,,Namefirpoo
+Override,Descr,,,,false,false,,

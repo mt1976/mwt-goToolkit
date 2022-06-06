@@ -13,25 +13,21 @@ package dao
 // ----------------------------------------------------------------
 
 import (
-	{{if not .IsSpecial}}
-	"log"
-	{{end}}
+
 	"fmt"
 	"net/http"
-
-	{{if not .IsSpecial}}"github.com/google/uuid"
-	core "{{.ProjectRepo}}core"
-	das  "{{.ProjectRepo}}das"
-	{{end}}
-	{{if .UsesAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
+{{if not .HasFetchAdaptor}}core "{{.ProjectRepo}}core"{{end}}
+{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
+{{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
+	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
 )
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
-	{{if .IsSpecial}}
-	count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_Impl()
+	{{if .HasFetchAdaptor}}
+	count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_impl()
 	{{else}}
 	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
@@ -39,18 +35,11 @@ func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 	return count, {{.ObjectNameLower}}List, nil
 }
 
-{{if .OffersLookup}}
+{{if .ProvidesLookup}}
 // {{.ObjectName}}_GetLookup() returns a lookup list of all {{.ObjectName}} items in lookup format
 func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
-
 	var returnList []dm.Lookup_Item
-
-	{{if .IsSpecial}}
-		count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_Impl()
-	{{else}}
-	    count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList()
-	{{end}}
-	
+	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList()
 	for i := 0; i < count; i++ {
 		returnList = append(returnList, dm.Lookup_Item{ID: {{.ObjectNameLower}}List[i].{{.LookupID}}, Name: {{.ObjectNameLower}}List[i].{{.LookupName}}})
 	}
@@ -61,8 +50,8 @@ func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
 // {{.ObjectName}}_GetByID() returns a single {{.ObjectName}} record
 func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 
-{{if .IsSpecial}}
-	 _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByID_Impl(id)
+{{if .HasFetchAdaptor}}
+	 _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByID_impl(id)
 	{{else}}
 	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
@@ -71,10 +60,10 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	return 1, {{.ObjectNameLower}}Item, nil
 }
 
-{{if .HasReverseLookup}}// {{.ObjectName}}_GetByReverseLookup(id string) returns a single {{.ObjectName}} record
+{{if .ProvidesReverseLookup}}// {{.ObjectName}}_GetByReverseLookup(id string) returns a single {{.ObjectName}} record using the {{.ReverseLookup}} field as key.
 func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, error) {
-{{if .IsSpecial}}
-	 _, _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByReverseLookup_Impl(id)
+{{if .HasFetchAdaptor}}
+	  _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
 {{else}}
 	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " WHERE {{.ReverseLookup}} = '" + id + "'"
@@ -87,8 +76,8 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_Delete(id string) {
 
-{{if .IsSpecial}}
-	adaptor.{{.ObjectName}}_Delete_Impl(id)
+{{if or .HasStoreAdaptor .HasFetchAdaptor}}
+	adaptor.{{.ObjectName}}_Delete_impl(id)
 	{{else}}
 	object_Table := core.ApplicationPropertiesDB["schema"] + "." + dm.{{.ObjectName}}_SQLTable
 	tsql := "DELETE FROM " + object_Table
@@ -120,10 +109,7 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
     var err error
 
-// If there are fields below, create the methods in dao\{{$.ObjectName}}_Impl.go
-{{range .FieldsList}}{{if .IsExtra}}   {{$.ObjectNameLower}}_{{.FieldName}}_Store (r,r.{{.FieldName}}){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  r.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_OverrideStore (r){{end}}
-{{end}}
+
 
 	logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 
@@ -131,10 +117,24 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 		r.{{.QueryFieldID}} = {{.ObjectName}}_NewID(r)
 	}
 
-{{if .UsesAdaptor}}
+// If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
+{{range .FieldsList}}{{if .IsExtra}}   err = adaptor.{{$.ObjectName}}_{{.FieldName}}_Store_impl (r,r.{{.FieldName}}){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  err = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_Store_impl (r){{end}}
+{{end}}
+
+	{{if .HasAudit}}
+	r.SYSCreated = Audit_Update(r.SYSCreated, Audit_TimeStamp())
+	r.SYSCreatedBy = Audit_Update(r.SYSCreatedBy, usr)
+	r.SYSCreatedHost = Audit_Update(r.SYSCreatedHost,Audit_Host())
+	r.SYSUpdated = Audit_Update("", Audit_TimeStamp())
+	r.SYSUpdatedBy = Audit_Update("",usr)
+	r.SYSUpdatedHost = Audit_Update("",Audit_Host())
+	{{end}}
+
+{{if .HasStoreAdaptor}}
 // Please Create Functions Below in the adaptor/{{.ObjectName}}_impl.go file
-	err1 := adaptor.{{.ObjectName}}_Delete_Impl(r.{{.QueryFieldID}})
-	err2 := adaptor.{{.ObjectName}}_Update_Impl(r,usr)
+	err1 := adaptor.{{.ObjectName}}_Delete_impl(r.{{.QueryFieldID}})
+	err2 := adaptor.{{.ObjectName}}_Update_impl(r.{{.QueryFieldID}},r,usr)
 	if err1 != nil {
 		err = err1
 	}
@@ -143,13 +143,6 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	}
 {{else}}
 //Deal with the if its Application or null add this bit, otherwise dont.
-	
-	r.SYSCreated = Audit_Update(r.SYSCreated, Audit_TimeStamp())
-	r.SYSCreatedBy = Audit_Update(r.SYSCreatedBy, usr)
-	r.SYSCreatedHost = Audit_Update(r.SYSCreatedHost,Audit_Host())
-	r.SYSUpdated = Audit_Update("", Audit_TimeStamp())
-	r.SYSUpdatedBy = Audit_Update("",usr)
-	r.SYSUpdatedHost = Audit_Update("",Audit_Host())
 
 	ts := SQLData{}
 
@@ -169,8 +162,9 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
 }
 
-{{if not .IsSpecial}}
-// {{.ObjectNameLower}}_Fetch read all employees
+
+{{if not .HasFetchAdaptor}}
+// {{.ObjectNameLower}}_Fetch read all {{.ObjectName}}'s
 func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error) {
 
 	var recItem dm.{{.ObjectName}}
@@ -178,7 +172,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 
 	returnList, noitems, err := das.Query(core.{{.PropertiesName}}DB, tsql)
 	if err != nil {
-		log.Fatal(err.Error())
+		logs.Fatal(err.Error(),err)
 	}
 
 	for i := 0; i < noitems; i++ {
@@ -186,30 +180,36 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 		rec := returnList[i]
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{else}}{{end}}
-{{end}}// If there are fields below, create the methods in dao\{{$.ObjectName}}_Impl.go
-{{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}} (recItem){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = {{$.ObjectNameLower}}_{{.FieldName}}_OverrideFetch (recItem){{end}}
+{{end}}// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
+{{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Fetch_impl (recItem){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_Fetch_impl (recItem){{end}}
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list
 		recList = append(recList, recItem)
 	}
+
 	return noitems, recList, recItem, nil
 }
-{{end}}
+	{{else}}
+// {{.ObjectNameLower}}_Fetch is not required as GetByID, GetAll etc... have been diverted to _impl
+	{{end}}
+
+
 func {{.ObjectName}}_NewID(r dm.{{.ObjectName}}) string {
-	{{if .IsSpecial}}
-		// {{.ObjectNameLower}}_NewIDImpl should be specified in dao/{{.ObjectName}}_Impl.go
+	{{if .CanOverrideID}}
+		// {{.ObjectName}}_NewID_impl should be specified in dao/{{.ObjectName}}_impl.go
 		// to provide the implementation for the special case.
 		// override should return id - override function should be defined as
-		// {{.ObjectNameLower}}_NewID_Impl(r dm.{{.ObjectName}}) string {...}
+		// {{.ObjectName}}_NewID_impl(r dm.{{.ObjectName}}) string {...}
 		//
-		id := adaptor.{{.ObjectName}}_NewID_Impl(r)
+		id := adaptor.{{.ObjectName}}_NewID_impl(r)
 	{{else}}
 			id := uuid.New().String()
 	{{end}}
 	return id
 }
+
 // ----------------------------------------------------------------
 // ADD Aditional Functions below this line
 // ----------------------------------------------------------------

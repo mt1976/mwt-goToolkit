@@ -16,6 +16,8 @@ import (
 	application "{{.ProjectRepo}}application"
 	dm          "{{.ProjectRepo}}datamodel"
 	logs        "{{.ProjectRepo}}logs"
+		core        "{{.ProjectRepo}}core"
+
 	cron        "github.com/robfig/cron/v3"
 )
 
@@ -25,12 +27,13 @@ func {{.ObjectName}}_Job() dm.JobDefinition {
 	// Job Definition
 	// Create a new job definition in the {{.ObjectName}}_Impl.go file called {{.ObjectName}}_JobImpl()
 	// ----------------------------------------------------------------
-	// j.ID = "{{.ObjectName}}"
-	// j.Name = "{{.ObjectName}}"
-	// j.Period = "10 1 * * *"
-	// j.Description = "{{.ObjectName}} processing"
-	// j.Type = core.Monitor
-	j:= {{.ObjectName}}_JobImpl()
+	var j dm.JobDefinition
+	j.ID = "{{.ObjectName}}"
+	j.Name = "{{.ObjectName}}"
+	j.Period = "10 1 * * *"
+	j.Description = "{{.ObjectName}} processing"
+	j.Type = core.General
+	j = {{.ObjectName}}_Job_impl(j)
 	return j
 }
 
@@ -44,8 +47,8 @@ func {{.ObjectName}}_Run() {
 	logs.StartJob({{.ObjectName}}_Job().Name)
 	message := ""
 	/// CONTENT STARTS
-	// Create a func in the {{.ObjectName}}_Impl.go file called {{.ObjectName}}_RunImpl() that returns string,error	
-	message,err := {{.ObjectName}}_RunImpl()
+	// Create a func in the {{.ObjectName}}_Impl.go file called {{.ObjectName}}_Run_impl() that returns string,error	
+	message,err := {{.ObjectName}}_Run_impl()
 	if err != nil {
 		logs.Warning(err.Error())
 	}

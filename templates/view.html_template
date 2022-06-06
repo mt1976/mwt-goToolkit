@@ -5,7 +5,7 @@
         <div class="card-header">
           <div class="row">
             <div class="col h3">
-              {{.Title}}&nbsp;:&nbsp;<code>{{.QueryField}}</code>
+              <i class="{{.ObjectGlyph}} me-2"></i>{{.Title}}&nbsp;:&nbsp;<code>{{.QueryField}}</code>
             </div>
             <div class="col d-flex justify-content-end">
               <div class="btn-group float-right">

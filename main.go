@@ -71,12 +71,14 @@ type enrichments struct {
 	CanList                bool
 	CanAPI                 bool
 	PropertiesName         string
-	UsesAdaptor            bool
+	HasStoreAdaptor        bool
+	HasFetchAdaptor        bool
+	HasAudit               bool
 	CanExport              bool
-	HasReverseLookup       bool
+	ProvidesReverseLookup  bool
 	ReverseLookup          string
 	IsSpecial              bool
-	OffersLookup           bool
+	ProvidesLookup         bool
 	LookupID               string
 	LookupName             string
 	TemplateHeader         string
@@ -88,6 +90,9 @@ type enrichments struct {
 	TemplateListControls   string
 	TemplateExportControls string
 	TitleText              string
+	MonitorPath            string
+	HasMonitor             bool
+	CanOverrideID          bool
 }
 
 type fields struct {
@@ -220,7 +225,7 @@ func processTableDefinition(configFile string) {
 		// Do nothing for now
 		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
 		e = getFieldDefinitions_DB(e, props)
-		e.SourceName = "APP"
+		e.SourceName = "CORE"
 	} else {
 		if props["propertiesoverride"] == "special" {
 			e.SourceName = "STATE"
@@ -242,7 +247,7 @@ func processTableDefinition(configFile string) {
 
 	e = generateCodeArtifact("application", props, configFile, e)
 
-	//e = generateCodeArtifact("adaptor", props, configFile, e)
+	e = generateCodeArtifact("adaptor", props, configFile, e)
 
 	if e.CanAPI {
 		e = generateCodeArtifact("api", props, configFile, e)
@@ -252,7 +257,7 @@ func processTableDefinition(configFile string) {
 
 	e = generateCodeArtifact("datamodel", props, configFile, e)
 
-	e = generateCodeArtifact("jobs", props, configFile, e)
+	e = generateCodeArtifact("job", props, configFile, e)
 
 	e = generateCodeArtifact("menu", props, configFile, e)
 
@@ -260,10 +265,13 @@ func processTableDefinition(configFile string) {
 
 	e = generateCodeArtifact("catalog", props, configFile, e)
 
+	e = generateCodeArtifact("monitor", props, configFile, e)
+
 }
 
 func generateCodeArtifact(a string, props map[string]string, configFile string, e enrichments) enrichments {
-	if strings.ToUpper(props["create_"+a]) == "Y" || a == "catalog" {
+
+	if getProperty("create_"+a, props) || a == "catalog" {
 		e = processCodeArtifact(a, configFile, a, e)
 	} else {
 		logs.Skipping(a)
@@ -302,6 +310,23 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 		in_extn = ".html_template"
 	}
 
+	if destFolder == "monitor" {
+		destFolder = "adaptor/monitors"
+		out_extn = "_core.go"
+		in_extn = ".go_template"
+	}
+
+	if destFolder == "job" {
+		destFolder = "jobs"
+		out_extn = "_core.go"
+		in_extn = ".go_template"
+	}
+
+	if destFolder == "adaptor" {
+		destFolder = "adaptor"
+		out_extn = "_impl.template"
+		in_extn = ".go_template"
+	}
 	//if destFolder == "application" {
 	//	out_extn = "_core" + out_extn
 	//	}
@@ -536,11 +561,11 @@ func displayTableHeader(in string) {
 	logs.Break()
 	logs.Header(in + " Information")
 	logs.Break()
-	logs.Information("Md ", "Mandatory")
-	logs.Information("Cr ", "Core Fields")
-	logs.Information("Ex ", "Extra Fields")
-	logs.Information("Ov ", "Override of a Core Field")
-	logs.Information("Lkp", "Lookup Field")
+	logs.Information("MD ", "Mandatory")
+	logs.Information("CR ", "Core Fields")
+	logs.Information("EX ", "Extra Fields")
+	logs.Information("OV", "Override of a Core Field")
+	logs.Information("LK", "Lookup Field")
 	logs.Break()
 	info := fmt.Sprintf(tableHeader, "Field Name", "Type", "Default", "Md", "Cr", "Ex", "Ov", "L⬆", "⬆ Object", "⬆ Field", "⬇ Value")
 	logs.Information(info, "")
@@ -590,14 +615,34 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.UUID = genUUID()
 
 	e.PropertiesName = ""
-	e.UsesAdaptor = false
+	e.HasStoreAdaptor = getProperty("hasstoreadaptor", props)
+	// if props["hasstoreadaptor"] == "y" {
+	// 	e.HasStoreAdaptor = true
+	// }
+	e.HasFetchAdaptor = getProperty("hasfetchadaptor", props)
+
+	// e.HasFetchAdaptor = false
+	// if props["hasfetchadaptor"] == "y" {
+	// 	e.HasFetchAdaptor = true
+	// }
+
+	// e.TemplateAudit = ""
+	// if props["hasaudit"] == "y" {
+	// 	e.TemplateAudit = wrapTemplate("audit")
+	// }
 	e.TemplateAudit = ""
+	e.HasAudit = getProperty("hasaudit", props)
+	if e.HasAudit {
+		e.TemplateAudit = wrapTemplate("audit")
+	}
+
 	e.IsSpecial = false
+
 	if props["propertiesoverride"] == "" {
 		e.PropertiesName = "Application"
-		e.TemplateAudit = wrapTemplate("audit")
+		//e.TemplateAudit = wrapTemplate("audit")
 	} else {
-		e.UsesAdaptor = true
+		e.HasStoreAdaptor = true
 		if props["propertiesoverride"] == "special" {
 			e.PropertiesName = "Application"
 			e.IsSpecial = true
@@ -610,10 +655,10 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e = setupPermissions(e, props)
 
-	e.HasReverseLookup = false
+	e.ProvidesReverseLookup = false
 	e.ReverseLookup = ""
 	if props["reverselookup"] != "" {
-		e.HasReverseLookup = true
+		e.ProvidesReverseLookup = true
 		e.ReverseLookup = props["reverselookup"]
 	}
 
@@ -622,9 +667,11 @@ func setupEnrichment(props map[string]string) enrichments {
 	// 	e.IsSpecial = true
 	// }
 
-	e.OffersLookup = false
-	if strings.ToUpper(props["offerslookup"]) == "Y" {
-		e.OffersLookup = true
+	e.ProvidesLookup = false
+	e.ProvidesLookup = getProperty("provideslookup", props)
+
+	if e.ProvidesLookup {
+		//e.ProvidesLookup = true
 		e.LookupID = props["lookupid"]
 		e.LookupName = props["lookupname"]
 	}
@@ -636,73 +683,83 @@ func setupEnrichment(props map[string]string) enrichments {
 	e.TemplateBody = wrapTemplate("bodydefinition")
 	e.TemplateListControls = wrapTemplate("tablecontrols")
 	e.TemplateExportControls = wrapTemplate("exportcontrols")
+
+	e.MonitorPath = props["monitorpath"]
+	e.HasMonitor = getProperty("hasmonitor", props)
+
+	e.CanOverrideID = getProperty("canoverrideid", props)
+
 	spew.Dump(e)
 	return e
 }
 
 func setupTemplateEnrichment(e enrichments, props map[string]string) enrichments {
-	e.Title = wrap("Title")
-	e.PageTitle = wrap("PageTitle")
-	e.UserMenu = wrap("UserMenu")
+	e.Title = wrapVariable("Title")
+	e.PageTitle = wrapVariable("PageTitle")
+	e.UserMenu = wrapVariable("UserMenu")
 	e.MenuHeader = "{{ (index .UserMenu 0).MenuHeaderText}}"
 	e.RangeUserMenuStart = "{{range .UserMenu}}"
 	e.RangeEnd = "{{end}}"
-	e.MenuHREF = wrap("MenuHREF")
-	e.MenuOnClick = wrap("MenuOnClick")
-	e.MenuGlyph = wrap("MenuGlyph")
-	e.MenuTextClass = wrap("MenuTextClass")
-	e.MenuText = wrap("MenuText")
-	e.ItemsOnPageWc = wrap("ItemsOnPage")
-	e.ItemList = wrap("ItemList")
+	e.MenuHREF = wrapVariable("MenuHREF")
+	e.MenuOnClick = wrapVariable("MenuOnClick")
+	e.MenuGlyph = wrapVariable("MenuGlyph")
+	e.MenuTextClass = wrapVariable("MenuTextClass")
+	e.MenuText = wrapVariable("MenuText")
+	e.ItemsOnPageWc = wrapVariable("ItemsOnPage")
+	e.ItemList = wrapVariable("ItemList")
 	e.RangeItemList = "{{range .ItemList}}"
 	return e
 }
 
 func setupPermissions(e enrichments, props map[string]string) enrichments {
-	e.CanView = true
-	e.CanEdit = true
-	e.CanDelete = true
-	e.CanNew = true
-	e.CanSave = true
-	e.CanList = true
-	e.CanExport = false
-	e.CanAPI = false
 
-	if strings.ToUpper(props["can_view"]) == "N" {
-		e.CanView = false
-	}
-	if strings.ToUpper(props["can_edit"]) == "N" {
-		e.CanEdit = false
-	}
-	if strings.ToUpper(props["can_delete"]) == "N" {
-		e.CanDelete = false
-	}
-	if strings.ToUpper(props["can_new"]) == "N" {
-		e.CanNew = false
-	}
-	if strings.ToUpper(props["can_save"]) == "N" {
+	e.CanView = getProperty("can_view", props)
+	e.CanEdit = getProperty("can_edit", props)
+	e.CanDelete = getProperty("can_delete", props)
+	e.CanNew = getProperty("can_new", props)
+
+	// if strings.ToUpper(props["can_view"]) == "N" {
+	// 	e.CanView = false
+	// }
+	// if strings.ToUpper(props["can_edit"]) == "N" {
+	// 	e.CanEdit = false
+	// }
+	// if strings.ToUpper(props["can_delete"]) == "N" {
+	// 	e.CanDelete = false
+	// }
+	// if strings.ToUpper(props["can_new"]) == "N" {
+	// 	e.CanNew = false
+	// }
+
+	e.CanSave = getProperty("can_save", props)
+	if !e.CanSave {
 		e.CanSave = false
 		e.CanEdit = false
 		e.CanNew = false
 	}
-	if strings.ToUpper(props["can_list"]) == "N" {
-		e.CanList = false
-	}
 
-	if strings.ToUpper(props["can_export"]) == "Y" {
-		e.CanExport = true
-	}
+	e.CanList = getProperty("can_list", props)
+	e.CanExport = getProperty("can_export", props)
+	e.CanAPI = getProperty("can_api", props)
 
-	if strings.ToUpper(props["can_api"]) == "Y" {
-		e.CanAPI = true
-	}
+	// if strings.ToUpper(props["can_list"]) == "N" {
+	// 	e.CanList = false
+	// }
+
+	// if strings.ToUpper(props["can_export"]) == "Y" {
+	// 	e.CanExport = true
+	// }
+
+	// if strings.ToUpper(props["can_api"]) == "Y" {
+	// 	e.CanAPI = true
+	// }
 
 	//spew.Dump(e)
 
 	return e
 }
 
-func wrap(in string) string {
+func wrapVariable(in string) string {
 	return "{{." + in + "}}"
 }
 
@@ -807,7 +864,7 @@ func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
 				lkKeyField = record[3]
 				lkValueField = record[4]
 				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrap(lkCodeField), wrap(lkValueField))
+				lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrapVariable(lkCodeField), wrapVariable(lkValueField))
 			}
 
 			if record[0] == "Extra" {
@@ -878,7 +935,7 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 		TemplateField: tplField,
 		Disabled:      noinput,
 		Hidden:        hidden,
-		ValueID:       wrap(fn),
+		ValueID:       wrapVariable(fn),
 		IsMandatory:   mand,
 		IsUserField:   userField,
 		IsBaseField:   baseField,
@@ -900,4 +957,11 @@ func tf(in bool) string {
 		return "Y"
 	}
 	return ""
+}
+
+func getProperty(name string, props map[string]string) bool {
+	if strings.ToUpper(props[name]) == "Y" {
+		return true
+	}
+	return false
 }

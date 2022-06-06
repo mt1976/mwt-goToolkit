@@ -1,0 +1,54 @@
+----------------------------------------------------------------
+Automatically generated  "/design/catalog/test1.nfo"
+----------------------------------------------------------------
+Package              : n/a
+Object 			     : Test1 (test1)
+Endpoint 	         : Test1 (ID)
+For Project          : github.com/mt1976/mwt-go-dev/
+----------------------------------------------------------------
+Template Generator   : delinquentDysprosium [r4-21.12.31]
+Date & Time		     : 03/06/2022 at 19:13:28
+Who & Where		     : matttownsend on silicon.local
+----------------------------------------------------------------
+Database Information
+----------------------------------------------------------------
+SQL Table Name       : 
+SQL Table Search Col : ID
+----------------------------------------------------------------
+Fields Generated
+----------------------------------------------------------------
+* Md  = Mandatory
+* Cr  = Core Fields
+* Ex  = Extra Fields
+* Ov  = Override of a Core Field
+* Lkp = Lookup Field
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+| ID                                  | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Endpoint                            | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Descr                               | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Query                               | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Source                              | String     |            | Y  | Y  |    |    |    |                 |                          |                          |
+| Cheese_Extra                        | String     |            |    |    | Y  |    |    |                 |                          |                          |
+| Onion_Extra                         | String     |            |    |    | Y  |    |    |                 |                          |                          |
+| CheeseLKUP_Lookup                   | String     |            |    |    |    |    | Y  | Firm            | Firm                     | FullName                 |
+| Descr                               | String     |            |    |    |    | Y  |    |                 |                          |                          |
+*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
+----------------------------------------------------------------
+Artifacts Generated
+----------------------------------------------------------------
+* application (/application/test1.go_tmp)
+* api (/application/test1_api.go)
+* dao (/dao/test1.go_tmp)
+* datamodel (/datamodel/test1.go_tmp)
+* job (/jobs/test1_core.go)
+* menu (/design/menu/test1.json)
+* html -> List (/html/Test1_List.html)
+* html -> View (/html/Test1_View.html)
+* html -> Edit (/html/Test1_Edit.html)
+* html -> New (/html/Test1_New.html)
+* catalog (/design/catalog/test1.nfo)
+----------------------------------------------------------------
+End of File
+----------------------------------------------------------------

@@ -1,0 +1,7 @@
+Name,Type,,Mandatory,NoInput
+ID,String,,true,false
+Endpoint,String,,true,false
+Descr,String,,true,false
+Query,String,,true,false
+Source,String,,true,false
+Firm,String,,true,false

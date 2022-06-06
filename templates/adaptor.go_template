@@ -1,4 +1,12 @@
 package adaptor
+
+import (
+	"strings"
+
+	core "{{.ProjectRepo}}core"
+	logs "{{.ProjectRepo}}logs"
+    dm "{{.ProjectRepo}}datamodel"
+)
 // ----------------------------------------------------------------
 // Automatically generated  "/adaptor/{{.ObjectNameLower}}.go"
 // ----------------------------------------------------------------
@@ -12,42 +20,40 @@ package adaptor
 // Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 
-import (
-	//"encoding/xml"
-	//"io/ioutil"
-	//"os"
+// The following functions should be created in {{.ObjectNameLower}}_impl.go
 
-	dm   "{{.ProjectRepo}}datamodel"
-	logs "{{.ProjectRepo}}logs"
-)
-
-
-func {{.ObjectName}}_Delete(id string) error {
-	var er error
-
-	message:= "Implement {{.ObjectName}}_Delete: " + id
-
-	// Implement {{.ObjectName}}_Delete_Impl in {{.ObjectNameLower}}_Impl.go
-	// Uncomment the line below to use the implementation
-	//
-	// er := {{.ObjectName}}_Delete_Impl(item)
-	//
-
-	logs.Success(message)
-	return er
+{{if .HasFetchAdaptor}}
+func {{.ObjectName}}_GetList_impl() (int, []dm.{{.ObjectName}}, error) {return 0, nil, nil}
+func {{.ObjectName}}_GetByID_impl(id string) (int, dm.{{.ObjectName}}, error) {return 0, dm.{{.ObjectName}}{}, nil}
+{{if .ProvidesReverseLookup}}
+func {{.ObjectName}}_GetByReverseLookup_impl(id string,lookupField string) (int, dm.{{.ObjectName}}, error) {return 0, dm.{{.ObjectName}}{}, nil}
+{{end}}
+{{end}}
+{{if or .HasStoreAdaptor .HasFetchAdaptor}}
+func {{.ObjectName}}_NewID_impl(rec dm.{{.ObjectName}}) (string) { return rec.{{.QueryFieldID}} }
+func {{.ObjectName}}_Delete_impl(id string) (error) {return nil}
+{{end}}
+{{if .HasStoreAdaptor}}
+func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (error) {return nil}
+{{end}}
+// If there are fields below, create the methods in adaptor\{{$.ObjectNameLower}}_impl.go
+{{range .FieldsList}}{{if .IsExtra}}func {{$.ObjectName}}_{{.FieldName}}_Store_impl (rec dm.{{$.ObjectName}},usr string) (error)  {return nil}{{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}func {{$.ObjectName}}_{{.FieldName}}_Override_Store_impl (rec dm.{{$.ObjectName}}) (error)  {return nil} {{end}}
+{{end}}
+{{range .FieldsList}}{{if .IsExtra}}func {{$.ObjectName}}_{{.FieldName}}_Fetch_impl (rec dm.{{$.ObjectName}})(string) {return ""}{{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}func {{$.ObjectName}}_{{.FieldName}}_Override_Fetch_impl (rec dm.{{$.ObjectName}}) (string) {return ""} {{end}}
+{{end}}
+{{if .HasMonitor}}
+func {{.ObjectName}}_Simulator_ProcessResponse_impl(filename string) error {
+	logs.Success("{{.ObjectName}}_ProcessResponse:" + filename)
+	// tokenise the filename, get last element
+	tokens := strings.Split(filename, "/")
+    last := tokens[len(tokens)-1]
+	core.Notification_Normal("New {{.FriendlyName}} Message Detected", last)
+    return {{.ObjectNameLower}}_ProcessResponse_impl (tokens,last)
 }
 
-func {{.ObjectName}}_Update(item dm.{{.ObjectName}}) error {
-	var er error
-
-	message:= "Implement {{.ObjectName}}_Update: " + item.{{.QueryFieldID}}
-
-	// Implement {{.ObjectName}}_Update_Impl in {{.ObjectNameLower}}_Impl.go
-	// Uncomment the line below to use the implementation
-	//
-	// er := {{.ObjectName}}_Update_Impl(item)
-	//
-
-	logs.Success(message)
-	return er
+func {{.ObjectNameLower}}_ProcessResponse_impl (tokens []string,latestToken string) error {
+    return nil
 }
+{{end}}
