@@ -19,12 +19,12 @@
           </div>
         </div>
         <div class="card-body">
-{{range .FieldsList}}<div class="row">
+{{range .FieldsList}}<div class="row"><div class="col">
               <div class="form-outline mb-3">
                 <input type="text" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}">
                 <label class="form-label" for="{{.FieldName}}">{{.FieldName}}</label>
               </div>
-            </div>
+            </div></div>
 {{end}}        </div>
 {{.TemplateAudit}}
       </div>

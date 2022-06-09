@@ -21,21 +21,21 @@
         </div>
         <div class="card-body">
               {{range .FieldsList}}{{if .IsBaseField}}
-              <div class="row">
+              <div class="row" {{.Disabled}} ><div class="col">
                 <div class="form-outline mb-3">
                   <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} />
                   <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
                 </div>
-              </div>
+              </div></div>
               {{end}}{{end}}
               {{range .FieldsList}}{{if not .IsBaseField}}             
-              <div class="row mb-3">
+              <div class="row mb-3" {{.Disabled}} ><div class="col">
             
                   {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="select" data-mdb-filter="true" {{.Disabled}}><option value="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
                   <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} />
                   {{end}}
                   <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-              </div>
+              </div></div>
               {{end}}{{end}}
         </div>
       </div>

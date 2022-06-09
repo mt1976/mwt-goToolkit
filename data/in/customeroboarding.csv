@@ -1,0 +1,14 @@
+Name,Type,,Mandatory,NoInput
+ID,String,,true,false
+CustomerName,String,,true,false
+CustomerAddress,String,,,false
+CustomerBOLID,String,,,false
+CustomerFirmName,String,,,false
+CustomerType,String,,,false
+CustomerRDC,String,,,false
+CustomerSortCode,String,,,false
+CustomerGMClientNo,String,,,false
+CustomerDefaultBook,String,,,false
+CustomerRegion,String,,,false
+CustomerCategory,String,,,false
+CustomerTelephoneNo,String,,,false
