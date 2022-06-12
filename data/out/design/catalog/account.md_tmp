@@ -120,11 +120,11 @@ SQL Table Key | **SienaReference**
 | Type | Artifact | Path|
 | :--: | -- | -- |
 | code | **application** | /application/account_core.go_tmp |
-| code | **adaptor** | /adaptor/account_impl.template |
-| code | **api** | /application/account_api.go |
+| code | **adaptor** | /adaptor/account_impl.go_tmp |
+| code | **api** | /application/account_api.go_tmp |
 | code | **dao** | /dao/account_core.go_tmp |
 | code | **datamodel** | /datamodel/account_core.go_tmp |
-| code | **menu** | /design/menu/account.json |
+| code | **menu** | /design/menu/account.json_tmp |
 | html | **list** | /html/Account_List.html |
 | html | **view** | /html/Account_View.html |
 
@@ -133,7 +133,7 @@ SQL Table Key | **SienaReference**
 |   |   |
 |---|---|
 Template Generator Version   | **delinquentDysprosium [r4-21.12.31]**
-Date & Time		     | **12/06/2022** at **15:40:05**
+Date & Time		     | **12/06/2022** at **15:43:30**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ### Footnotes

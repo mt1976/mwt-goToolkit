@@ -180,16 +180,17 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	//logs.Processing(w)
 
 	in_extn := ".go_template"
-	out_extn := ".go_tmp"
-	if core.Properties["deliverto"] != "" {
-		out_extn = "_core.go"
-	}
+	out_extn := "_core.go"
 
 	if destFolder == "catalog" {
 		destFolder = "design/catalog"
 		out_extn = ".md"
 		in_extn = ".nfo_template"
 	}
+
+	// if destFolder == "application" {
+	// 	out_extn = "_core" + out_extn
+	// }
 
 	if destFolder == "api" {
 		destFolder = "application"
@@ -221,13 +222,13 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 
 	if destFolder == "adaptor" {
 		destFolder = "adaptor"
-		out_extn = "_impl.template"
+		out_extn = "_impl.go"
 		in_extn = ".go_template"
 	}
-	//if destFolder == "application" {
-	//	out_extn = "_core" + out_extn
-	//	}
 
+	if core.Properties["deliverto"] == "" {
+		out_extn = out_extn + "_tmp"
+	}
 	//spew.Dump(replacements)
 	fp := e.Path + "/templates/" + w + in_extn
 
