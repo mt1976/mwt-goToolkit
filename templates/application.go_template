@@ -41,10 +41,9 @@ type {{.ObjectName}}_Page struct {
 	Title       	 string
 	PageTitle   	 string
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}{{if not .IsOverride}}	{{.FieldName}} string{{end}}
+	{{range .FieldsList}}{{if not .IsOverride}}	{{.FieldName}} {{if or .IsLookup .IsListLookup}}   []dm.Lookup_Item{{else}}        string{{end}}{{end}}
 	{{end}}
-	{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}{{.FieldName}}_List	[]dm.{{.LookupObject}}{{end}}{{end}}
-	{{end}}
+
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 }
 
@@ -61,8 +60,8 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{else}}//Cannot Create via GUI{{end}}
 	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{else}}//Cannot Save via GUI{{end}}
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
-	logs.Publish("{{.PropertiesName}}", dm.{{.ObjectName}}_Title)
-    {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceName}}"){{else}}//No API{{end}}
+	logs.Publish("{{.SourceType}}", dm.{{.ObjectName}}_Title)
+    {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
 }
 
 //{{.ObjectName}}_HandlerList is the handler for the list page
@@ -124,9 +123,17 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 {{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 {{end}}{{end}}
 // Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
-pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
-{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+
+
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
+{{end}}
+{{if .IsListLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
+{{end}}
+{{end}}{{end}}
+
+// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
 
@@ -167,10 +174,13 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 {{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 {{end}}{{end}}
 // Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}_,{{.LookupField}}_Lookup_{{.LookupValue}},_:= dao.{{.LookupObject}}_GetByID(rD.{{.LookupField}})
-pageDetail.{{.FieldName}} = {{.LookupField}}_Lookup_{{.LookupValue}}.{{.LookupValue}}
-_,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
-{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
+{{end}}
+{{if .IsListLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
+{{end}}
+{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 
@@ -232,9 +242,13 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 {{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = ""
 {{end}}{{end}}
 // Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}pageDetail.{{.FieldName}} = ""
-_,pageDetail.{{.FieldName}}_List,_ = dao.{{.LookupObject}}_GetList()
-{{end}}{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
+{{end}}
+{{if .IsListLookup}}
+_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
+{{end}}
+{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//
 
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)

@@ -7,128 +7,18 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/user"
 	"path/filepath"
-	"runtime"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/google/uuid"
 
 	"github.com/mt1976/templateBuilder/das"
 	"github.com/mt1976/templateBuilder/logs"
 	core "github.com/mt1976/templatebuiler/core"
-)
-
-type enrichments struct {
-	ObjectName             string
-	ObjectNameLower        string
-	ObjectCamelCase        string
-	ObjectGlyph            string
-	ObjectTextClass        string
-	EndpointRoot           string
-	QueryString            string
-	QueryField             string
-	QueryFieldID           string
-	SourceName             string
-	Version                string
-	Date                   string
-	Time                   string
-	Who                    string
-	Host                   string
-	FieldsList             []fields
-	FriendlyName           string
-	SQLTableName           string
-	SQLSearchID            string
-	SearchKey              string
-	SourceType             string
-	MessageList            []messages
-	Path                   string
-	ProjectRepo            string
-	UUID                   string
-	Title                  string
-	PageTitle              string
-	UserMenu               string
-	MenuHeader             string
-	RangeUserMenuStart     string
-	RangeEnd               string
-	MenuHREF               string
-	MenuOnClick            string
-	MenuGlyph              string
-	MenuTextClass          string
-	MenuText               string
-	ItemsOnPageWc          string
-	ItemList               string
-	RangeItemList          string
-	CanView                bool
-	CanEdit                bool
-	CanSave                bool
-	CanNew                 bool
-	CanDelete              bool
-	CanList                bool
-	CanAPI                 bool
-	PropertiesName         string
-	HasStoreAdaptor        bool
-	HasFetchAdaptor        bool
-	HasAudit               bool
-	CanExport              bool
-	ProvidesReverseLookup  bool
-	ReverseLookup          string
-	IsSpecial              bool
-	ProvidesLookup         bool
-	LookupID               string
-	LookupName             string
-	TemplateHeader         string
-	TemplateUserFooter     string
-	TemplatePageFooter     string
-	TemplateScripts        string
-	TemplateAudit          string
-	TemplateBody           string
-	TemplateListControls   string
-	TemplateExportControls string
-	TitleText              string
-	MonitorPath            string
-	HasMonitor             bool
-	CanOverrideID          bool
-}
-
-type fields struct {
-	FieldName     string
-	Type          string
-	Default       string
-	FieldSQL      string
-	Formatted     string
-	TemplateField string
-	Disabled      string
-	Hidden        string
-	ValueID       string
-	IsMandatory   bool
-	IsUserField   bool
-	IsBaseField   bool
-	IsLookup      bool
-	IsOverride    bool
-	IsExtra       bool
-	LookupObject  string
-	LookupField   string
-	LookupValue   string
-	RangeHTML     string
-	WrapFieldName string
-}
-
-type messages struct {
-	Message string
-}
-
-const (
-	go_template   = ".go_template"
-	html_template = ".html_template"
-	json_template = ".json_template"
-	nfo_template  = ".nfo_template"
-	tableHeader   = "| %-35s | %-10s | %-10s | %-2s | %-2s | %-2s | %-2s | %-2s | %-15s | %-24s | %-24s |"
-	tableRow      = "| %-35s | %-10s | %-10s | %-2s | %-2s | %-2s | %-2s | %-2s | %-15s | %-24s | %-24s |"
 )
 
 func main() {
@@ -142,7 +32,7 @@ func main() {
 	displayApplicationHeader()
 
 	logs.Break()
-	logs.Header("Searching for work...")
+	logs.Activity("Searching for work...", "")
 	logs.Break()
 
 	pwd, _ := os.Getwd()
@@ -158,17 +48,17 @@ func main() {
 	var paths []string
 	if clItem == "" {
 		// Get list of files from a folder
-		logs.Information("Searching...", data_in())
+		logs.Activity("Searching...", data_in())
 		paths = seekTableDefinitions(data_in())
-		logs.Success("Found Files in " + data_in())
+		logs.Success("Object Definition Files in " + data_in())
 	} else {
-		logs.Information("CL Specified", clItem+".cfg")
+		logs.Information("Object Definition File", clItem+".cfg")
 		paths = append(paths, clItem+".cfg")
 	}
 
 	noFiles := len(paths)
 
-	logs.Information("Found ", fmt.Sprintf("%d %s %s", noFiles, " files in ", data_in()))
+	logs.Information("Object Definition File(s) Found ", fmt.Sprintf("%d %s %s", noFiles, " files in ", data_in()))
 
 	// loop through files from Paths
 
@@ -179,7 +69,7 @@ func main() {
 		fileExtension := paths[i][len(paths[i])-4:]
 		//fmt.Println(fileExtension) // gives "lo"
 		if fileExtension == ".cfg" {
-			processTableDefinition(paths[i])
+			processObjectDefinition(paths[i])
 		}
 	}
 	logs.Break()
@@ -206,43 +96,49 @@ func seekTableDefinitions(dir string) []string {
 	return paths
 }
 
-func processTableDefinition(configFile string) {
+func processObjectDefinition(configFile string) {
 	logs.Processing(configFile)
 	//	logs.Information("Populate", "Replacement Values")
 
 	props := core.Config_Get(configFile)
 
-	fmt.Printf("props: %v\n", props)
+	//fmt.Printf("props: %v\n", props)
 
 	e := setupEnrichment(props)
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
 	enriPath := getPWD() + data_in() + "/" + e.ObjectName + ".enri"
-	logs.Information("CSV Path", csvPath)
+	logs.Information("CSV  Path", csvPath)
 	logs.Information("Enri Path", enriPath)
 
 	if props["use"] == "db" {
 		// Do nothing for now
 		logs.Information("Getting List of fields from DB", props["server"]+" "+props["database"]+" "+props["tablename"])
 		e = getFieldDefinitions_DB(e, props)
-		e.SourceName = "CORE"
+		e.SourceType = "Application"
 	} else {
-		if props["propertiesoverride"] == "special" {
-			e.SourceName = "STATE"
-		} else {
-			e.SourceName = "SIENA"
+		e.SourceType = "Application"
+		if getProperty("HasFetchAdaptor", props) {
+			e.SourceType = "External"
+		}
+		if getProperty("HasStoreAdaptor", props) {
+			e.SourceType = "External"
 		}
 		logs.Information("Getting List of fields from CSV", csvPath)
 		e = getFieldDefinitions_CSV(csvPath, e)
 	}
 
-	if strings.ToUpper(props["hasenrichments"]) == "Y" {
+	if getProperty("hasenrichments", props) {
 		//logs.Break()
 		//	logs.Information("Getting Enrichment Fields from enri", csvPath)
-		e = getEnrichmentFields_CSV(enriPath, e)
+		e = mergeEnrichmentDefinitions(enriPath, e)
 	}
 
-	logs.Header("Generating Files")
+	for i := 0; i < len(e.MessageList); i++ {
+		logs.Information(e.MessageList[i].Message, strconv.Itoa(i))
+	}
+	logs.Break()
+	logs.Header("Generating Artifacts")
 	logs.Break()
 
 	e = generateCodeArtifact("application", props, configFile, e)
@@ -267,9 +163,10 @@ func processTableDefinition(configFile string) {
 
 	e = generateCodeArtifact("monitor", props, configFile, e)
 
+	spew.Dump(e)
 }
 
-func generateCodeArtifact(a string, props map[string]string, configFile string, e enrichments) enrichments {
+func generateCodeArtifact(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
 
 	if getProperty("create_"+a, props) || a == "catalog" {
 		e = processCodeArtifact(a, configFile, a, e)
@@ -279,8 +176,8 @@ func generateCodeArtifact(a string, props map[string]string, configFile string, 
 	return e
 }
 
-func processCodeArtifact(w string, p string, destFolder string, e enrichments) enrichments {
-	logs.Processing(w)
+func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichments) ObjectEnrichments {
+	//logs.Processing(w)
 
 	in_extn := ".go_template"
 	out_extn := ".go_tmp"
@@ -290,7 +187,7 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 
 	if destFolder == "catalog" {
 		destFolder = "design/catalog"
-		out_extn = ".nfo"
+		out_extn = ".md"
 		in_extn = ".nfo_template"
 	}
 
@@ -345,7 +242,7 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 		return e
 	}
 
-	e.MessageList = append(e.MessageList, messages{Message: "* " + w + " (" + dest + ")"})
+	//	e.MessageList = append(e.MessageList, messages{Message: "* " + w + " (" + dest + ")"})
 
 	err2 := t.Execute(f, e)
 	if err2 != nil {
@@ -353,10 +250,19 @@ func processCodeArtifact(w string, p string, destFolder string, e enrichments) e
 	}
 	f.Close()
 	logs.Created(f.Name())
+
+	e = logArtifact(w, dest, e, "code", f.Name())
+
 	return e
 }
 
-func generateHTMLArtifacts(a string, props map[string]string, configFile string, e enrichments) enrichments {
+func logArtifact(inName string, fileName string, e ObjectEnrichments, inType string, filePath string) ObjectEnrichments {
+	art := artifact{Name: inName, Path: fileName, Type: inType, FilePath: filePath}
+	e.Artifacts = append(e.Artifacts, art)
+	return e
+}
+
+func generateHTMLArtifacts(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
 	if strings.ToUpper(props["create_html"]) == "Y" {
 		if e.CanList {
 			e = generateHTMLArtifact("list", configFile, "html", e)
@@ -392,8 +298,8 @@ func generateHTMLArtifacts(a string, props map[string]string, configFile string,
 	return e
 }
 
-func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) enrichments {
-	logs.Processing(w + html_template)
+func generateHTMLArtifact(w string, p string, destFolder string, e ObjectEnrichments) ObjectEnrichments {
+	//logs.Processing(w + html_template)
 
 	userAction := strings.ToUpper(w[:1]) + w[1:]
 
@@ -416,12 +322,13 @@ func generateHTMLArtifact(w string, p string, destFolder string, e enrichments) 
 		logs.Error("Process Template", err2)
 	}
 	f.Close()
-	e.MessageList = append(e.MessageList, messages{Message: "* html -> " + userAction + " (" + dest + ")"})
+	//e.MessageList = append(e.MessageList, messages{Message: "* html -> " + userAction + " (" + dest + ")"})
 	logs.Created(f.Name())
+	e = logArtifact(w, dest, e, "html", f.Name())
 	return e
 }
 
-func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
+func getFieldDefinitions_CSV(filePath string, e ObjectEnrichments) ObjectEnrichments {
 	// Load a csv file.
 	//logs.Information("Read CSV", filePath)
 	f, _ := os.Open(filePath)
@@ -464,7 +371,7 @@ func getFieldDefinitions_CSV(filePath string, e enrichments) enrichments {
 	return e
 }
 
-func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
+func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnrichments {
 	// Open Database Connection
 	db, err := core.GlobalsDatabaseConnect(p)
 	if err != nil {
@@ -530,57 +437,8 @@ func getFieldDefinitions_DB(e enrichments, p map[string]string) enrichments {
 	return e
 }
 
-func displayApplicationHeader() {
-
-	logs.Break()
-
-	logs.Header("Application Information")
-	logs.Break()
-
-	logs.Header("Application")
-	logs.Information("Name", core.Properties["appname"])
-	logs.Information("Host Name", getHostName())
-
-	logs.Information("Server Release", genReleaseName())
-	logs.Information("Server Date", time.Now().Format(core.DATEFORMATUSER))
-
-	logs.Information("Licence", core.Properties["licname"])
-	logs.Information("Lic URL", core.Properties["liclink"])
-	logs.Header("Runtime")
-	logs.Information("GO Version", runtime.Version())
-	logs.Information("Operating System", runtime.GOOS+" ("+runtime.GOARCH+")")
-
-	logs.Default("Working Directory", getPWD())
-	logs.Information("User", getUsername())
-	logs.Header("Connectivity")
-	logs.Default("Input", data_in())
-	logs.Default("Output", data_out())
-}
-
-func displayTableHeader(in string) {
-	logs.Break()
-	logs.Header(in + " Information")
-	logs.Break()
-	logs.Information("MD ", "Mandatory")
-	logs.Information("CR ", "Core Fields")
-	logs.Information("EX ", "Extra Fields")
-	logs.Information("OV", "Override of a Core Field")
-	logs.Information("LK", "Lookup Field")
-	logs.Break()
-	info := fmt.Sprintf(tableHeader, "Field Name", "Type", "Default", "Md", "Cr", "Ex", "Ov", "L⬆", "⬆ Object", "⬆ Field", "⬇ Value")
-	logs.Information(info, "")
-	logs.Break()
-}
-
-func addField(en enrichments, fn string, tp string, df string, mand bool, noInput bool) []fields {
-
-	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false)
-
-	return en.FieldsList
-}
-
-func setupEnrichment(props map[string]string) enrichments {
-	e := enrichments{ObjectName: props["objectname"]}
+func setupEnrichment(props map[string]string) ObjectEnrichments {
+	e := ObjectEnrichments{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
 	logs.Information("Object Name", e.ObjectName)
 	e.ObjectName = strings.Title(e.ObjectName)
@@ -689,11 +547,12 @@ func setupEnrichment(props map[string]string) enrichments {
 
 	e.CanOverrideID = getProperty("canoverrideid", props)
 
-	spew.Dump(e)
+	//spew.Dump(e)
+	fmt.Printf("e: %v\n", e)
 	return e
 }
 
-func setupTemplateEnrichment(e enrichments, props map[string]string) enrichments {
+func setupTemplateEnrichment(e ObjectEnrichments, props map[string]string) ObjectEnrichments {
 	e.Title = wrapVariable("Title")
 	e.PageTitle = wrapVariable("PageTitle")
 	e.UserMenu = wrapVariable("UserMenu")
@@ -711,7 +570,7 @@ func setupTemplateEnrichment(e enrichments, props map[string]string) enrichments
 	return e
 }
 
-func setupPermissions(e enrichments, props map[string]string) enrichments {
+func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrichments {
 
 	e.CanView = getProperty("can_view", props)
 	e.CanEdit = getProperty("can_edit", props)
@@ -755,147 +614,19 @@ func setupPermissions(e enrichments, props map[string]string) enrichments {
 	// }
 
 	//spew.Dump(e)
+	spew.Dump(e)
 
 	return e
 }
 
-func wrapVariable(in string) string {
-	return "{{." + in + "}}"
+func addField(en ObjectEnrichments, fn string, tp string, df string, mand bool, noInput bool) []ObjectFields {
+
+	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false, false, false)
+
+	return en.FieldsList
 }
 
-func wrapTemplate(in string) string {
-	return "{{template " + enquote(in) + " .}}"
-}
-
-func enquote(in string) string {
-	return "\"" + in + "\""
-}
-
-func getUsername() string {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return usr.Username
-}
-
-func genUUID() string {
-	id := uuid.New()
-	//fmt.Printf("github.com/google/uuid:         %s\n", id.String())
-	return id.String()
-}
-
-func genReleaseName() string {
-	return fmt.Sprintf("%s [r%s-%s]",
-		core.Properties["releaseid"],
-		core.Properties["releaselevel"],
-		core.Properties["releasenumber"])
-}
-
-func getHostName() string {
-	host, _ := os.Hostname()
-	return host
-}
-
-func getPWD() string {
-	thisPwd, _ := os.Getwd()
-	return thisPwd
-}
-
-func data_out() string {
-	do := ""
-	if core.Properties["deliverto"] != "" {
-		do = core.Properties["deliverto"]
-	} else {
-		do = getPWD() + core.Properties["data_out"]
-	}
-	return do
-}
-
-func data_in() string {
-	return strings.TrimSpace(core.Properties["data_in"])
-}
-
-func getEnrichmentFields_CSV(filePath string, en enrichments) enrichments {
-
-	//logs.Information("Read CSV", filePath)
-	f, _ := os.Open(filePath)
-	//logs.Information("File Open", filePath)
-	// Create a new reader.
-	r := csv.NewReader(f)
-	//logs.Information("New Reader", filePath)
-	//displayTableHeader("Enrichment")
-	for {
-		record, err := r.Read()
-		//fmt.Printf("record: %v\n", record)
-		// Stop at EOF.
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			logs.Fatal("Read Enri", err)
-			panic(err)
-		}
-		if record[0] == "Type" && record[1] == "Field" {
-			//logs.Information("Found", "Enrichments")
-		} else {
-			colMand := false
-			if record[6] == "true" {
-				colMand = true
-			}
-
-			isLookup := false
-			isExtra := false
-			isOverride := false
-			lkObject := ""
-			lkKeyField := ""
-			lkValueField := ""
-			lkRange := ""
-			lkCodeField := ""
-
-			//log.Println(record[0])
-			suffix := "_Unknown"
-			if record[0] == "Lookup" {
-				suffix = "_Lookup"
-				isLookup = true
-
-				lkObject = record[2]
-				lkKeyField = record[3]
-				lkValueField = record[4]
-				lkCodeField = record[8]
-				lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_Lookup_List", wrapVariable(lkCodeField), wrapVariable(lkValueField))
-			}
-
-			if record[0] == "Extra" {
-				isExtra = true
-				suffix = "_Extra"
-			}
-
-			if record[0] == "Override" {
-				isOverride = true
-				suffix = ""
-			}
-
-			//log.Println(isLookup, isExtra, isOverride)
-
-			noInput := true
-			if record[5] == "true" {
-				noInput = false
-			}
-			//fmt.Printf("record: %v\n", record)
-			//fmt.Printf("record[5]: %v\n", record[5])
-			//fmt.Printf("noInput: %v\n", noInput)
-			//fmt.Printf("colMand: %v\n", colMand)
-
-			en.FieldsList = addComplexField(en, record[1]+suffix, "String", record[7], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride)
-		}
-	}
-	logs.Break()
-	return en
-}
-
-func addComplexField(en enrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool) []fields {
+func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool, isListLookup bool, isFetch bool) []ObjectFields {
 
 	// log parameters
 
@@ -921,17 +652,28 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 	}
 
 	if noinp {
-		noinput = "disabled"
+		noinput = html_disabled
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
-	info := fmt.Sprintf(tableRow, fn, tp, df, tf(mand), tf(baseField), tf(isExtra), tf(isOverride), tf(isLookup), lkObject, lkKeyField, lkValueField)
+	// lkval := ""
+	// if isLookup {
+	// 	lkval = "LK"
+	// }
+	// if isListLookup {
+	// 	lkval = "LS"
+	// }
+	// if isFetch {
+	// 	lkval = "FT"
+	// }
+
+	//info := fmt.Sprintf(tableRow, fn, tp, df, tf(mand), tf(baseField), tf(isExtra), tf(isOverride), lkval, lkObject, lkKeyField, lkValueField)
 	tplField := "{{." + fn + "}}"
-	en.FieldsList = append(en.FieldsList, fields{FieldName: fn,
+	en.FieldsList = append(en.FieldsList, ObjectFields{FieldName: fn,
 		Type:          tp,
 		Default:       df,
 		FieldSQL:      origfn,
-		Formatted:     info,
+		Formatted:     "",
 		TemplateField: tplField,
 		Disabled:      noinput,
 		Hidden:        hidden,
@@ -945,23 +687,266 @@ func addComplexField(en enrichments, fn string, tp string, df string, mand bool,
 		LookupValue:   lkValueField,
 		RangeHTML:     lkRange,
 		IsExtra:       isExtra,
-		IsOverride:    isOverride})
+		IsOverride:    isOverride,
+		IsListLookup:  isListLookup})
 
-	logs.Information(info, "")
+	//logs.Information(info, "")
 
 	return en.FieldsList
 }
 
-func tf(in bool) string {
-	if in {
-		return "Y"
+func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnrichments {
+
+	//logs.Information("Read CSV", filePath)
+	f, _ := os.Open(filePath)
+	//logs.Information("File Open", filePath)
+	// Create a new reader.
+	r := csv.NewReader(f)
+	//logs.Information("New Reader", filePath)
+	//displayTableHeader("Enrichment")
+	var enrichmentDefinitions [][]string
+
+	for i := 0; i < len(en.FieldsList); i++ {
+		//	fmt.Printf("b4 en: %d %v\n", i, en.FieldsList[i])
 	}
-	return ""
+	for {
+		enrichmentDefinition, err := r.Read()
+		//fmt.Printf("record: %v\n", record)
+		// Stop at EOF.
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			logs.Fatal("Read Enri", err)
+			panic(err)
+		}
+		if enrichmentDefinition[enri_Type] == "Type" && enrichmentDefinition[enri_Field] == "Field" {
+			//logs.Information("Found", "Enrichments")
+		} else {
+
+			if enrichmentType(enrichmentDefinition[enri_Type], extraField) {
+				// Add additional "Extra" fields to the object definition as specfied in .../?.enri
+				//			logs.Information("Found", "Extra Field")
+				en.FieldsList = addExtraTypeFields(enrichmentDefinition, en)
+			} else {
+				// add enrichmentDefinition to enrichmentDefinitions list
+
+				enrichmentDefinitions = append(enrichmentDefinitions, enrichmentDefinition)
+			}
+		}
+	}
+	//fmt.Printf("enrichmentDefinitions: %v\n", enrichmentDefinitions)
+	//loop through enrichmentDefinitions
+	for _, enrichmentOverride := range enrichmentDefinitions {
+		//	fmt.Printf("enrichmentOverride: %v\n", enrichmentOverride)
+		switch {
+		case enrichmentType(enrichmentOverride[enri_Type], listField):
+			//logs.Processing(listField + " " + enrichmentOverride[enri_Field])
+
+			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+
+		case enrichmentType(enrichmentOverride[enri_Type], lookupField):
+			//logs.Processing(lookupField + " " + enrichmentOverride[enri_Field])
+			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+
+		case enrichmentType(enrichmentOverride[enri_Type], extraField):
+			// Do Nothing
+			//logs.Information(extraField, enrichmentOverride[enri_Field])
+
+		case enrichmentType(enrichmentOverride[enri_Type], overrideField):
+			// Do Nothing
+			//logs.Information(overrideField, enrichmentOverride[enri_Field])
+			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+
+		case enrichmentType(enrichmentOverride[enri_Type], fetchField):
+			// Do Nothing
+			//logs.Processing(fetchField + " " + enrichmentOverride[enri_Field])
+			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+
+		case enrichmentType(enrichmentOverride[enri_Type], defaultField):
+
+			//logs.Processing(fetchField + " " + enrichmentOverride[enri_Field])
+
+			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+
+		default:
+			// Do Nothing
+			logs.Warning("Unkown Enrichment Type" + enrichmentOverride[enri_Type] + enrichmentOverride[enri_Field])
+		}
+	}
+	noRows := len(en.FieldsList)
+	for i := 0; i < noRows; i++ {
+		//fmt.Printf("AF en: %d %v\n", i, en.FieldsList[i])
+		op := en.FieldsList[i]
+		lkVal := ""
+		switch {
+		case op.IsLookup:
+			lkVal = "OL"
+		case op.IsListLookup:
+			lkVal = "LL"
+		case op.IsFetch:
+			lkVal = "FL"
+		}
+		//fmt.Printf("lkVal: %v\n", lkVal)
+		ipVal := "Y"
+		if op.Disabled == html_disabled {
+			ipVal = "N"
+		}
+		if op.Hidden == html_hidden {
+			ipVal = "H"
+		}
+		info := fmt.Sprintf(tableRow, op.FieldName, op.Type, op.Default, tf(op.IsMandatory), tf(op.IsBaseField), tf(op.IsExtra), tf(op.IsOverride), lkVal, op.LookupObject, op.LookupField, op.LookupValue, ipVal)
+		en.MessageList = append(en.MessageList, messages{Message: info})
+		//	fmt.Printf("info: %v\n", info)
+	}
+	//logs.Break()
+	return en
 }
 
-func getProperty(name string, props map[string]string) bool {
-	if strings.ToUpper(props[name]) == "Y" {
-		return true
+func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
+	colMand := false
+	if record[enri_IsMandatory] == "true" {
+		colMand = true
 	}
-	return false
+
+	isLookup := false
+	isExtra := false
+	isOverride := false
+	isListLookup := false
+	isFetch := false
+	lkObject := ""
+	lkKeyField := ""
+	lkValueField := ""
+	lkRange := ""
+
+	suffix := "_Unknown"
+	if enrichmentType(record[enri_Type], lookupField) {
+		suffix = "_list"
+		isLookup = true
+
+		lkObject = record[enri_LookupObject]
+		lkKeyField = record[enri_LookupKey]
+		lkValueField = record[enri_LookupValue]
+
+		lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_list", wrapVariable("ID"), wrapVariable("Name"))
+	}
+
+	if enrichmentType(record[enri_Type], extraField) {
+		isExtra = true
+		suffix = ""
+	}
+
+	if enrichmentType(record[enri_Type], overrideField) {
+		isOverride = true
+		suffix = ""
+	}
+
+	if enrichmentType(record[enri_Type], listField) {
+		isListLookup = true
+		suffix = "_list"
+		lkObject = record[2]
+		lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_list", wrapVariable("ID"), wrapVariable("Name"))
+	}
+
+	if enrichmentType(record[enri_Type], fetchField) {
+		suffix = "_fetch"
+		isFetch = true
+		lkObject = record[enri_LookupObject]
+		lkKeyField = record[enri_LookupKey]
+		lkValueField = record[enri_LookupValue]
+	}
+
+	noInput := true
+	if record[enri_IsInputtable] == "true" {
+		noInput = false
+
+	}
+
+	return addComplexField(en, record[enri_Field]+suffix, "String", record[enri_DefaultValue], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride, isListLookup, isFetch)
+}
+
+func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOverride []string) []ObjectFields {
+
+	// log parameters
+
+	//log.Println("addComplexField:"+fn+" "+tp+" "+df+" "+strconv.FormatBool(mand)+" "+strconv.FormatBool(baseField)+" "+strconv.FormatBool(isLookup)+" "+lkObject+" "+lkKeyField+" "+lkValueField+" "+lkRange+" "+strconv.FormatBool(noinp), strconv.FormatBool(isExtra), strconv.FormatBool(isOverride))
+
+	//origfn := ""
+
+	//if first charachter of fieldName is _ then replace _ with SYS
+
+	//noinput := ""
+	//hidden := ""
+	//userField := true
+	noFields := len(en.FieldsList)
+
+	//logs.Break()
+
+	//fmt.Printf("noFields: %v\n", noFields)
+	//fmt.Printf("fn: %v\n", fn)
+	//fmt.Printf("tp: %v\n", tp)
+	for i := 0; i < noFields; i++ {
+		//	fmt.Printf("b4 en: %d %v\n", i, en.FieldsList[i])
+		if en.FieldsList[i].FieldName == fn {
+			//logs.Success("Found " + fn)
+
+			switch {
+			case tp == listField:
+				//logs.Processing("LIST")
+				en.FieldsList[i].IsListLookup = true
+				en.FieldsList[i].LookupObject = enrichmentOverride[enri_LookupObject]
+				en.FieldsList[i].LookupField = enrichmentOverride[enri_LookupKey]
+				en.FieldsList[i].LookupValue = enrichmentOverride[enri_LookupValue]
+				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
+			case tp == lookupField:
+				//logs.Processing("LOOKUP")
+				en.FieldsList[i].IsLookup = true
+				en.FieldsList[i].LookupObject = enrichmentOverride[enri_LookupObject]
+				en.FieldsList[i].LookupField = enrichmentOverride[enri_LookupKey]
+				en.FieldsList[i].LookupValue = enrichmentOverride[enri_LookupValue]
+				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
+			case tp == extraField:
+				//logs.Skipping("EXTRA")
+			case tp == overrideField:
+				//logs.Processing("OVERRIDE")
+				en.FieldsList[i].IsOverride = true
+				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
+			case tp == fetchField:
+				//logs.Processing("FETCH")
+				en.FieldsList[i].IsFetch = true
+				en.FieldsList[i].LookupObject = enrichmentOverride[enri_LookupObject]
+				en.FieldsList[i].LookupField = enrichmentOverride[enri_LookupKey]
+				en.FieldsList[i].LookupValue = enrichmentOverride[enri_LookupValue]
+			case tp == defaultField:
+				//logs.Processing("DEFAULTING")
+				if enrichmentOverride[enri_DefaultValue] != "" {
+					en.FieldsList[i].Default = enrichmentOverride[enri_DefaultValue]
+				}
+				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
+			default:
+				logs.Warning("UNKNOWN Enrichment Type: " + tp)
+			}
+
+		}
+
+	}
+
+	return en.FieldsList
+}
+
+func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFields {
+	if commonOverrides[enri_IsInputtable] != "" {
+		if commonOverrides[enri_IsInputtable] == "true" {
+			fieldsList.Disabled = ""
+		} else {
+			fieldsList.Disabled = html_disabled
+		}
+		if commonOverrides[enri_IsMandatory] == "true" {
+			fieldsList.IsMandatory = true
+		} else {
+			fieldsList.IsMandatory = false
+		}
+	}
+	return fieldsList
 }

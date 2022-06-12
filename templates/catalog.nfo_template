@@ -1,36 +1,73 @@
-----------------------------------------------------------------
-Automatically generated  "/design/catalog/{{.ObjectNameLower}}.nfo"
-----------------------------------------------------------------
-Package              : n/a
-Object 			     : {{.ObjectName}} ({{.ObjectNameLower}})
-Endpoint 	         : {{.EndpointRoot}} ({{.QueryString}})
-For Project          : {{.ProjectRepo}}
-----------------------------------------------------------------
-Template Generator   : {{.Version}}
-Date & Time		     : {{.Date}} at {{.Time}}
-Who & Where		     : {{.Who}} on {{.Host}}
-----------------------------------------------------------------
-Database Information
-----------------------------------------------------------------
-SQL Table Name       : {{.SQLTableName}}
-SQL Table Search Col : {{.SQLSearchID}}
-----------------------------------------------------------------
-Fields Generated
-----------------------------------------------------------------
-* Md  = Mandatory
-* Cr  = Core Fields
-* Ex  = Extra Fields
-* Ov  = Override of a Core Field
-* Lkp = Lookup Field
-*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
-| Field Name                          | Type       | Default    | Md | Cr | Ex | Ov | Lkp| Lkp Object      | Lkp Field Source         | Lkp Value                |  
-*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
-{{range .FieldsList}}{{.Formatted}}
-{{end}}*-------------------------------------+------------+------------+----+----+----+----+----+-----------------+--------------------------+--------------------------*
-----------------------------------------------------------------
-Artifacts Generated
-----------------------------------------------------------------
-{{range .MessageList}}{{.Message}}
-{{end}}----------------------------------------------------------------
-End of File
-----------------------------------------------------------------
+# **{{.ObjectName}}** - Object Definition
+---
+##  Information
+|   |   |
+|---|---|
+|Object         |**{{.ObjectName}}** ({{.ObjectNameLower}}) |
+|Endpoint 	    |**/{{.EndpointRoot}}...** [^1]|
+|Endpoint Query |**{{.QueryString}}**|{{if .CanAPI}}
+|REST API|**/API/{{.ObjectName}}/**|{{end}}
+Glyph|**{{.ObjectGlyph}}** ({{.ObjectTextClass}})
+Friendly Name|**{{.FriendlyName}}**|
+|For Project    |{{.ProjectRepo}}|
+
+##  Actions {#action-id}
+{{if .CanList}}* **List** (/{{.EndpointRoot}}/{{.ObjectName}}List) {{if .CanExport}}[Exportable]{{end}}{{end}}
+{{if .CanView}}* **View** (/{{.EndpointRoot}}/{{.ObjectName}}View){{end}}
+{{if .CanEdit}}* **Edit** (/{{.EndpointRoot}}/{{.ObjectName}}Edit){{end}}
+{{if .CanSave}}* **Save** (/{{.EndpointRoot}}/{{.ObjectName}}Save){{end}}
+{{if .CanNew}}* **New** (/{{.EndpointRoot}}/{{.ObjectName}}New){{end}}
+{{if .CanDelete}}* **Delete** (/{{.EndpointRoot}}/{{.ObjectName}}Delete){{end}}
+{{if .CanImport}}* **Import** (/{{.EndpointRoot}}/{{.ObjectName}}Import){{end}}
+{{if .CanImport}}* **Import** (/{{.EndpointRoot}}/{{.ObjectName}}Upload){{end}}
+{{if .CanDo}}* **Do** (/{{.EndpointRoot}}/{{.ObjectName}}Do){{end}}
+
+
+
+
+##  Provides
+{{if .ProvidesLookup}} * Lookup ({{.LookupID}} {{.LookupName}}){{end}}
+{{if .ProvidesReverseLookup}} * Reverse Lookup ({{.ReverseLookup}}){{end}}
+{{if .HasAudit}}* Auditing {{end}}
+{{if .HasMonitor}}* Monitoring {{end}}
+
+
+
+##  Data Source 
+|   |   |
+|---|---|
+{{if .SQLTableName}}SQL Table Name       | **{{.SQLTableName}}**
+SQL Table Key | **{{.SQLSearchID}}**{{end}}
+{{if .HasFetchAdaptor}}Fetch|<ul><li>**Implement in Adaptor**</li><li> func {{.ObjectName}}_GetList_impl() (int, []dm.{{.ObjectName}}, error) {return 0, nil, nil}</li><li>func {{.ObjectName}}_GetByID_impl(id string) (int, dm.{{.ObjectName}}, error) {return 0, dm.{{.ObjectName}}{}, nil}</li></ul>{{end}}
+{{if .HasFetchAdaptor}}Store|<ul><li>**Implement in Adaptor**</li><li>func {{.ObjectName}}_NewID_impl(rec dm.{{.ObjectName}}) (string) { return rec.ID } </li><li>func {{.ObjectName}}_Delete_impl(id string) (error) {return nil}</li><li>func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (error) {return nil}</li></ul>{{end}}
+
+##  Properties / Fields
+| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value|
+| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --|
+{{range .FieldsList}}|**{{.FieldName}}**|{{.Type}}|{{.IsMandatory}}|{{.IsBaseField}}|{{.IsExtra}}|{{.IsOverride}}|{{if .IsLookup}}OL{{end}}{{if .IsListLookup}}LL{{end}}{{if .IsFetch}}FL{{end}}|{{.LookupObject}}|{{.LookupField}}|{{.LookupValue}}|{{if or .Disabled .Hidden}}{{if .Disabled}}N{{end}}{{if .Hidden}}H{{end}}{{else}}Y{{end}}|{{if .IsBaseField}}{{.FieldSQL}}{{end}}|{{.Default}}|
+{{end}}
+
+##  Artifacts Generated
+| Type | Artifact | Path|
+| :--: | -- | -- |
+{{range .Artifacts}}| {{.Type}} | **{{.Name}}** | {{.Path}} |
+{{end}}
+
+## Audit Information
+|   |   |
+|---|---|
+Template Generator Version   | **{{.Version}}**
+Date & Time		     | **{{.Date}}** at **{{.Time}}**
+Who & Where		     | **{{.Who}}** on **{{.Host}}**
+
+### Footnotes
+[^1]: **Endpoint**
+    * The full list of endpoints can be found in the [Actions](#action-id) section
+[^2]: **Lookup Fields**
+    * LL = A List Lookup. Define list in lits.cfg
+    * OL = An Object Lookup. Get a list of values from an Object
+    * FL = Fetches 1 value from an object based on the content of the field. 
+[^3]: **Inputtable**   
+    * H = Hidden Field
+    * N = No Input Field
+    * Y = Inputtable Field

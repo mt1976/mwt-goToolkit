@@ -5,3 +5,5 @@ Descr,String,,true,false
 Query,String,,true,false
 Source,String,,true,false
 Firm,String,,true,false
+YN,String,,false,false
+User,String,,flase,false

@@ -1,4 +1,4 @@
-Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
 Lookup,CCY,Currency,CCY,Name,true,false,,CCYpoo
 Lookup,Book,Book,Book,FullName,false,,,Bookpoo
 Lookup,Portfolio,Portfolio,Portfolio,Description1,false,,,Portfoliopoo

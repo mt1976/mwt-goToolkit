@@ -16,7 +16,7 @@ package datamodel
 //Centre is cheese
 type {{.ObjectName}} struct {
 
-{{range .FieldsList}}{{if not .IsOverride }}{{.FieldName}}        string{{end}}
+{{range .FieldsList}}{{if not .IsOverride }}{{.FieldName}}{{if or .IsLookup .IsListLookup}}   []dm.Lookup_Item{{else}}        string{{end}}{{end}}
 {{end}}
 }
 
@@ -46,7 +46,7 @@ const (
 	///
 	/// SQL Field Definitions
 	///
-{{range .FieldsList}}{{if not .IsOverride }}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}{{end}}
+{{range .FieldsList}}{{if not .IsOverride }}{{if .IsBaseField}}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}{{end}}{{end}}
 {{end}}
 	/// Definitions End
 )

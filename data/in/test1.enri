@@ -1,5 +1,7 @@
-Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
-Extra,Cheese,,,,false,false,,
-Extra,Onion,,,,false,false,,
-Lookup,CheeseLKUP,Firm,Firm,FullName,false,,,Namefirpoo
-Override,Descr,,,,false,false,,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
+Extra,Cheese,,,,true,false,,
+Extra,Onion,,,,true,true,,
+Lookup,Firm,Firm,Firmx,FullName,false,,,Namefirpoo
+Override,Descr,,,,false,false,DefltDescr,
+List,YN,,yn,,,,,
+List,User,,users,,,,,

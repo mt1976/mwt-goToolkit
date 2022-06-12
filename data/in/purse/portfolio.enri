@@ -1,4 +1,4 @@
-Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
 Lookup,Type,PortfolioType,Type,Name,true,false,,Code
 Lookup,DefaultModel,PortfolioModel,DefaultModel,Name,true,false,,Code
 Override,Type,,,,false,false,,

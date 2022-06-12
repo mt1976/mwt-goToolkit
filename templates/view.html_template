@@ -1,34 +1,43 @@
-{{.TemplateHeader}}
-{{.TemplateBody}}
-    <form action="/{{.ObjectName}}Edit?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
-      <div class="card">
+{{.TemplateHeader}} {{.TemplateBody}}
+<form action="/{{.ObjectName}}Edit?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
+    <div class="card">
         <div class="card-header">
-          <div class="row">
-            <div class="col h3">
-              <i class="{{.ObjectGlyph}} me-2"></i>{{.Title}}&nbsp;:&nbsp;<code>{{.QueryField}}</code>
+            <div class="row">
+                <div class="col h3">
+                    <i class="{{.ObjectGlyph}} me-2"></i>{{.Title}}&nbsp;:&nbsp;<code>{{.QueryField}}</code>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <div class="btn-group float-right">
+                        {{if .CanEdit}}
+                        <button type="submit" value="" class="btn btn-warning"><i class="fas fa-pen"  method="POST" formaction="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" title="Edit {{.FriendlyName}}"></i>&nbsp;&nbsp;Edit</button>                        {{end}}
+                        <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
+                        <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
+                    </div>
+                </div>
             </div>
-            <div class="col d-flex justify-content-end">
-              <div class="btn-group float-right">
-              {{if .CanEdit}}
-                <button type="submit" value="" class="btn btn-warning"><i class="fas fa-pen"  method="POST" formaction="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" title="Edit {{.FriendlyName}}"></i>&nbsp;&nbsp;Edit</button>
-              {{end}}  
-                <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print"></i></i>&nbsp;&nbsp;Print</button>
-                <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times" ></i>&nbsp;&nbsp;Cancel</button>
-              </div>
-            </div>
-          </div>
         </div>
         <div class="card-body">
-{{range .FieldsList}}<div class="row"><div class="col">
-              <div class="form-outline mb-3">
-                <input type="text" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}">
-                <label class="form-label" for="{{.FieldName}}">{{.FieldName}}</label>
-              </div>
-            </div></div>
-{{end}}        </div>
-{{.TemplateAudit}}
-      </div>
-    </form>
-  
-{{.TemplateUserFooter}}
-{{.TemplatePageFooter}}
+            {{range .FieldsList}} {{if or .IsBaseField .IsExtra}}
+            <div class="row">
+                <div class="col">
+                    <div class="form-outline mb-3">
+                        <input type="text" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}">
+                        <label class="form-label" for="{{.FieldName}}">{{.FieldName}}</label>
+                    </div>
+                </div>
+            </div>
+            {{else}} {{if not .IsOverride}}
+            <div class="row mb-3 hidden">
+                <div class="col">
+                    <select class="select" data-mdb-filter="true" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" disabled>
+                    {{.RangeHTML}}
+                    </select>
+                    <label class="form-label select-label" for="{{.FieldName}}">{{.FieldName}}</label>
+                </div>
+            </div> {{end}}{{end}}{{end}}
+        </div>
+        {{.TemplateAudit}}
+    </div>
+</form>
+
+{{.TemplateUserFooter}} {{.TemplatePageFooter}}

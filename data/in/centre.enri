@@ -1,2 +1,2 @@
-Type,Field,Object,Lookup,Return,Inputtable,Mandatory,Default,Key
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
 Lookup,Country,Country,Country,Name,false,,,Code

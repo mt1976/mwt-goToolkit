@@ -118,8 +118,8 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	}
 
 // If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .IsExtra}}   err = adaptor.{{$.ObjectName}}_{{.FieldName}}_Store_impl (r,r.{{.FieldName}}){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  err = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_Store_impl (r){{end}}
+{{range .FieldsList}}{{if .IsExtra}}   err = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r,r.{{.FieldName}}){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  r.{{.FieldName}} = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_OnStore_impl (r){{end}}
 {{end}}
 
 	{{if .HasAudit}}
@@ -181,8 +181,8 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{else}}{{end}}
 {{end}}// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-{{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Fetch_impl (recItem){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_Fetch_impl (recItem){{end}}
+{{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
+{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_OnFetch_impl (recItem){{end}}
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list

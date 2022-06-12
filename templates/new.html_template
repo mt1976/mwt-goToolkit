@@ -17,21 +17,19 @@
           </div>
         </div>
         <div class="card-body">
-{{range .FieldsList}}{{if .IsBaseField}}            <div class="row mb-3" {{.Disabled}}><div class="col">
+{{range .FieldsList}}{{if or .IsBaseField .IsExtra}}            <div class="row mb-3" {{.Disabled}}><div class="col">
               <div class="form-outline">
                 <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
                 <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
               </div>
             </div></div>
 {{end}}{{end}}
-{{range .FieldsList}}{{if not .IsBaseField}}             <div class="row mb-3" {{.Disabled}}><div class="col">
+{{range .FieldsList}}{{if not .IsBaseField}}            
               
-                {{if .IsLookup}}<select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}}><option value="{{.ValueID}}" selected>{{.ValueID}}</option>{{.RangeHTML}}</select>{{else}}
-                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
+                {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div class="col"><select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}} data-mdb-filter="true">{{.RangeHTML}}</select>
+                <label class="form-label select-label" for="{{.FieldName}}"}>{{.FieldName}}</label>            </div></div>
                 {{end}}
-                <label class="form-label select-label" for="{{.FieldName}}"}>{{.FieldName}}</label>
-      
-            </div></div>
+
 {{end}}{{end}}     
         </div>
       </div>

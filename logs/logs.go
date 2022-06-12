@@ -6,9 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/TwiN/go-color"
 	colour "github.com/TwiN/go-color"
-	"github.com/davecgh/go-spew/spew"
 	viper "github.com/spf13/viper"
 	"golang.org/x/term"
 )
@@ -39,15 +37,16 @@ const (
 	log_Query         = "Query"
 	log_Result        = "Result"
 	log_Storing       = "Storing"
+	log_Activity      = "Activity"
 
-	ColorReset        = "\033[0m"
-	ColorRed          = "\033[31m"
-	ColorGreen        = "\033[32m"
-	ColorYellow       = "\033[33m"
-	ColorBlue         = "\033[34m"
-	ColorPurple       = "\033[35m"
-	ColorCyan         = "\033[36m"
-	ColorWhite        = "\033[37m"
+	colourReset       = "\033[0m"
+	colourRed         = "\033[31m"
+	colourGreen       = "\033[32m"
+	colourYellow      = "\033[33m"
+	colourBlue        = "\033[34m"
+	colourPurple      = "\033[35m"
+	colourCyan        = "\033[36m"
+	colourWhite       = "\033[37m"
 	Character_MapTo   = "⇄"
 	Character_Job     = "⚙️"
 	Character_Heart   = "🫀"
@@ -73,7 +72,7 @@ var CFG Config
 
 func init() {
 	CFG, _ = getConfig()
-	spew.Dump(CFG)
+	//spew.Dump(CFG)
 }
 
 func Poke(w string, v string) {
@@ -110,7 +109,18 @@ func Information(w string, v string) {
 	if len(v) == 0 {
 		msg_raw(log_Info, w, "", colour.Reset)
 	} else {
-		msg_raw(log_Info, w+" =", color.Bold+v, colour.Reset)
+		msg_raw(log_Info, w+" =", colour.Bold+v, colour.Reset)
+	}
+	//msg_raw(log_Info, w, v, colour.Reset)
+
+}
+
+func Activity(w string, v string) {
+	//msg_info(w, v)
+	if len(v) == 0 {
+		msg_raw(log_Activity, w, "", colour.Reset)
+	} else {
+		msg_raw(log_Activity, w+" =", colour.Bold+v, colour.Reset)
 	}
 	//msg_raw(log_Info, w, v, colour.Reset)
 
@@ -200,13 +210,13 @@ func EndJob(w string) {
 func Warning(s string) {
 	msg_raw(log_Warning, s, Character_Warning, colour.Bold+colour.Yellow)
 
-	//log.Println(ColorYellow + "Warning       : " + s + " " + ColorReset)
+	//log.Println(colourYellow + "Warning       : " + s + " " + colourReset)
 }
 
 func Message(w string, v string) {
-	//log.Println(ColorReset + "Warning       : " + s + " " + ColorReset)
+	//log.Println(colourReset + "Warning       : " + s + " " + colourReset)
 	//output := fmt.Sprintf("%s : %s", w, v)
-	//log.Println(ColorReset + output + ColorReset)
+	//log.Println(colourReset + output + colourReset)
 	msg_raw(w, v, "", colour.White)
 
 }
@@ -245,7 +255,7 @@ func Break() {
 }
 
 func Header(s string) {
-	log.Println(colour.Green + color.Bold + s + colour.Reset)
+	log.Println(colour.Green + colour.Bold + s + colour.Reset)
 }
 
 func Clear() {
@@ -269,7 +279,7 @@ func getConfig() (config Config, err error) {
 	}
 
 	err = viper.Unmarshal(&config)
-	spew.Dump(config)
+	//spew.Dump(config)
 	if config.Verbose == "true" {
 		config.VerboseMode = true
 	} else {
