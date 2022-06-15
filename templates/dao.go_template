@@ -19,7 +19,9 @@ import (
 {{if not .HasFetchAdaptor}}core "{{.ProjectRepo}}core"{{end}}
 {{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
 {{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
-	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
+	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{else}}
+	{{if or .DoesLookup}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
+	{{end}}
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
 )
@@ -111,15 +113,14 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
 
 
-	logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
+	
 
 	if len(r.{{.QueryFieldID}}) == 0 {
 		r.{{.QueryFieldID}} = {{.ObjectName}}_NewID(r)
 	}
 
 // If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .IsExtra}}   err = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r,r.{{.FieldName}}){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  r.{{.FieldName}} = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_OnStore_impl (r){{end}}
+{{range .FieldsList}}{{if .HasCallout}}  r.{{.FieldName}},err = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end}}
 {{end}}
 
 	{{if .HasAudit}}
@@ -130,7 +131,7 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	r.SYSUpdatedBy = Audit_Update("",usr)
 	r.SYSUpdatedHost = Audit_Update("",Audit_Host())
 	{{end}}
-
+logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 {{if .HasStoreAdaptor}}
 // Please Create Functions Below in the adaptor/{{.ObjectName}}_impl.go file
 	err1 := adaptor.{{.ObjectName}}_Delete_impl(r.{{.QueryFieldID}})
@@ -145,9 +146,14 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 //Deal with the if its Application or null add this bit, otherwise dont.
 
 	ts := SQLData{}
-
-{{range .FieldsList}}{{if not .IsOverride}}{{if not .IsExtra}}{{if not .IsLookup}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}}){{end}}{{end}}{{end}}
-{{end}}	
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	{{range .FieldsList}}{{if not .IsExtra}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}}){{end}}
+	{{end}}	
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
 
 	tsql := "INSERT INTO " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " (" + fields(ts) + ")"
@@ -181,8 +187,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
 {{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{else}}{{end}}
 {{end}}// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-{{range .FieldsList}}{{if .IsExtra}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}  recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_Override_OnFetch_impl (recItem){{end}}
+{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
 {{end}}
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
 		//Add to the list

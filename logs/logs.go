@@ -101,7 +101,7 @@ func System(s string) {
 
 func Default(s string, w string) {
 	//msg_done(s)
-	msg_raw(log_Default, s, w, colour.Purple)
+	msg_raw(log_Default, s, w, colour.Purple+colour.Bold)
 }
 
 func Information(w string, v string) {

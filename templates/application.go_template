@@ -32,6 +32,10 @@ type {{.ObjectName}}_PageList struct {
 	ItemsOnPage 	 int
 	ItemList  		 []dm.{{.ObjectName}}
 }
+//{{.ObjectName}}_Redirect provides a page to return to aftern an action
+const (
+	{{.ObjectName}}_Redirect = dm.{{.ObjectName}}_PathList
+)
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
 type {{.ObjectName}}_Page struct {
@@ -40,16 +44,17 @@ type {{.ObjectName}}_Page struct {
 	UserRole    	 string
 	Title       	 string
 	PageTitle   	 string
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}{{if not .IsOverride}}	{{.FieldName}} {{if or .IsLookup .IsListLookup}}   []dm.Lookup_Item{{else}}        string{{end}}{{end}}
-	{{end}}
-
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//	
+	{{range .FieldsList}}{{.FieldName}}         string{{if or .IsLookup .IsListLookup}}
+	{{.FieldName}}_lookup    []dm.Lookup_Item{{end}}
+	{{end}}// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
 }
 
-const (
-	{{.ObjectName}}_Redirect = dm.{{.ObjectName}}_PathList
-)
+
 
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
@@ -64,6 +69,7 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
     {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
 }
 
+{{if .CanList}}
 //{{.ObjectName}}_HandlerList is the handler for the list page
 func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
@@ -93,7 +99,8 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
 
 }
-
+{{end}}
+{{if .CanView}}
 //{{.ObjectName}}_HandlerView is the handler used to View a page
 func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
@@ -116,35 +123,15 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		UserRole:    Session_GetUserRole(r),
 	}
 
-		// 
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}
-{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}
-// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-
-
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
-{{end}}
-{{if .IsListLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
-{{end}}
-{{end}}{{end}}
-
-// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//
-
-
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
 
 }
-
+{{end}}
+{{if .CanEdit}}
 //{{.ObjectName}}_HandlerEdit is the handler used generate the Edit page
 func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
@@ -167,29 +154,13 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		UserRole:    Session_GetUserRole(r),
 	}
 
-		// 
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}
-{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-{{end}}{{end}}
-// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
-{{end}}
-{{if .IsListLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
-{{end}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 
+	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
+
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
-
-
 }
+{{end}}
 {{if .CanSave}}
 //{{.ObjectName}}_HandlerSave is the handler used process the saving of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
@@ -204,17 +175,19 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	logs.Servicing(r.URL.Path+r.FormValue("{{.QueryFieldID}}"))
 
 	var item dm.{{.ObjectName}}
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-	{{range .FieldsList}}	{{if not .IsOverride}}item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}){{end}}
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
 	{{end}}
-
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
 	dao.{{.ObjectName}}_Store(item,r)	
-
 	http.Redirect(w, r, {{.ObjectName}}_Redirect, http.StatusFound)
 }
 {{end}}
+{{if .CanNew}}
 //{{.ObjectName}}_HandlerNew is the handler used process the creation of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
@@ -235,28 +208,15 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		UserRole:    Session_GetUserRole(r),
 	}
 
-		// 
-		// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = ""
-{{end}}{{end}}
-{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = ""
-{{end}}{{end}}
-// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-{{range .FieldsList}}{{if not .IsBaseField}}{{if .IsLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.{{.LookupObject}}_GetLookup()
-{{end}}
-{{if .IsListLookup}}
-_,pageDetail.{{.FieldName}},_:= dao.StubLists_Get("{{.LookupObject}}")
-{{end}}
-{{end}}{{end}}// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
+
+	pageDetail = {{.ObjectNameLower}}_PopulatePage(dm.{{.ObjectName}}{} , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
 
-}
-
+}	
+{{end}}
+{{if .CanDelete}}
 //{{.ObjectName}}_HandlerDelete is the handler used process the deletion of an {{.ObjectName}}
 func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 	// Mandatory Security Validation
@@ -273,3 +233,29 @@ func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, {{.ObjectName}}_Redirect, http.StatusFound)
 }
+{{end}}
+
+// Builds/Popuplates the {{.ObjectName}} Page 
+func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail {{.ObjectName}}_Page) {{.ObjectName}}_Page {
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+	{{end}}{{end}}
+	{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
+	{{end}}{{end}}
+	//
+	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
+	//
+	{{range .FieldsList}}{{if .IsLookup}}
+	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetLookup()
+	{{end}}
+	{{if .IsListLookup}}
+	pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")
+	{{end}}
+	{{end}}
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
+return pageDetail
+}	

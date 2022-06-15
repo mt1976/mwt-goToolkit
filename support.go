@@ -17,6 +17,12 @@ func wrapVariable(in string) string {
 	return "{{." + in + "}}"
 }
 
+func wrapParentVariable(in string) string {
+
+	return "{{$." + in + "}}"
+
+}
+
 func wrapTemplate(in string) string {
 	return "{{template " + enquote(in) + " .}}"
 }

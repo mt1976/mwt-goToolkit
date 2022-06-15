@@ -46,6 +46,7 @@ func Query(db *sql.DB, query string) ([]map[string]interface{}, int, error) {
 		// Outputs: map[columnName:value columnName2:value2 columnName3:value3 ...]
 		//fmt.Println(m)
 		//log.Println("Append", m)
+		//fmt.Printf("m: %v\n", m)
 		recs = append(recs, m)
 	}
 	//rows.Close()

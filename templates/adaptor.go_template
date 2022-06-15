@@ -37,23 +37,21 @@ func {{.ObjectName}}_Delete_impl(id string) (error) {return nil}
 func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (error) {return nil}
 {{end}}
 // If there are fields below, create the methods in adaptor\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .IsExtra}}func {{$.ObjectName}}_{{.FieldName}}_Store_impl (rec dm.{{$.ObjectName}},usr string) (error)  {return nil}{{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}func {{$.ObjectName}}_{{.FieldName}}_Override_Store_impl (rec dm.{{$.ObjectName}}) (error)  {return nil} {{end}}
+{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (fieldval string,rec dm.{{$.ObjectName}},usr string) (string,error)  {return fieldval,nil}{{end}}
 {{end}}
-{{range .FieldsList}}{{if .IsExtra}}func {{$.ObjectName}}_{{.FieldName}}_Fetch_impl (rec dm.{{$.ObjectName}})(string) {return ""}{{end}}
-{{end}}{{range .FieldsList}}{{if .IsOverride}}func {{$.ObjectName}}_{{.FieldName}}_Override_Fetch_impl (rec dm.{{$.ObjectName}}) (string) {return ""} {{end}}
+{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {return ""}{{end}}
 {{end}}
 {{if .HasMonitor}}
 func {{.ObjectName}}_Simulator_ProcessResponse_impl(filename string) error {
-	logs.Success("{{.ObjectName}}_ProcessResponse:" + filename)
+	logs.Success("{{.ObjectName}}_Simulator_ProcessResponse:" + filename)
 	// tokenise the filename, get last element
 	tokens := strings.Split(filename, "/")
     last := tokens[len(tokens)-1]
 	core.Notification_Normal("New {{.FriendlyName}} Message Detected", last)
-    return {{.ObjectNameLower}}_ProcessResponse_impl (tokens,last)
+    return {{.ObjectNameLower}}_Simulator_ProcessResponse_impl (tokens,last)
 }
 
-func {{.ObjectNameLower}}_ProcessResponse_impl (tokens []string,latestToken string) error {
+func {{.ObjectNameLower}}_Simulator_ProcessResponse_impl (tokens []string,latestToken string) error {
     return nil
 }
 {{end}}

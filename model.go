@@ -77,6 +77,7 @@ type ObjectEnrichments struct {
 	HasJob                 bool
 	CanImport              bool
 	CanDo                  bool
+	DoesLookup             bool
 }
 
 type ObjectFields struct {
@@ -102,6 +103,9 @@ type ObjectFields struct {
 	LookupValue   string
 	RangeHTML     string
 	WrapFieldName string
+	IsNoChange    bool
+	HasCallout    bool
+	IsAudit       bool
 }
 
 type messages struct {
@@ -138,8 +142,12 @@ const (
 	enri_IsMandatory  = 6
 	enri_DefaultValue = 7
 	enri_SPARE        = 8
+	enri_NoChange     = 9
+	enri_HasCallout   = 10
 
-	html_disabled  = "disabled"
+	html_disabled  = "readonly=\"true\""
 	html_hidden    = "hidden"
 	html_mandatory = "required"
+
+	rangeHTMLString = "{{range .%s}}<option value=\"%s\" {{if eq .ID %s}}selected{{end}} data-mdb-secondary-text=\"{{.ID}}\">%s</option>{{end}}"
 )

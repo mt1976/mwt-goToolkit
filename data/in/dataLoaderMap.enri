@@ -1,4 +1,4 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
-Lookup,Loader,DataLoader,Loader,Name,false,false,,Loader
-Lookup,LoaderDescription,DataLoader,Loader,Description,false,false,,Loader
-Lookup,LoaderType,DataLoader,Loader,Type,false,false,,Loader
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
+Lookup,Loader,DataLoader,Loader,Name,false,false,,Loader,,
+Lookup,LoaderDescription,DataLoader,Loader,Description,false,false,,Loader,,
+Lookup,LoaderType,DataLoader,Loader,Type,false,false,,Loader,,

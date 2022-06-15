@@ -13,7 +13,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 
 	"github.com/mt1976/templateBuilder/das"
@@ -99,7 +98,7 @@ func seekTableDefinitions(dir string) []string {
 func processObjectDefinition(configFile string) {
 	logs.Processing(configFile)
 	//	logs.Information("Populate", "Replacement Values")
-
+	//logs.Information("sausage", "")
 	props := core.Config_Get(configFile)
 
 	//fmt.Printf("props: %v\n", props)
@@ -130,12 +129,12 @@ func processObjectDefinition(configFile string) {
 
 	if getProperty("hasenrichments", props) {
 		//logs.Break()
-		//	logs.Information("Getting Enrichment Fields from enri", csvPath)
+		logs.Information("Getting Enrichment Fields from enri", enriPath)
 		e = mergeEnrichmentDefinitions(enriPath, e)
 	}
 
-	for i := 0; i < len(e.MessageList); i++ {
-		logs.Information(e.MessageList[i].Message, strconv.Itoa(i))
+	for i := 0; i < len(e.FieldsList); i++ {
+		logs.Information(e.FieldsList[i].FieldName, strconv.Itoa(i))
 	}
 	logs.Break()
 	logs.Header("Generating Artifacts")
@@ -163,7 +162,7 @@ func processObjectDefinition(configFile string) {
 
 	e = generateCodeArtifact("monitor", props, configFile, e)
 
-	spew.Dump(e)
+	//spew.Dump(e)
 }
 
 func generateCodeArtifact(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
@@ -222,12 +221,15 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 
 	if destFolder == "adaptor" {
 		destFolder = "adaptor"
-		out_extn = "_impl.go"
+		out_extn = "_impl.go_template"
 		in_extn = ".go_template"
 	}
 
 	if core.Properties["deliverto"] == "" {
 		out_extn = out_extn + "_tmp"
+		if destFolder == "design/catalog" {
+			out_extn = ".md"
+		}
 	}
 	//spew.Dump(replacements)
 	fp := e.Path + "/templates/" + w + in_extn
@@ -337,7 +339,7 @@ func getFieldDefinitions_CSV(filePath string, e ObjectEnrichments) ObjectEnrichm
 	// Create a new reader.
 	r := csv.NewReader(f)
 	//logs.Information("New Reader", filePath)
-	displayTableHeader("Table")
+	//displayTableHeader("Table")
 
 	for {
 		record, err := r.Read()
@@ -381,7 +383,7 @@ func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnri
 	//fmt.Printf("db: %v\n", db)
 
 	//tsql := fmt.Sprintf("USE %s EXEC sp_columns '%s'", p["database"], p["sqltablename"])
-	tsql := fmt.Sprintf("EXEC sp_columns '%s'", p["sqltablename"])
+	tsql := fmt.Sprintf("EXEC sp_columns '%s', @table_owner = '%s'", p["sqltablename"], p["schema"])
 	//logs.Query(tsql)
 	results, noFields, err := das.Query(db, tsql)
 	//fmt.Printf("results: %v\n", results)
@@ -389,8 +391,10 @@ func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnri
 	//spew.Dump(results)
 	if noFields == 0 {
 		logs.Error("No Fields Found", err)
+	} else {
+		logs.Success("Fields Found =" + strconv.Itoa(noFields))
 	}
-	displayTableHeader("Table")
+	//displayTableHeader("Table")
 	for _, row := range results {
 		colName := row["COLUMN_NAME"].(string)
 		colType := row["TYPE_NAME"].(string)
@@ -442,6 +446,13 @@ func setupEnrichment(props map[string]string) ObjectEnrichments {
 	e := ObjectEnrichments{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
 	logs.Information("Object Name", e.ObjectName)
+	logs.Accessing("Object Name " + e.ObjectName)
+	logs.Processing("Object Name " + e.ObjectName)
+	logs.Servicing("Object Name " + e.ObjectName)
+	logs.System("Object Name " + e.ObjectName)
+	logs.Default("Object Name", e.ObjectName)
+	logs.Created("Object Name " + e.ObjectName)
+
 	e.ObjectName = strings.Title(e.ObjectName)
 	e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
 	e.ObjectNameLower = strings.ToLower(e.ObjectName)
@@ -450,6 +461,7 @@ func setupEnrichment(props map[string]string) ObjectEnrichments {
 	e.Date = time.Now().Format(core.DATEFORMATUSER)
 	e.Host = getHostName()
 	e.Who = getUsername()
+	e.DoesLookup = false
 
 	e.FriendlyName = props["friendlyname"]
 	if e.FriendlyName == "" {
@@ -549,7 +561,7 @@ func setupEnrichment(props map[string]string) ObjectEnrichments {
 	e.CanOverrideID = getProperty("canoverrideid", props)
 
 	//spew.Dump(e)
-	fmt.Printf("e: %v\n", e)
+	//fmt.Printf("e: %v\n", e)
 	return e
 }
 
@@ -577,45 +589,19 @@ func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrich
 	e.CanEdit = getProperty("can_edit", props)
 	e.CanDelete = getProperty("can_delete", props)
 	e.CanNew = getProperty("can_new", props)
-
-	// if strings.ToUpper(props["can_view"]) == "N" {
-	// 	e.CanView = false
-	// }
-	// if strings.ToUpper(props["can_edit"]) == "N" {
-	// 	e.CanEdit = false
-	// }
-	// if strings.ToUpper(props["can_delete"]) == "N" {
-	// 	e.CanDelete = false
-	// }
-	// if strings.ToUpper(props["can_new"]) == "N" {
-	// 	e.CanNew = false
-	// }
-
 	e.CanSave = getProperty("can_save", props)
 	if !e.CanSave {
 		e.CanSave = false
 		e.CanEdit = false
 		e.CanNew = false
 	}
-
 	e.CanList = getProperty("can_list", props)
 	e.CanExport = getProperty("can_export", props)
 	e.CanAPI = getProperty("can_api", props)
-
-	// if strings.ToUpper(props["can_list"]) == "N" {
-	// 	e.CanList = false
-	// }
-
-	// if strings.ToUpper(props["can_export"]) == "Y" {
-	// 	e.CanExport = true
-	// }
-
-	// if strings.ToUpper(props["can_api"]) == "Y" {
-	// 	e.CanAPI = true
-	// }
+	e.CanDo = getProperty("can_do", props)
 
 	//spew.Dump(e)
-	spew.Dump(e)
+	//spew.Dump(e)
 
 	return e
 }
@@ -657,19 +643,14 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 	}
 	fn = strings.ToUpper(fn[:1]) + fn[1:]
 
-	// lkval := ""
-	// if isLookup {
-	// 	lkval = "LK"
-	// }
-	// if isListLookup {
-	// 	lkval = "LS"
-	// }
-	// if isFetch {
-	// 	lkval = "FT"
-	// }
-
 	//info := fmt.Sprintf(tableRow, fn, tp, df, tf(mand), tf(baseField), tf(isExtra), tf(isOverride), lkval, lkObject, lkKeyField, lkValueField)
 	tplField := "{{." + fn + "}}"
+
+	hasAPI := false
+	if isExtra {
+		hasAPI = true
+	}
+
 	en.FieldsList = append(en.FieldsList, ObjectFields{FieldName: fn,
 		Type:          tp,
 		Default:       df,
@@ -689,11 +670,17 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 		RangeHTML:     lkRange,
 		IsExtra:       isExtra,
 		IsOverride:    isOverride,
-		IsListLookup:  isListLookup})
+		IsListLookup:  isListLookup,
+		HasCallout:    hasAPI,
+		IsAudit:       isAudit(origfn)})
 
 	//logs.Information(info, "")
 
 	return en.FieldsList
+}
+
+func isAudit(fn string) bool {
+	return fn[0:1] == "_"
 }
 
 func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnrichments {
@@ -707,9 +694,9 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 	//displayTableHeader("Enrichment")
 	var enrichmentDefinitions [][]string
 
-	for i := 0; i < len(en.FieldsList); i++ {
-		//	fmt.Printf("b4 en: %d %v\n", i, en.FieldsList[i])
-	}
+	// for i := 0; i < len(en.FieldsList); i++ {
+	// 	fmt.Printf("b4 en: %d %v\n", i, en.FieldsList[i])
+	// }
 	for {
 		enrichmentDefinition, err := r.Read()
 		//fmt.Printf("record: %v\n", record)
@@ -719,7 +706,8 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 		}
 
 		if err != nil {
-			logs.Fatal("Read Enri", err)
+			logs.Warning("Read Enri :" + err.Error())
+
 			panic(err)
 		}
 		if enrichmentDefinition[enri_Type] == "Type" && enrichmentDefinition[enri_Field] == "Field" {
@@ -739,41 +727,45 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 	}
 	//fmt.Printf("enrichmentDefinitions: %v\n", enrichmentDefinitions)
 	//loop through enrichmentDefinitions
-	for _, enrichmentOverride := range enrichmentDefinitions {
+	for _, thisEnrichment := range enrichmentDefinitions {
 		//	fmt.Printf("enrichmentOverride: %v\n", enrichmentOverride)
+		//fmt.Printf("thisEnrichment: %v\n", thisEnrichment)
+		//fmt.Printf("thisEnrichmentType: %v\n", thisEnrichment[enri_Type])
+
 		switch {
-		case enrichmentType(enrichmentOverride[enri_Type], listField):
-			//logs.Processing(listField + " " + enrichmentOverride[enri_Field])
+		case enrichmentType(thisEnrichment[enri_Type], listField):
+			logs.Processing(listField + " " + thisEnrichment[enri_Field])
+			en.DoesLookup = true
+			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
-			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+		case enrichmentType(thisEnrichment[enri_Type], lookupField):
+			logs.Processing(lookupField + " " + thisEnrichment[enri_Field])
+			en.DoesLookup = true
+			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
-		case enrichmentType(enrichmentOverride[enri_Type], lookupField):
-			//logs.Processing(lookupField + " " + enrichmentOverride[enri_Field])
-			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
-
-		case enrichmentType(enrichmentOverride[enri_Type], extraField):
+		case enrichmentType(thisEnrichment[enri_Type], extraField):
 			// Do Nothing
-			//logs.Information(extraField, enrichmentOverride[enri_Field])
+			logs.Information(extraField, thisEnrichment[enri_Field])
 
-		case enrichmentType(enrichmentOverride[enri_Type], overrideField):
+		case enrichmentType(thisEnrichment[enri_Type], overrideField):
 			// Do Nothing
-			//logs.Information(overrideField, enrichmentOverride[enri_Field])
-			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+			logs.Information(overrideField, thisEnrichment[enri_Field])
+			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
-		case enrichmentType(enrichmentOverride[enri_Type], fetchField):
+		case enrichmentType(thisEnrichment[enri_Type], fetchField):
 			// Do Nothing
-			//logs.Processing(fetchField + " " + enrichmentOverride[enri_Field])
-			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+			logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
+			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
-		case enrichmentType(enrichmentOverride[enri_Type], defaultField):
+		case enrichmentType(thisEnrichment[enri_Type], defaultField):
 
-			//logs.Processing(fetchField + " " + enrichmentOverride[enri_Field])
+			logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
 
-			en.FieldsList = mergeComplexField(en, enrichmentOverride[enri_Field], enrichmentOverride[enri_Type], enrichmentOverride)
+			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		default:
 			// Do Nothing
-			logs.Warning("Unkown Enrichment Type" + enrichmentOverride[enri_Type] + enrichmentOverride[enri_Field])
+			logs.Warning("Unkown Enrichment Type" + thisEnrichment[enri_Type] + thisEnrichment[enri_Field])
 		}
 	}
 	noRows := len(en.FieldsList)
@@ -802,6 +794,9 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 		//	fmt.Printf("info: %v\n", info)
 	}
 	//logs.Break()
+	// for i := 0; i < len(en.FieldsList); i++ {
+	// 	fmt.Printf("af en: %d %v\n", i, en.FieldsList[i])
+	// }
 	return en
 }
 
@@ -830,7 +825,7 @@ func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
 		lkKeyField = record[enri_LookupKey]
 		lkValueField = record[enri_LookupValue]
 
-		lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_list", wrapVariable("ID"), wrapVariable("Name"))
+		lkRange = buildRangeHTML(record[1])
 	}
 
 	if enrichmentType(record[enri_Type], extraField) {
@@ -847,7 +842,7 @@ func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
 		isListLookup = true
 		suffix = "_list"
 		lkObject = record[2]
-		lkRange = fmt.Sprintf("{{range .%s}}<option value=\"%s\">%s</option>{{end}}", record[1]+"_list", wrapVariable("ID"), wrapVariable("Name"))
+		lkRange = buildRangeHTML(record[1])
 	}
 
 	if enrichmentType(record[enri_Type], fetchField) {
@@ -867,6 +862,16 @@ func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
 	return addComplexField(en, record[enri_Field]+suffix, "String", record[enri_DefaultValue], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride, isListLookup, isFetch)
 }
 
+func buildRangeHTML(inObject string) string {
+	return fmt.Sprintf(rangeHTMLString,
+		inObject+"_lookup",
+		wrapVariable("ID"),
+		"$."+inObject,
+		wrapVariable("Name"))
+	//		wrapParentVariable(inObject))
+}
+
+//
 func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOverride []string) []ObjectFields {
 
 	// log parameters
@@ -899,6 +904,8 @@ func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOve
 				en.FieldsList[i].LookupObject = enrichmentOverride[enri_LookupObject]
 				en.FieldsList[i].LookupField = enrichmentOverride[enri_LookupKey]
 				en.FieldsList[i].LookupValue = enrichmentOverride[enri_LookupValue]
+				en.FieldsList[i].RangeHTML = buildRangeHTML(fn)
+
 				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
 			case tp == lookupField:
 				//logs.Processing("LOOKUP")
@@ -906,6 +913,8 @@ func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOve
 				en.FieldsList[i].LookupObject = enrichmentOverride[enri_LookupObject]
 				en.FieldsList[i].LookupField = enrichmentOverride[enri_LookupKey]
 				en.FieldsList[i].LookupValue = enrichmentOverride[enri_LookupValue]
+				en.FieldsList[i].RangeHTML = buildRangeHTML(fn)
+
 				en.FieldsList[i] = commonOverrides(enrichmentOverride, en.FieldsList[i])
 			case tp == extraField:
 				//logs.Skipping("EXTRA")
@@ -937,17 +946,28 @@ func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOve
 }
 
 func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFields {
-	if commonOverrides[enri_IsInputtable] != "" {
-		if commonOverrides[enri_IsInputtable] == "true" {
-			fieldsList.Disabled = ""
-		} else {
-			fieldsList.Disabled = html_disabled
-		}
-		if commonOverrides[enri_IsMandatory] == "true" {
-			fieldsList.IsMandatory = true
-		} else {
-			fieldsList.IsMandatory = false
-		}
+	//if commonOverrides[enri_IsInputtable] != "" {
+
+	if commonOverrides[enri_IsInputtable] == "false" {
+		fieldsList.Disabled = html_disabled
+	} else {
+		fieldsList.Disabled = ""
 	}
+	if commonOverrides[enri_IsMandatory] == "true" {
+		fieldsList.IsMandatory = true
+	} else {
+		fieldsList.IsMandatory = false
+	}
+	if commonOverrides[enri_NoChange] == "true" {
+		fieldsList.IsNoChange = true
+	} else {
+		fieldsList.IsNoChange = false
+	}
+	if commonOverrides[enri_HasCallout] == "true" {
+		fieldsList.HasCallout = true
+	} else {
+		fieldsList.HasCallout = false
+	}
+	//}
 	return fieldsList
 }

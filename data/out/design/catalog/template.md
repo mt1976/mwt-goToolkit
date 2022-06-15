@@ -62,13 +62,13 @@ SQL Table Key | **ID**
 ##  Artifacts Generated
 | Type | Artifact | Path|
 | :--: | -- | -- |
-| code | **application** | /application/template.go_tmp |
-| code | **adaptor** | /adaptor/template_impl.template |
-| code | **api** | /application/template_api.go |
-| code | **dao** | /dao/template.go_tmp |
-| code | **datamodel** | /datamodel/template.go_tmp |
-| code | **job** | /jobs/template_core.go |
-| code | **menu** | /design/menu/template.json |
+| code | **application** | /application/template_core.go_tmp |
+| code | **adaptor** | /adaptor/template_impl.go_tmp |
+| code | **api** | /application/template_api.go_tmp |
+| code | **dao** | /dao/template_core.go_tmp |
+| code | **datamodel** | /datamodel/template_core.go_tmp |
+| code | **job** | /jobs/template_core.go_tmp |
+| code | **menu** | /design/menu/template.json_tmp |
 | html | **list** | /html/Template_List.html |
 | html | **view** | /html/Template_View.html |
 | html | **edit** | /html/Template_Edit.html |
@@ -79,7 +79,7 @@ SQL Table Key | **ID**
 |   |   |
 |---|---|
 Template Generator Version   | **delinquentDysprosium [r4-21.12.31]**
-Date & Time		     | **12/06/2022** at **15:18:15**
+Date & Time		     | **12/06/2022** at **16:16:38**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ### Footnotes

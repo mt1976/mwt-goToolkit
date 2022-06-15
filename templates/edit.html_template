@@ -20,11 +20,25 @@
           </div>
         </div>
         <div class="card-body">
-          {{range .FieldsList}}{{if or .IsBaseField .IsExtra}}            <div class="row mb-3" {{.Disabled}}><div class="col">
-              <div class="form-outline">
-                <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
-                <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-              </div>
+{{range .FieldsList}}{{if or .IsBaseField .IsExtra}}            <div class="row mb-3" {{.Disabled}}><div class="col">
+         {{if or .IsLookup .IsListLookup}}
+         {{if .IsNoChange}}
+                        <div class="form-outline">
+                      <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true"{{end}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
+                      <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
+                    </div>
+         {{else}}
+                  <select id="{{.FieldName}}" name="{{.FieldName}}" class="select" data-mdb-filter="true" {{.Disabled}} {{if .IsMandatory}}required{{end}}>
+                  {{.RangeHTML}}
+                  </select>
+                  <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
+          {{end}}        
+          {{else}}
+                  <div class="form-outline">
+                      <input type="text" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true"{{end}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}}>
+                      <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
+                    </div>
+          {{end}}
             </div></div>
 {{end}}{{end}}
 {{range .FieldsList}}{{if not .IsBaseField}}            

@@ -34,11 +34,9 @@
                           {{end}}
                           <td class="text-center" style="width:1px;">
                            <form action="/home" method="POST" class="d-flex justify-content-center">
-                            <div class="btn-group">
-                            {{if .CanView}}<button type="submit" value="" class="btn btn-info" formaction="/{{.ObjectName}}View?{{.QueryString}}={{.QueryField}}" method="POST" title="View {{.FriendlyName}}"><i class="far fa-eye"></i></button>{{end}}
-                            {{if .CanEdit}}<button type="submit" value="" class="btn btn-warning" formaction="/{{.ObjectName}}Edit?{{.QueryString}}={{.QueryField}}" method="POST" title="Edit {{.FriendlyName}}"><i class="fas fa-edit"></i></button>{{end}}
-                            {{if .CanDelete}}<button type="submit" value="" class="btn btn-danger" formaction="/{{.ObjectName}}Delete?{{.QueryString}}={{.QueryField}}" method="POST" title="Delete {{.FriendlyName}}"><i class="fas fa-trash"></i></button>{{end}}
-                            </div>
+                            {{if .CanView}}<button type="submit" value="" class="btn btn-info ms-2 btn-floating" formaction="/{{.ObjectName}}View?{{.QueryString}}={{.QueryField}}" method="POST" title="View {{.FriendlyName}}"><i class="far fa-eye"></i></button>{{end}}
+                            {{if .CanEdit}}<button type="submit" value="" class="btn btn-warning ms-2 btn-floating" formaction="/{{.ObjectName}}Edit?{{.QueryString}}={{.QueryField}}" method="POST" title="Edit {{.FriendlyName}}"><i class="fas fa-edit"></i></button>{{end}}
+                            {{if .CanDelete}}<button type="submit" value="" class="btn btn-danger ms-2 btn-floating" formaction="/{{.ObjectName}}Delete?{{.QueryString}}={{.QueryField}}" method="POST" title="Delete {{.FriendlyName}}"><i class="fas fa-trash"></i></button>{{end}}
                             </form>
                           </td>
                         </tr>

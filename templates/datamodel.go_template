@@ -13,11 +13,12 @@ package datamodel
 // Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 
-//Centre is cheese
+//{{.ObjectName}} defines the datamolde for the {{.ObjectName}} object
 type {{.ObjectName}} struct {
 
-{{range .FieldsList}}{{if not .IsOverride }}{{.FieldName}}{{if or .IsLookup .IsListLookup}}   []dm.Lookup_Item{{else}}        string{{end}}{{end}}
-{{end}}
+{{range .FieldsList}}{{.FieldName}}       string
+{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item
+{{end}}{{end}}
 }
 
 const (
@@ -46,7 +47,7 @@ const (
 	///
 	/// SQL Field Definitions
 	///
-{{range .FieldsList}}{{if not .IsOverride }}{{if .IsBaseField}}	{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}{{end}}{{end}}
+{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
 {{end}}
 	/// Definitions End
 )

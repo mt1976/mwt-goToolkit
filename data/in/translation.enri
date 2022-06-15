@@ -1,2 +1,4 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
-Override,MessageFmt,,,,false,false,,,,
+Override,Class,,,,,true,,,true,
+Override,Message,,,,,true,,,true,
+Override,Id,,,,false,,,,,

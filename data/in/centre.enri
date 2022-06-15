@@ -1,2 +1,2 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,Key
-Lookup,Country,Country,Country,Name,false,,,Code
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
+Lookup,Country,Country,Country,Name,false,,,Code,,
