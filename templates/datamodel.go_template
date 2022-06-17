@@ -30,10 +30,10 @@ const (
 	/// Handler Defintions
 	///
 	{{.ObjectName}}_Template     = "{{.ObjectName}}"
-	{{.ObjectName}}_TemplateList = "{{.ObjectName}}_List"
-	{{.ObjectName}}_TemplateView = "{{.ObjectName}}_View"
-	{{.ObjectName}}_TemplateEdit = "{{.ObjectName}}_Edit"
-	{{.ObjectName}}_TemplateNew  = "{{.ObjectName}}_New"
+	{{.ObjectName}}_TemplateList = "/{{.ObjectName}}/{{.ObjectName}}_List"
+	{{.ObjectName}}_TemplateView = "/{{.ObjectName}}/{{.ObjectName}}_View"
+	{{.ObjectName}}_TemplateEdit = "/{{.ObjectName}}/{{.ObjectName}}_Edit"
+	{{.ObjectName}}_TemplateNew  = "/{{.ObjectName}}/{{.ObjectName}}_New"
 	///
 	/// Handler Monitor Paths
 	///
@@ -45,9 +45,16 @@ const (
 	{{.ObjectName}}_PathSave   = "/{{.ObjectName}}Save/"
 	{{.ObjectName}}_PathDelete = "/{{.ObjectName}}Delete/"
 	///
+	///
 	/// SQL Field Definitions
 	///
-{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
+{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}_sql   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
+{{end}}
+	/// Definitions End
+
+	/// Application Field Definitions
+	///
+{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}_scrn   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
 {{end}}
 	/// Definitions End
 )

@@ -266,7 +266,7 @@ func getConfig() (config Config, err error) {
 	// get current os directory path
 	pwd, _ := os.Getwd()
 
-	fmt.Println(pwd)
+	//fmt.Println(pwd)
 	viper.AddConfigPath(pwd + "/config/")
 	viper.SetConfigName("logs")
 	viper.SetConfigType("env")

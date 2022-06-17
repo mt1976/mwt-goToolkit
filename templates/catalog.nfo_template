@@ -42,9 +42,9 @@ SQL Table Key | **{{.SQLSearchID}}**{{end}}
 {{if .HasFetchAdaptor}}Store|<ul><li>**Implement in Adaptor**</li><li>func {{.ObjectName}}_NewID_impl(rec dm.{{.ObjectName}}) (string) { return rec.ID } </li><li>func {{.ObjectName}}_Delete_impl(id string) (error) {return nil}</li><li>func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (error) {return nil}</li></ul>{{end}}
 
 ##  Properties / Fields
-| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal |
-| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: |
-{{range .FieldsList}}|**{{.FieldName}}**|{{.Type}}|{{.IsMandatory}}|{{.IsBaseField}}|{{.IsExtra}}|{{.IsOverride}}|{{if .IsLookup}}OL{{end}}{{if .IsListLookup}}LL{{end}}{{if .IsFetch}}FL{{end}}|{{.LookupObject}}|{{.LookupField}}|{{.LookupValue}}|{{if or .Disabled .Hidden}}{{if .Disabled}}N{{end}}{{if .Hidden}}H{{end}}{{else}}Y{{end}}|{{if .IsBaseField}}{{.FieldSQL}}{{end}}|{{.Default}}|{{.IsNoChange}}|{{.HasCallout}}|{{.IsAudit}}|
+| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
+| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
+{{range .FieldsList}}|**{{.FieldName}}**|{{.Type}}|{{.IsMandatory}}|{{.IsBaseField}}|{{.IsExtra}}|{{.IsOverride}}|{{if .IsLookup}}OL{{end}}{{if .IsListLookup}}LL{{end}}{{if .IsFetch}}FL{{end}}|{{.LookupObject}}|{{.LookupField}}|{{.LookupValue}}|{{if or .Disabled .Hidden}}{{if .Disabled}}N{{end}}{{if .Hidden}}H{{end}}{{else}}Y{{end}}|{{if .IsBaseField}}{{.FieldSQL}}{{end}}|{{.Default}}|{{.IsNoChange}}|{{.HasCallout}}|{{.IsAudit}}|{{.FieldType}}|{{.FieldMask}}|
 {{end}}
 
 ##  Artifacts Generated

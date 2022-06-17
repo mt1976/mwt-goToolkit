@@ -178,7 +178,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}})
+	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
 	{{end}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 

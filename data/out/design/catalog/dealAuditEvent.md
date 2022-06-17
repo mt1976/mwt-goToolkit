@@ -36,74 +36,53 @@ Friendly Name|**Deal Audit History**|
 |   |   |
 |---|---|
 SQL Table Name       | **DealAuditEvent**
-SQL Table Key | **InternalID**
+SQL Table Key | **InternalId**
 
 
 
 ##  Properties / Fields
-| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value|
-| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --|
-|**DealRefNo**|String|true|true|false|false|||||Y|DealRefNo||
-|**EventIndex**|Int|true|true|false|false|||||Y|EventIndex|0|
-|**CommonRefNo**|String|false|true|false|false|||||Y|CommonRefNo||
-|**Timestamp**|Time|false|true|false|false|||||Y|Timestamp||
-|**UTCTimestamp**|String|false|true|false|false|||||Y|UTCTimestamp||
-|**EventType**|String|false|true|false|false|||||Y|EventType||
-|**Status**|String|false|true|false|false|||||Y|Status||
-|**LimitOrderStatus**|String|false|true|false|false|||||Y|LimitOrderStatus||
-|**Usr**|String|false|true|false|false|||||Y|Usr||
-|**DealingInterface**|String|false|true|false|false|||||Y|DealingInterface||
-|**SourceIP**|String|false|true|false|false|||||Y|SourceIP||
-|**MessageID**|String|false|true|false|false|||||Y|MessageID||
-|**Details**|String|false|true|false|false|||||Y|Details||
-|**InternalId**|Int|true|true|false|false|||||Y|InternalId|0|
-|**InternalDeleted**|Time|false|true|false|false|||||Y|InternalDeleted||
-|**UpdatedTransactionId**|String|false|true|false|false|||||Y|UpdatedTransactionId||
-|**UpdatedUserId**|String|false|true|false|false|||||Y|UpdatedUserId||
-|**UpdatedDateTime**|Time|false|true|false|false|||||Y|UpdatedDateTime||
-|**DeletedTransactionId**|String|false|true|false|false|||||Y|DeletedTransactionId||
-|**DeletedUserId**|String|false|true|false|false|||||Y|DeletedUserId||
-|**ChangeType**|String|false|true|false|false|||||Y|ChangeType||
-|**DealRefNo**|String|true|true|false|false|||||Y|DealRefNo||
-|**EventIndex**|Int|true|true|false|false|||||Y|EventIndex|0|
-|**CommonRefNo**|String|false|true|false|false|||||Y|CommonRefNo||
-|**Timestamp**|Time|false|true|false|false|||||Y|Timestamp||
-|**UTCTimestamp**|String|false|true|false|false|||||Y|UTCTimestamp||
-|**EventType**|String|false|true|false|false|||||Y|EventType||
-|**Status**|String|false|true|false|false|||||Y|Status||
-|**LimitOrderStatus**|String|false|true|false|false|||||Y|LimitOrderStatus||
-|**Usr**|String|false|true|false|false|||||Y|Usr||
-|**DealingInterface**|String|false|true|false|false|||||Y|DealingInterface||
-|**SourceIP**|String|false|true|false|false|||||Y|SourceIP||
-|**MessageID**|String|false|true|false|false|||||Y|MessageID||
-|**Details**|String|false|true|false|false|||||Y|Details||
-|**InternalId**|Int|true|true|false|false|||||Y|InternalId|0|
-|**InternalDeleted**|Time|false|true|false|false|||||Y|InternalDeleted||
-|**UpdatedTransactionId**|String|false|true|false|false|||||Y|UpdatedTransactionId||
-|**UpdatedUserId**|String|false|true|false|false|||||Y|UpdatedUserId||
-|**UpdatedDateTime**|Time|false|true|false|false|||||Y|UpdatedDateTime||
-|**DeletedTransactionId**|String|false|true|false|false|||||Y|DeletedTransactionId||
-|**DeletedUserId**|String|false|true|false|false|||||Y|DeletedUserId||
-|**ChangeType**|String|false|true|false|false|||||Y|ChangeType||
+| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal |
+| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: |
+|**DealRefNo**|String|true|true|false|false|||||Y|DealRefNo||false|false|false|
+|**EventIndex**|Int|true|true|false|false|||||Y|EventIndex|0|false|false|false|
+|**CommonRefNo**|String|false|true|false|false|||||Y|CommonRefNo||false|false|false|
+|**Timestamp**|Time|false|true|false|false|||||Y|Timestamp||false|false|false|
+|**UTCTimestamp**|String|false|true|false|false|||||Y|UTCTimestamp||false|false|false|
+|**EventType**|String|false|true|false|false|||||Y|EventType||false|false|false|
+|**Status**|String|false|true|false|false|||||Y|Status||false|false|false|
+|**LimitOrderStatus**|String|false|true|false|false|||||Y|LimitOrderStatus||false|false|false|
+|**Usr**|String|false|true|false|false|||||Y|Usr||false|false|false|
+|**DealingInterface**|String|false|true|false|false|||||Y|DealingInterface||false|false|false|
+|**SourceIP**|String|false|true|false|false|||||Y|SourceIP||false|false|false|
+|**MessageID**|String|false|true|false|false|||||Y|MessageID||false|false|false|
+|**Details**|String|false|true|false|false|||||Y|Details||false|false|false|
+|**InternalId**|Int|true|true|false|false|||||Y|InternalId|0|false|false|false|
+|**InternalDeleted**|Time|false|true|false|false|||||Y|InternalDeleted||false|false|false|
+|**UpdatedTransactionId**|String|false|true|false|false|||||Y|UpdatedTransactionId||false|false|false|
+|**UpdatedUserId**|String|false|true|false|false|||||Y|UpdatedUserId||false|false|false|
+|**UpdatedDateTime**|Time|false|true|false|false|||||Y|UpdatedDateTime||false|false|false|
+|**DeletedTransactionId**|String|false|true|false|false|||||Y|DeletedTransactionId||false|false|false|
+|**DeletedUserId**|String|false|true|false|false|||||Y|DeletedUserId||false|false|false|
+|**ChangeType**|String|false|true|false|false|||||Y|ChangeType||false|false|false|
 
 
 ##  Artifacts Generated
 | Type | Artifact | Path|
 | :--: | -- | -- |
 | code | **application** | /application/dealAuditEvent_core.go_tmp |
-| code | **adaptor** | /adaptor/dealAuditEvent_impl.go_tmp |
+| code | **adaptor** | /adaptor/dealAuditEvent_impl.go_template_tmp |
 | code | **dao** | /dao/dealAuditEvent_core.go_tmp |
 | code | **datamodel** | /datamodel/dealAuditEvent_core.go_tmp |
 | code | **menu** | /design/menu/dealAuditEvent.json_tmp |
-| html | **list** | /html/DealAuditEvent_List.html |
-| html | **view** | /html/DealAuditEvent_View.html |
+| html/base | **list** | /DealAuditEvent_List.html |
+| html/base | **view** | /DealAuditEvent_View.html |
 
 
 ## Audit Information
 |   |   |
 |---|---|
 Template Generator Version   | **delinquentDysprosium [r4-21.12.31]**
-Date & Time		     | **12/06/2022** at **16:16:32**
+Date & Time		     | **16/06/2022** at **13:14:01**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ### Footnotes

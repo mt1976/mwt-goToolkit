@@ -13,11 +13,12 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	_ "github.com/denisenkom/go-mssqldb"
 
+	core "github.com/mt1976/templateBuilder/core"
 	"github.com/mt1976/templateBuilder/das"
 	"github.com/mt1976/templateBuilder/logs"
-	core "github.com/mt1976/templatebuiler/core"
 )
 
 func main() {
@@ -31,7 +32,7 @@ func main() {
 	displayApplicationHeader()
 
 	logs.Break()
-	logs.Activity("Searching for work...", "")
+	logs.Activity("Searching for work...", data_in())
 	logs.Break()
 
 	pwd, _ := os.Getwd()
@@ -103,7 +104,7 @@ func processObjectDefinition(configFile string) {
 
 	//fmt.Printf("props: %v\n", props)
 
-	e := setupEnrichment(props)
+	e := setupObjectEnrichment(props)
 
 	csvPath := getPWD() + data_in() + "/" + e.ObjectName + ".csv"
 	enriPath := getPWD() + data_in() + "/" + e.ObjectName + ".enri"
@@ -238,10 +239,21 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	if err != nil {
 		logs.Error("Load Template :", err)
 	}
-	dest := "/" + destFolder + "/" + e.ObjectCamelCase + out_extn
-	f, err := os.Create(data_out() + dest)
+	dfp := "/" + destFolder
+	dest := dfp + "/" + e.ObjectCamelCase + out_extn
+	fullname := data_out() + dest
+	//fmt.Printf("dfp: %v\n", dfp)
+	//fmt.Printf("dest: %v\n", dest)
+	//fmt.Printf("fullname: %v\n", fullname)
+
+	if _, err := os.Stat(fullname); os.IsNotExist(err) {
+		logs.Created(dfp)
+		os.MkdirAll(dfp, 0700)
+	}
+
+	f, err := os.Create(fullname)
 	if err != nil {
-		logs.Error("Create file: ", err)
+		logs.Error("Create file : ", err)
 		return e
 	}
 
@@ -266,27 +278,28 @@ func logArtifact(inName string, fileName string, e ObjectEnrichments, inType str
 }
 
 func generateHTMLArtifacts(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
+	destinationFolder := "html/base"
 	if strings.ToUpper(props["create_html"]) == "Y" {
 		if e.CanList {
-			e = generateHTMLArtifact("list", configFile, "html", e)
+			e = generateHTMLArtifact("list", configFile, destinationFolder, e)
 		} else {
 			logs.Skipping("Listing is not enabled for this object")
 		}
 
 		if e.CanView {
-			e = generateHTMLArtifact("view", configFile, "html", e)
+			e = generateHTMLArtifact("view", configFile, destinationFolder, e)
 		} else {
 			logs.Skipping("Viewing is not enabled for this object")
 		}
 
 		if e.CanEdit {
-			e = generateHTMLArtifact("edit", configFile, "html", e)
+			e = generateHTMLArtifact("edit", configFile, destinationFolder, e)
 		} else {
 			logs.Skipping("Editing is not enabled for this object")
 		}
 
 		if e.CanNew {
-			e = generateHTMLArtifact("new", configFile, "html", e)
+			e = generateHTMLArtifact("new", configFile, destinationFolder, e)
 		} else {
 			logs.Skipping("Creating is not enabled for this object")
 		}
@@ -313,12 +326,44 @@ func generateHTMLArtifact(w string, p string, destFolder string, e ObjectEnrichm
 	if err != nil {
 		logs.Error("Load Template", err)
 	}
-	dest := "/" + destFolder + "/" + e.ObjectName + "_" + userAction + ".html"
-	f, err := os.Create(data_out() + dest)
-	if err != nil {
-		logs.Error("Create file: ", err)
-		return e
+
+	dfp := "/" + destFolder + "/" + e.ObjectName
+	dest := "/" + e.ObjectName + "_" + userAction + ".html"
+
+	//dest := dfp + "/" + e.ObjectCamelCase
+
+	pathname := data_out() + dfp
+	fullname := pathname + dest
+
+	//fmt.Printf("dfp: %v\n", dfp)
+
+	//fmt.Printf("dest: %v\n", dest)
+	//fmt.Printf("pathname: %v\n", pathname)
+	//fmt.Printf("fullname: %v\n", fullname)
+
+	if _, err := os.Stat(fullname); os.IsNotExist(err) {
+
+		logs.Created(pathname)
+
+		os.MkdirAll(pathname, 0700)
+
 	}
+
+	f, err := os.Create(fullname)
+
+	if err != nil {
+
+		logs.Error("Create file  : ", err)
+
+		return e
+
+	}
+
+	// f, err := os.Create(data_out() + dest)
+	// if err != nil {
+	// 	logs.Error("Create file: ", err)
+	// 	return e
+	// }
 	//spew.Dump(e)
 	err2 := t.Execute(f, e)
 	if err2 != nil {
@@ -442,7 +487,8 @@ func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnri
 	return e
 }
 
-func setupEnrichment(props map[string]string) ObjectEnrichments {
+func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
+
 	e := ObjectEnrichments{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
 	logs.Information("Object Name", e.ObjectName)
@@ -469,6 +515,10 @@ func setupEnrichment(props map[string]string) ObjectEnrichments {
 	}
 	e.SQLTableName = props["sqltablename"]
 	e.SQLSearchID = strings.TrimSpace(props["sqlsearchid"])
+	e.SearchKey = props["searchkey"]
+	if e.SearchKey == "" {
+		e.SearchKey = props["queryfield"]
+	}
 	e.QueryString = props["querystring"]
 	e.QueryField = "{{." + props["queryfield"] + "}}"
 	e.QueryFieldID = props["queryfield"]
@@ -651,6 +701,14 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 		hasAPI = true
 	}
 
+	isKey := false
+	fmt.Printf("fn: %v\n", fn)
+	fmt.Printf("en.SearchKey: %v\n", en.SearchKey)
+	spew.Dump(en)
+	if fn == en.SearchKey {
+		isKey = true
+	}
+
 	en.FieldsList = append(en.FieldsList, ObjectFields{FieldName: fn,
 		Type:          tp,
 		Default:       df,
@@ -672,7 +730,9 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 		IsOverride:    isOverride,
 		IsListLookup:  isListLookup,
 		HasCallout:    hasAPI,
-		IsAudit:       isAudit(origfn)})
+		IsAudit:       isAudit(origfn),
+		FieldType:     "text",
+		IsKey:         isKey})
 
 	//logs.Information(info, "")
 
@@ -967,6 +1027,9 @@ func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFi
 		fieldsList.HasCallout = true
 	} else {
 		fieldsList.HasCallout = false
+	}
+	if commonOverrides[enri_FieldType] != "" {
+		fieldsList.FieldType = core.FieldTypes[commonOverrides[enri_FieldType]]
 	}
 	//}
 	return fieldsList

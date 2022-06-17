@@ -6,12 +6,12 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 
+	core "github.com/mt1976/templateBuilder/core"
 	"github.com/mt1976/templateBuilder/logs"
-	core "github.com/mt1976/templatebuiler/core"
 )
 
 func displayApplicationHeader() {
-
+	//fmt.Printf("core.Properties: %v\n", core.Properties)
 	logs.Break()
 
 	logs.Header("Application Information")

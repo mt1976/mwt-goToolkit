@@ -114,20 +114,20 @@ func GlobalsDatabaseConnect(mssqlConfig map[string]string) (*sql.DB, error) {
 	if err2 != nil {
 
 		logs.Warning("Database " + dbName + " does not exists. GENERATING")
-		CreateDatabase(dbInstance, ApplicationPropertiesDB, dbName)
+		CreateDatabase(dbInstance, PropertiesDB, dbName)
 
-		ApplicationPropertiesDB["database"] = dbName
+		PropertiesDB["database"] = dbName
 		//Connect to the specific instance
-		newDBInstance, errReCon := connect(ApplicationPropertiesDB)
+		newDBInstance, errReCon := connect(PropertiesDB)
 		if errReCon != nil {
 			log.Panicln(errReCon.Error())
 		}
 
 		if len(instance) != 0 {
-			ApplicationPropertiesDB["database"] = database + "-" + instance
+			PropertiesDB["database"] = database + "-" + instance
 		}
-		CreateDatabaseObjects(newDBInstance, ApplicationPropertiesDB, "/config/database/appdb/tables", true)
-		CreateDatabaseObjects(newDBInstance, ApplicationPropertiesDB, "/config/database/appdb/views", true)
+		CreateDatabaseObjects(newDBInstance, PropertiesDB, "/config/database/appdb/tables", true)
+		CreateDatabaseObjects(newDBInstance, PropertiesDB, "/config/database/appdb/views", true)
 		returnDB = newDBInstance
 	} else {
 		logs.Success("Database " + dbName + " exists Created: " + result2)

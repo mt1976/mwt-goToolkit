@@ -149,7 +149,7 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-	{{range .FieldsList}}{{if not .IsExtra}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}, r.{{.FieldName}}){{end}}
+	{{range .FieldsList}}{{if not .IsExtra}}ts = addData(ts, dm.{{$.ObjectName}}_{{.FieldName}}_sql, r.{{.FieldName}}){{end}}
 	{{end}}	
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
@@ -184,13 +184,20 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	for i := 0; i < noitems; i++ {
 
 		rec := returnList[i]
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - START
-{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}, "{{.Default}}"){{else}}{{end}}
-{{end}}// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
-{{end}}
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - END
-		//Add to the list
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}_sql, "{{.Default}}"){{else}}{{end}}
+	{{end}}
+	// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
+	{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
+	{{end}}
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+	///
+	//Add to the list
+	//
 		recList = append(recList, recItem)
 	}
 

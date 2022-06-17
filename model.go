@@ -106,6 +106,9 @@ type ObjectFields struct {
 	IsNoChange    bool
 	HasCallout    bool
 	IsAudit       bool
+	FieldType     string
+	FieldMask     string
+	IsKey         bool
 }
 
 type messages struct {
@@ -141,7 +144,7 @@ const (
 	enri_IsInputtable = 5
 	enri_IsMandatory  = 6
 	enri_DefaultValue = 7
-	enri_SPARE        = 8
+	enri_FieldType    = 8
 	enri_NoChange     = 9
 	enri_HasCallout   = 10
 

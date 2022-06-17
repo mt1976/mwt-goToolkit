@@ -18,8 +18,8 @@ var UUID = "authorAdjust"
 var SecurityViolation = ""
 var DB *sql.DB
 
-var ApplicationProperties map[string]string
-var ApplicationPropertiesDB map[string]string
+var Properties map[string]string
+var PropertiesDB map[string]string
 var ApplicationDB *sql.DB
 
 var InstanceProperties map[string]string
@@ -31,6 +31,8 @@ var SienaSystemDate DateItem
 var SessionManager *scs.SessionManager
 
 var IsChildInstance bool
+
+var FieldTypes map[string]string
 
 const (
 	DATEFORMATPICK           = "20060102T150405"
@@ -142,15 +144,43 @@ func Initialise() {
 	PreInitialise()
 
 	//SienaSystemDate DateItem
-	ApplicationProperties = Properties_Get(APPCONFIG)
+	Properties = Properties_Get(APPCONFIG)
 
 	IsChildInstance = false
-	if len(ApplicationPropertiesDB["instance"]) != 0 {
+	if len(Properties["instance"]) != 0 {
 		IsChildInstance = true
 	}
 	//
 
+	FieldTypes = buildFieldTypes(make(map[string]string))
+	//fmt.Printf("Properties: %v\n", Properties)
+
 	logs.Information("Initialisation", "Vroooom Vrooooom! "+Bike+Bike)
+}
+
+func buildFieldTypes(in map[string]string) map[string]string {
+
+	//fmt.Printf("buildFieldTypes: %v\n", in)
+	//	in["string"] = "string"
+
+	in["text"] = "text"
+	in["num"] = "number"
+	in["number"] = "number"
+	in["email"] = "email"
+	in["passwpord"] = "password"
+	in["date"] = "date"
+	in["time"] = "time"
+	in["datetime"] = "datetime"
+	in["phone"] = "tel"
+	in["tel"] = "tel"
+	in["url"] = "url"
+	in["link"] = "url"
+	in["image"] = "image"
+	in["https"] = "url"
+	in["textarea"] = "textarea"
+	in["textbox"] = "textarea"
+
+	return in
 }
 
 // Load a Properties File
@@ -174,6 +204,7 @@ func Properties_Get(inPropertiesFile string) map[string]string {
 
 // Load a Properties File
 func Config_Get(inPropertiesFile string) map[string]string {
+	logs.Accessing(inPropertiesFile)
 	wctProperties := make(map[string]string)
 	//machineName, _ := os.Hostname()
 	// For docker - if can't find properties file (create one from the template properties file)
@@ -188,7 +219,7 @@ func Config_Get(inPropertiesFile string) map[string]string {
 		//	logs.Fatal("Cannot Load Properties File "+propertiesFileName, nil)
 
 	}
-
+	//fmt.Printf("wctProperties: %v\n", wctProperties)
 	return wctProperties
 }
 

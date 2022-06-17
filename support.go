@@ -10,7 +10,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
-	core "github.com/mt1976/templatebuiler/core"
+	core "github.com/mt1976/templateBuilder/core"
 )
 
 func wrapVariable(in string) string {
@@ -77,6 +77,7 @@ func data_out() string {
 }
 
 func data_in() string {
+	//fmt.Printf("core.Properties: %v\n", core.Properties)
 	return strings.TrimSpace(core.Properties["data_in"])
 }
 
