@@ -193,7 +193,19 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 
 	if destFolder == "api" {
 		destFolder = "application"
-		out_extn = "_api.go"
+		out_extn = "_restapi.go"
+		in_extn = ".go_template"
+	}
+
+	if destFolder == "dao" {
+		destFolder = "application"
+		out_extn = "_dao.go"
+		in_extn = ".go_template"
+	}
+
+	if destFolder == "datamodel" {
+		destFolder = "application"
+		out_extn = "_datamodel.go"
 		in_extn = ".go_template"
 	}
 
@@ -209,13 +221,13 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 
 	if destFolder == "monitor" {
 		destFolder = "adaptor/monitors"
-		out_extn = "_core.go"
+		out_extn = "_moni.go"
 		in_extn = ".go_template"
 	}
 
 	if destFolder == "job" {
 		destFolder = "jobs"
-		out_extn = "_core.go"
+		out_extn = "_serv.go"
 		in_extn = ".go_template"
 	}
 
@@ -240,10 +252,6 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	}
 	dfp := "/" + destFolder
 	dest := dfp + "/" + e.ObjectCamelCase + out_extn
-	//fullname := data_out() + dest
-	//fmt.Printf("dfp: %v\n", dfp)
-	//fmt.Printf("dest: %v\n", dest)
-	//fmt.Printf("fullname: %v\n", fullname)
 
 	fullPath := data_out() + dfp + "/" + e.ObjectPackage
 	fullname := fullPath + "/" + e.ObjectCamelCase + out_extn

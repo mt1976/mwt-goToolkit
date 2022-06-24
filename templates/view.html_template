@@ -29,6 +29,7 @@
                     <div class="form-outline">
                         <input type="{{.FieldType}}" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}" data-mdb-input-mask="{{.FieldMask}}">
                         <label class="form-label" for="{{.FieldName}}">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+                        {{if .IsHelper}}<div class="form-helper">{{.HelperHTML}}</div>{{end}}
                     </div>
                 {{end}}
                 </div>

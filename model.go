@@ -78,6 +78,7 @@ type ObjectEnrichments struct {
 	CanImport              bool
 	CanDo                  bool
 	DoesLookup             bool
+	ObjectPackage          string
 }
 
 type ObjectFields struct {
@@ -98,6 +99,8 @@ type ObjectFields struct {
 	IsExtra       bool
 	IsListLookup  bool
 	IsFetch       bool
+	IsHelper      bool
+	HelperHTML    string
 	LookupObject  string
 	LookupField   string
 	LookupValue   string
@@ -135,6 +138,7 @@ const (
 	listField     = "List"
 	fetchField    = "Fetch"
 	defaultField  = "Default"
+	helperField   = "Helper"
 
 	enri_Type         = 0
 	enri_Field        = 1

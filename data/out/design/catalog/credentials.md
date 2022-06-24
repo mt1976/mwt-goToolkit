@@ -6,6 +6,7 @@
 |Object         |**Credentials** (credentials) |
 |Endpoint 	    |**/Credentials...** [^1]|
 |Endpoint Query |**Id**|
+|REST API|**/API/Credentials/**|
 Glyph|**fas fa-key** (text-danger)
 Friendly Name|**Credential**|
 |For Project    |github.com/mt1976/mwt-go-dev/|
@@ -25,7 +26,7 @@ Friendly Name|**Credential**|
 
 
 ##  Provides
-
+ * Lookup (Username Id)
 
 * Auditing 
 
@@ -41,48 +42,50 @@ SQL Table Key | **id**
 
 
 ##  Properties / Fields
-| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal |
-| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: |
-|**SYSId**|Int|true|true|false|false|||||NH|_id|0|false|false|true|
-|**Id**|String|true|true|false|false|||||Y|Id||false|false|false|
-|**Username**|String|true|true|false|false|||||Y|Username||false|false|false|
-|**Password**|String|false|true|false|false|||||Y|Password||false|false|false|
-|**Firstname**|String|false|true|false|false|||||Y|Firstname||false|false|false|
-|**Lastname**|String|false|true|false|false|||||Y|Lastname||false|false|false|
-|**Knownas**|String|false|true|false|false|||||Y|Knownas||false|false|false|
-|**Email**|String|false|true|false|false|||||Y|Email||false|false|false|
-|**Issued**|String|false|true|false|false|||||Y|Issued||false|false|false|
-|**Expiry**|String|false|true|false|false|||||Y|Expiry||false|false|false|
-|**RoleType**|String|false|true|false|false|||||Y|RoleType||false|false|false|
-|**Brand**|String|false|true|false|false|||||Y|Brand||false|false|false|
-|**SYSCreated**|String|false|true|false|false|||||NH|_created||false|false|true|
-|**SYSWho**|String|false|true|false|false|||||NH|_who||false|false|true|
-|**SYSHost**|String|false|true|false|false|||||NH|_host||false|false|true|
-|**SYSUpdated**|String|false|true|false|false|||||NH|_updated||false|false|true|
-|**SYSCreatedBy**|String|false|true|false|false|||||NH|_createdBy||false|false|true|
-|**SYSCreatedHost**|String|false|true|false|false|||||NH|_createdHost||false|false|true|
-|**SYSUpdatedBy**|String|false|true|false|false|||||NH|_updatedBy||false|false|true|
-|**SYSUpdatedHost**|String|false|true|false|false|||||NH|_updatedHost||false|false|true|
+| Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
+| -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
+|**SYSId**|Int|true|true|false|false|||||NH|_id|0|false|false|true|text||
+|**Id**|String|true|true|false|false|||||Y|Id||false|false|false|text||
+|**Username**|String|true|true|false|false|||||Y|Username||false|false|false|text||
+|**Password**|String|false|true|false|false|||||Y|Password||false|false|false|text||
+|**Firstname**|String|false|true|false|false|||||Y|Firstname||false|false|false|text||
+|**Lastname**|String|false|true|false|false|||||Y|Lastname||false|false|false|text||
+|**Knownas**|String|false|true|false|false|||||Y|Knownas||false|false|false|text||
+|**Email**|String|false|true|false|false|||||Y|Email||false|false|false|text||
+|**Issued**|String|false|true|false|false|||||Y|Issued||false|false|false|text||
+|**Expiry**|String|false|true|false|false|||||Y|Expiry||false|false|false|text||
+|**RoleType**|String|false|true|false|false|||||Y|RoleType||false|false|false|text||
+|**Brand**|String|false|true|false|false|||||Y|Brand||false|false|false|text||
+|**SYSCreated**|String|false|true|false|false|||||NH|_created||false|false|true|text||
+|**SYSWho**|String|false|true|false|false|||||NH|_who||false|false|true|text||
+|**SYSHost**|String|false|true|false|false|||||NH|_host||false|false|true|text||
+|**SYSUpdated**|String|false|true|false|false|||||NH|_updated||false|false|true|text||
+|**SYSCreatedBy**|String|false|true|false|false|||||NH|_createdBy||false|false|true|text||
+|**SYSCreatedHost**|String|false|true|false|false|||||NH|_createdHost||false|false|true|text||
+|**SYSUpdatedBy**|String|false|true|false|false|||||NH|_updatedBy||false|false|true|text||
+|**SYSUpdatedHost**|String|false|true|false|false|||||NH|_updatedHost||false|false|true|text||
+|**State**|String|false|true|false|false|LL|credentialStates|||Y|State||false|false|false|text||
 
 
 ##  Artifacts Generated
 | Type | Artifact | Path|
 | :--: | -- | -- |
 | code | **application** | /application/credentials_core.go_tmp |
+| code | **api** | /application/credentials_api.go_tmp |
 | code | **dao** | /dao/credentials_core.go_tmp |
 | code | **datamodel** | /datamodel/credentials_core.go_tmp |
 | code | **menu** | /design/menu/credentials.json_tmp |
-| html/base | **list** | /Credentials_List.html |
-| html/base | **view** | /Credentials_View.html |
-| html/base | **edit** | /Credentials_Edit.html |
-| html/base | **new** | /Credentials_New.html |
+| html | **list** | /Credentials_List.html |
+| html | **view** | /Credentials_View.html |
+| html | **edit** | /Credentials_Edit.html |
+| html | **new** | /Credentials_New.html |
 
 
 ## Audit Information
 |   |   |
 |---|---|
 Template Generator Version   | **delinquentDysprosium [r4-21.12.31]**
-Date & Time		     | **16/06/2022** at **13:14:00**
+Date & Time		     | **22/06/2022** at **09:33:40**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ### Footnotes

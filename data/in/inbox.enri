@@ -1,0 +1,3 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
+List,MailUnread,tf,,,true,false,,,,
+List,MailAcknowledged,tf,,,true,false,,,,
