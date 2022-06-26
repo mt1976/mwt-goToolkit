@@ -1,3 +1,3 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
-Lookup,Country,Country,CountryCode,Name,true,true,,Name,,
-Lookup,Parent,CounterpartyGroup,SuperGroup,Name,true,true,,Name,,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Lookup,Country,Country,CountryCode,Name,true,true,,Name,,,,,,
+Lookup,Parent,CounterpartyGroup,SuperGroup,Name,true,true,,Name,,,,,,

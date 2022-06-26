@@ -1,2 +1,2 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
-Lookup,Country,Country,Country,Name,false,,,,,,,,,
+Override,Id,,,,true,true,,,true,,,,,15

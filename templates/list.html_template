@@ -23,14 +23,14 @@
                     <table class="table" id="ListTable">
                       <thead class="thead-light">
                         <tr>
-                          {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}<th class="text-center">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</th>{{end}}{{end}}
+                          {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}{{if not .Hidden}}<th class="text-center">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</th>{{end}}{{end}}{{end}}
                           {{end}}<th class="text-right"><div class="d-flex justify-content-center">Actions</div></th>
                         </tr>
                       </thead>
                       <tbody id="filterTable">
                         {{.RangeItemList}}
                         <tr>
-                          {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}<td class="align-middle" >{{.TemplateField}}</td>{{end}}{{end}}
+                          {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}{{if not .Hidden}}<td class="align-middle" {{.Hidden}}>{{.TemplateField}}</td>{{end}}{{end}}{{end}}
                           {{end}}
                           <td class="text-center" style="width:1px;">
                            <form action="/home" method="POST" class="d-flex justify-content-center">

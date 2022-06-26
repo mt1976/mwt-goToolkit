@@ -20,7 +20,9 @@ import (
 {{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
 {{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
 	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{else}}
-	{{if or .DoesLookup}} adaptor   "{{.ProjectRepo}}adaptor"{{end}}
+	{{/* {{if or .DoesLookup}} 
+	// Does Lookup
+	adaptor   "{{.ProjectRepo}}adaptor"{{end}} */}}
 	{{end}}
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
@@ -59,6 +61,13 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 {{end}}
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
+{{end}}{{end}}	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
 	return 1, {{.ObjectNameLower}}Item, nil
 }
 
@@ -93,7 +102,12 @@ func {{.ObjectName}}_Delete(id string) {
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
 
-	err := {{.ObjectNameLower}}_Save(r,Audit_User(req))
+	err, r := {{.ObjectName}}_Validate(r)
+	if err == nil {
+		err = {{.ObjectNameLower}}_Save(r, Audit_User(req))
+	} else {
+		logs.Information("{{.ObjectName}}_Store()", err.Error())
+	}
 
 	return err
 }
@@ -101,10 +115,28 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
 // {{.ObjectName}}_StoreSystem() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
 	
-	err := {{.ObjectNameLower}}_Save(r,Audit_Host())
+	err, r := {{.ObjectName}}_Validate(r)
+	if err == nil {
+		err = {{.ObjectNameLower}}_Save(r, Audit_Host())
+	} else {
+		logs.Information("{{.ObjectName}}_Store()", err.Error())
+	}
 
 	return err
 }
+
+// {{.ObjectName}}_Validate() validates for saves/stores a {{.ObjectName}} record to the database
+func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (error,dm.{{.ObjectName}}) {
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{end}}{{end}}	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+	return nil,r
+}
+//
 
 // {{.ObjectNameLower}}_Save() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
@@ -222,7 +254,25 @@ func {{.ObjectName}}_NewID(r dm.{{.ObjectName}}) string {
 	return id
 }
 
-// ----------------------------------------------------------------
-// ADD Aditional Functions below this line
-// ----------------------------------------------------------------
 
+
+// {{.ObjectNameLower}}_Fetch read all {{.ObjectName}}'s
+func {{.ObjectName}}_New() (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error) {
+
+	var r = dm.{{.ObjectName}}{}
+	var rList []dm.{{.ObjectName}}
+	
+
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{end}}{{end}}	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+
+
+	rList = append(rList, r)
+
+	return 1, rList, r, nil
+}

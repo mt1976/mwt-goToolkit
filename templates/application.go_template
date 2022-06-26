@@ -34,7 +34,11 @@ type {{.ObjectName}}_PageList struct {
 }
 //{{.ObjectName}}_Redirect provides a page to return to aftern an action
 const (
+	{{if .CanList}}
 	{{.ObjectName}}_Redirect = dm.{{.ObjectName}}_PathList
+	{{else}}
+	{{.ObjectName}}_Redirect = dm.{{.ObjectName}}_PathView
+	{{end}}
 )
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
@@ -49,6 +53,7 @@ type {{.ObjectName}}_Page struct {
 	//	
 	{{range .FieldsList}}{{.FieldName}}         string{{if or .IsLookup .IsListLookup}}
 	{{.FieldName}}_lookup    []dm.Lookup_Item{{end}}
+	{{.FieldName}}_props     dm.FieldProperties
 	{{end}}// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -197,9 +202,9 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	}
 	// Code Continues Below
 
-	inUTL := r.URL.Path
 	w.Header().Set("Content-Type", "text/html")
-	core.ServiceMessage(inUTL)
+	logs.Servicing(r.URL.Path)
+	_, _, rD, _ := dao.{{.ObjectName}}_New()
 
 	pageDetail := {{.ObjectName}}_Page{
 		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_New),
@@ -210,7 +215,7 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 
-	pageDetail = {{.ObjectNameLower}}_PopulatePage(dm.{{.ObjectName}}{} , pageDetail) 
+	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
 
@@ -254,8 +259,11 @@ func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail {{.Obje
 	pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")
 	{{end}}
 	{{end}}
+	{{range .FieldsList}}pageDetail.{{.FieldName}}_props = rD.{{.FieldName}}_props
+	{{end}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
+	//spew.Dump(pageDetail)
 return pageDetail
 }	

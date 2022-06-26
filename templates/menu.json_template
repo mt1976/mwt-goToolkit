@@ -1,12 +1,11 @@
 {{if .CanList}}
-    {
-      "ID": "{{.UUID}}",
-      "Text": "{{.FriendlyName}}",
-      "Glyph": "{{.ObjectGlyph}}",
-      "HREF": "/{{.EndpointRoot}}List",
-      "OnClick": "",
-      "TextClass": "{{.ObjectTextClass}}"
+   '{
+      "MenuID": "{{.UUID}}",
+      "MenuText": "{{.FriendlyName}}",
+      "MenuGlyph": "{{.ObjectGlyph}}",
+      "MenuHREF": "/{{.EndpointRoot}}List",
+      "MenuOnClick": "",
+      "MenuTextClass": "{{.ObjectTextClass}}"
     }
-    ,
     {{else}}
 {{end}}

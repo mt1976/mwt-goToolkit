@@ -82,36 +82,40 @@ type ObjectEnrichments struct {
 }
 
 type ObjectFields struct {
-	FieldName     string
-	Type          string
-	Default       string
-	FieldSQL      string
-	Formatted     string
-	TemplateField string
-	Disabled      string
-	Hidden        string
-	ValueID       string
-	IsMandatory   bool
-	IsUserField   bool
-	IsBaseField   bool
-	IsLookup      bool
-	IsOverride    bool
-	IsExtra       bool
-	IsListLookup  bool
-	IsFetch       bool
-	IsHelper      bool
-	HelperHTML    string
-	LookupObject  string
-	LookupField   string
-	LookupValue   string
-	RangeHTML     string
-	WrapFieldName string
-	IsNoChange    bool
-	HasCallout    bool
-	IsAudit       bool
-	FieldType     string
-	FieldMask     string
-	IsKey         bool
+	FieldName                string
+	Type                     string
+	Default                  string
+	FieldSQL                 string
+	Formatted                string
+	TemplateField            string
+	Disabled                 string
+	Hidden                   string
+	ValueID                  string
+	IsMandatory              bool
+	IsUserField              bool
+	IsBaseField              bool
+	IsLookup                 bool
+	IsOverride               bool
+	IsExtra                  bool
+	IsListLookup             bool
+	IsFetch                  bool
+	IsHelper                 bool
+	HelperHTML               string
+	LookupObject             string
+	LookupField              string
+	LookupValue              string
+	RangeHTML                string
+	WrapFieldName            string
+	IsNoChange               bool
+	HasCallout               bool
+	IsAudit                  bool
+	FieldType                string
+	FieldMask                string
+	IsKey                    bool
+	WrapPropsMsgType         string
+	WrapPropsMsgFeedBackType string
+	WrapPropsMsgMessage      string
+	WrapPropsMsgGlyph        string
 }
 
 type messages struct {
@@ -151,6 +155,10 @@ const (
 	enri_FieldType    = 8
 	enri_NoChange     = 9
 	enri_HasCallout   = 10
+	enri_Mask         = 11
+	enri_Hidden       = 12
+	enri_Min          = 13
+	enri_Max          = 14
 
 	html_disabled  = "readonly=\"true\""
 	html_hidden    = "hidden"

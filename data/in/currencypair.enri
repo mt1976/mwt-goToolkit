@@ -1,7 +1,7 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
-Lookup,CodeMajorCurrencyIsoCode,Currency,CodeMajorCurrencyIsoCode,Name,,,,Code,,
-Lookup,CodeMinorCurrencyIsoCode,Currency,CodeMinorCurrencyIsoCode,Name,,,,Code,,
-List,ReciprocalActive,tf,,,,,,,,
-Override,CodeMajorCurrencyIsoCode,,,,,true,,,true,
-Override,CodeMinorCurrencyIsoCode,,,,,true,,,true,
-Override,Code,,,,false,true,,,true,true
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Lookup,CodeMajorCurrencyIsoCode,Currency,CodeMajorCurrencyIsoCode,Name,,,,Code,,,,,,
+Lookup,CodeMinorCurrencyIsoCode,Currency,CodeMinorCurrencyIsoCode,Name,,,,Code,,,,,,
+List,ReciprocalActive,tf,,,,,,,,,,,,
+Override,CodeMajorCurrencyIsoCode,,,,,true,,,true,,,,,
+Override,CodeMinorCurrencyIsoCode,,,,,true,,,true,,,,,
+Override,Code,,,,false,true,,,true,true,,,,

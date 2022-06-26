@@ -36,11 +36,30 @@ func {{.ObjectName}}_Delete_impl(id string) (error) {return nil}
 {{if .HasStoreAdaptor}}
 func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (error) {return nil}
 {{end}}
-// If there are fields below, create the methods in adaptor\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (fieldval string,rec dm.{{$.ObjectName}},usr string) (string,error)  {return fieldval,nil}{{end}}
-{{end}}
-{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {return ""}{{end}}
-{{end}}
+	// If there are fields below, create the methods in adaptor\{{$.ObjectNameLower}}_impl.go
+	// START - GET API/Callout
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (fieldval string,rec dm.{{$.ObjectName}},usr string) (string,error)  {
+	logs.Callout("{{$.ObjectName}}", "{{.FieldName}}", PUT, rec.{{$.QueryFieldID}})
+	return fieldval,nil
+	}
+{{end}}{{end}}
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END - GET API/Callout
+	//
+	// START - PUT API/Callout
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {
+	logs.Callout("{{$.ObjectName}}", "{{.FieldName}}", GET, rec.{{$.QueryFieldID}})
+	return ""
+	}
+{{end}}{{end}}
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END - PUT API/Callout
 {{if .HasMonitor}}
 func {{.ObjectName}}_Simulator_ProcessResponse_impl(filename string) error {
 	logs.Success("{{.ObjectName}}_Simulator_ProcessResponse:" + filename)
@@ -55,3 +74,15 @@ func {{.ObjectNameLower}}_Simulator_ProcessResponse_impl (tokens []string,latest
     return nil
 }
 {{end}}
+	// START - Validation API/Callout
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+{{range .FieldsList}}{{if .HasCallout}}	// {{$.ObjectName}}_{{.FieldName}}_Impl provides validation/actions for {{.FieldName}}
+	func {{$.ObjectName}}_{{.FieldName}}_Impl (iAction string, iId string, iValue string, iRec dm.{{$.ObjectName}}, fP dm.FieldProperties) (string, dm.FieldProperties) {
+	logs.Callout("{{$.ObjectName}}", "{{.FieldName}}", VAL +"-"+iAction, iId)
+	return "",fP
+	}
+{{end}}{{end}}
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END - Validation API/Callout

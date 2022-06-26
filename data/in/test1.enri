@@ -1,7 +1,7 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
-Extra,Cheese,,,,true,false,,,,
-Extra,Onion,,,,true,true,,,,
-Lookup,Firm,Firm,Firmx,FullName,false,,,Namefirpoo,,
-Override,Descr,,,,false,false,DefltDescr,,,
-List,YN,,yn,,,,,,,
-List,User,,users,,,,,,,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Extra,Cheese,,,,true,false,,,,,,,,
+Extra,Onion,,,,true,true,,,,,,,,
+Lookup,Firm,Firm,Firmx,FullName,false,,,Namefirpoo,,,,,,
+Override,Descr,,,,false,false,DefltDescr,,,,,,,
+List,YN,,yn,,,,,,,,,,,
+List,User,,users,,,,,,,,,,,

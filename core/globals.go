@@ -167,7 +167,7 @@ func buildFieldTypes(in map[string]string) map[string]string {
 	in["num"] = "number"
 	in["number"] = "number"
 	in["email"] = "email"
-	in["passwpord"] = "password"
+	in["password"] = "password"
 	in["date"] = "date"
 	in["time"] = "time"
 	in["datetime"] = "datetime"

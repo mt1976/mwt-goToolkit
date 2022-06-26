@@ -1,0 +1,5 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Override,Contact,,,,,,,email,,,,,,
+Override,Code,,,,,true,,,true,,,,2,2
+Override,Name,,,,,true,,,,,,,,
+Override,Address,,,,,,,textarea,,,,,,255

@@ -1,57 +1,72 @@
 {{.TemplateHeader}}
 {{.TemplateBody}}
 
-    <form action="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" method="GET" class="form">
-      <div class="card">
-        <div class="card-header">
-          <div class="row">
-            <div class="col h3">
-              <i class="{{.ObjectGlyph}} me-2" title="{{.QueryString}}={{.QueryField}}"></i><span class="me-3">{{.Title}}</span>
-            </div>
-            <div class="col d-flex justify-content-end">
-              <div class="btn-group">
-              {{if .CanSave}}
-                <button type="submit" value="" class="btn btn-danger" method="GET" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"><i class="fas fa-save me-2"></i>Save</button>
-              {{end}}
-                <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print me-2"></i></i>Print</button>
-                <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times me-2" ></i>Cancel</button>
-              </div>
-            </div>
-          </div>
+<form action="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"
+  method="GET" class="form">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col h3">
+          <i class="{{.ObjectGlyph}} me-2"
+            title="{{.QueryString}}={{.QueryField}}"></i><span class="me-3">{{.Title}}</span>
         </div>
-        <div class="card-body">
-{{range .FieldsList}}{{if or .IsBaseField .IsExtra}}            <div class="row mb-3" {{.Disabled}}><div class="col">
-         {{if or .IsLookup .IsListLookup}}
-         {{if .IsNoChange}}
-                        <div class="form-outline">
-                      <input type="{{.FieldType}}" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true"{{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}}>
-                      <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
-                    </div>
-         {{else}}
-                  <select id="{{.FieldName}}" name="{{.FieldName}}" class="select" data-mdb-filter="true" {{.Disabled}} {{if .IsMandatory}}required{{end}}>
-                  {{.RangeHTML}}
-                  </select>
-                  <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-          {{end}}        
-          {{else}}
-                  <div class="form-outline">
-                      <input type="{{.FieldType}}" class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true"{{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}">
-                      <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
-                    </div>
-          {{end}}
-            </div></div>
-{{end}}{{end}}
-{{range .FieldsList}}{{if not .IsBaseField}}            
-              
-                {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div class="col"><select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}} data-mdb-filter="true">{{.RangeHTML}}</select>
-                <label class="form-label select-label" for="{{.FieldName}}"}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>            </div></div>
-                {{end}}
-
-{{end}}{{end}}     
+        <div class="col d-flex justify-content-end">
+          <div class="btn-group">
+            {{if .CanSave}}
+            <button type="submit" value="" class="btn btn-danger" method="GET" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"><i class="fas fa-save me-2"></i>Save</button>
+            {{end}}
+            <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print me-2"></i></i>Print</button>
+            <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times me-2"></i>Cancel</button>
         </div>
-        {{.TemplateAudit}}
       </div>
-    </form>
+    </div>
+  </div>
+  <div class="card-body">
+    {{range .FieldsList}}{{if or .IsBaseField .IsExtra}} 
+        <div class="row mb-3" {{.Disabled}} {{.Hidden}}><div class="col">
+        {{if or .IsLookup .IsListLookup}}
+            {{if .IsNoChange}}
+            <div class="form-outline">
+              <input type="{{.FieldType}}" class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true" {{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} />
+              <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+                <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+            </div>
+            {{else}}
+            <select id="{{.FieldName}}" name="{{.FieldName}}" class="select" data-mdb-filter="true" {{.Disabled}} {{if .IsMandatory}}required{{end}}>
+                {{.RangeHTML}}
+            </select>
+            <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
+            <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+            {{end}}
+        {{else}}
+            <div class="form-outline">
+              {{if eq .FieldType "textarea"}}
+              <textarea class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true" {{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}" rows="4" maxlength="255">{{.ValueID}}</textarea>
+              {{else}}
+              <input type="{{.FieldType}}" class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true" {{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}" />
+              {{end}}
+              <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+              <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+            </div>
+        {{end}}
+        </div></div>
+      {{end}}{{end}}
+      {{range .FieldsList}}{{if not .IsBaseField}}
+
+      {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div
+          class="col"><select id="{{.FieldName}}" name="{{.FieldName}}"
+            class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}}
+            data-mdb-filter="true">{{.RangeHTML}}</select>
+          <label class="form-label select-label" for="{{.FieldName}}" }>{{if
+            .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+        </div></div>
+      {{end}}
+
+      {{end}}{{end}}
+    </div>
+    {{.TemplateAudit}}
+  </div>
+</form>
 
 {{.TemplateUserFooter}}
 {{.TemplatePageFooter}}

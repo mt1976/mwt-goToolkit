@@ -16,9 +16,11 @@ package datamodel
 //{{.ObjectName}} defines the datamolde for the {{.ObjectName}} object
 type {{.ObjectName}} struct {
 
-{{range .FieldsList}}{{.FieldName}}       string
-{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item
-{{end}}{{end}}
+{{range .FieldsList}}
+{{.FieldName}}       string
+{{.FieldName}}_props FieldProperties{{end}}
+ // Any lookups will be added below{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item{{else}}{{end}}
+{{end}}
 }
 
 const (

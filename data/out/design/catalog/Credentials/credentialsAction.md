@@ -68,7 +68,7 @@ Store|<ul><li>**Implement in Adaptor**</li><li>func CredentialsAction_NewID_impl
 |   |   |
 |---|---|
 Template Generator Version   | **delinquentDysprosium [r4-21.12.31]**
-Date & Time		     | **24/06/2022** at **09:57:47**
+Date & Time		     | **24/06/2022** at **09:56:23**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ### Footnotes

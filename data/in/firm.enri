@@ -1,4 +1,4 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,SPARE,NoChange,HasApi
-Lookup,Sector,Sector,Sector,Name,true,false,,Code,,
-Lookup,Country,Country,Country,Name,false,,,Code,,
-Override,FirmName,,,,,,,,true,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Lookup,Sector,Sector,Sector,Name,true,false,,,,,,,,
+Lookup,Country,Country,Country,Name,false,,,,,,,,,
+Override,FirmName,,,,,,,,true,,,,,

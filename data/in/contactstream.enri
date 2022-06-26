@@ -1,0 +1,7 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Lookup,StreamTypeId,ContactStreamType,,,,,,,,,,,,15
+Lookup,StreamStatusId,ContactStreamStatus,,,,,,,,,,,,
+List,RecordState,cmrecordstatus,,,,,,,,,,,,
+Override,CreatedDateTime,,,,,,,datetime,,,,,,
+Override,OpenedDateTime,,,,,,,datetime,,,,,,
+Override,ClosedDateTime,,,,,,,datetime,,,,,,

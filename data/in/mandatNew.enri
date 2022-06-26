@@ -1,9 +1,0 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask
-Lookup,Country,Country,Country,Name,false,,,Code,,,
-Lookup,MandatedUserKeyCounterpartyFirm,Firm,MandatedUserKeyCounterpartyFirm,FullName,false,false,,FirmName,true,,
-Lookup,MandatedUserKeyCounterpartyCentre,Centre,MandatedUserKeyCounterpartyCentre,Name,false,false,,Code,true,,
-List,Notify,tf,,,,,,,,,
-List,Active,tf,,,,,,,,,
-Override,DateOfBirth,,,,,,date,,,,yyyy-mm-dd
-Override,TelephoneNumber,,,,,,tel,,,,+48 999-999-999
-Override,EmailAddress,,,,,,email,,,,
