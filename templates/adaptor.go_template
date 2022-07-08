@@ -54,7 +54,7 @@ func {{.ObjectName}}_Update_impl(id string,rec dm.{{.ObjectName}}, usr string) (
 	//
 {{range .FieldsList}}{{if .HasCallout}}func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {
 	logs.Callout("{{$.ObjectName}}", "{{.FieldName}}", GET, rec.{{$.QueryFieldID}})
-	return ""
+	return rec.{{.FieldName}}
 	}
 {{end}}{{end}}
 	// 
@@ -77,12 +77,30 @@ func {{.ObjectNameLower}}_Simulator_ProcessResponse_impl (tokens []string,latest
 	// START - Validation API/Callout
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	// {{$.ObjectName}}_{{.FieldName}}_Impl provides validation/actions for {{.FieldName}}
-	func {{$.ObjectName}}_{{.FieldName}}_Impl (iAction string, iId string, iValue string, iRec dm.{{$.ObjectName}}, fP dm.FieldProperties) (string, dm.FieldProperties) {
+{{range .FieldsList}}{{if .HasCallout}}	// {{$.ObjectName}}_{{.FieldName}}_impl provides validation/actions for {{.FieldName}}
+	func {{$.ObjectName}}_{{.FieldName}}_impl (iAction string, iId string, iValue string, iRec dm.{{$.ObjectName}}, fP dm.FieldProperties) (string, dm.FieldProperties) {
 	logs.Callout("{{$.ObjectName}}", "{{.FieldName}}", VAL +"-"+iAction, iId)
-	return "",fP
+	return iValue,fP
 	}
 {{end}}{{end}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END - Validation API/Callout
+
+func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm.{{$.ObjectName}}) (dm.{{$.ObjectName}}, error, string) {
+	logs.Callout("{{$.ObjectName}}", "ObjectValidation", VAL +"-"+iAction, iId)
+	switch iAction {
+		case VAL:
+
+		case NEW:
+
+		case PUT:
+
+		case GET:
+
+		default:
+			logs.Warning("Tmpl_TDate_impl" + " - Invalid Action")
+		}
+	return iRec,nil,""
+	}
+	

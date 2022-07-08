@@ -1,5 +1,4 @@
 {{.TemplateHeader}}
-<link rel="stylesheet" type="text/css" href="/assets/DataTables/datatables.min.css"/>
 {{.TemplateBody}}
 
       <div class="card">
@@ -9,22 +8,27 @@
                 <div class="col d-flex"><h3><i class="{{.ObjectGlyph}} me-2"></i>{{.Title}}</h3></div>
                 <div class="col d-flex justify-content-end">
                   <form action="/home" method="GET">
-                    <div class="btn-group" id="ActionButtonGroup">
+                    <div class="btn-group">
                     {{if .CanNew}}<button type="submit" value="" class="btn btn-primary" formaction="/{{.ObjectName}}New" method="GET" title="Create a new {{.FriendlyName}}"><i class="fas fa-plus me-2"></i>New</button>{{end}}
+                    {{if .CanExport}}<button id="export" type="button" class="btn btn-info" title="Export {{.FriendlyName}} as CSV"><i class="fas fa-file-csv me-2"></i>Export</button>{{end}}
+                    <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print me-2"></i></i>Print</button>
                     <button id="close" type="button" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times me-2"></i>Cancel</button>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
+              <div class="card-body">
+              <div class="input-group mb-4">
+  <input type="text" class="form-control" id="advanced-search-input" placeholder="phrase in:column1,column2" />
+  <button class="btn btn-primary" id="advanced-search-button" type="button">
+    <i class="fa fa-search"></i>
+  </button>
+</div>
 
-
-
-            <div class="card-body">
-             
-                           
-                    <table id="DataTable" class="table table-hover table-responsive" style="width:100%">
-                      <thead class="table-light">
+                  <div class="datatable" data-mdb-striped="true" data-mdb-borderless="true" data-mdb-hover="true" data-mdb-full-pagination="true" data-mdb-sm="true" data-mdb-fixed-header="true" >
+                    <table id="ListTable">
+                      <thead>
                         <tr style="background-color:red;">
                           {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}{{if not .Hidden}}<th class="text-center">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</th>{{end}}{{end}}{{end}}
                           {{end}}<th class="text-right"><div class="d-flex justify-content-center">Actions</div></th>
@@ -45,16 +49,9 @@
                         </tr>
                         {{.RangeEnd}}
                       </tbody>
-                       <tfoot class="table-light">
-                        <tr style="background-color:red;">
-                          {{range .FieldsList}}{{if .IsUserField}}{{if or .IsBaseField .IsExtra}}{{if not .Hidden}}<th class="text-center">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</th>{{end}}{{end}}{{end}}
-                          {{end}}<th class="text-right"><div class="d-flex justify-content-center">Actions</div></th>
-                        </tr>
-                      </tfoot>
                     </table>
-            
-
-            </div>
+                  </div>
+              </div>
         </form>
       </div>
 
@@ -63,5 +60,29 @@
 
 {{.TemplateUserFooter}}
 {{if .CanExport}}{{.TemplateExportControls}}{{end}}
-{{.TemplateListControls}}
+<script>
+const instance = document.getElementById('ListTable')
+const advancedSearchInput = document.getElementById('advanced-search-input');
+
+const search = (value) => {
+  let [phrase, columns] = value.split(' in:').map((str) => str.trim());
+
+  if (columns) {
+    columns = columns.split(',').map((str) => str.toLowerCase().trim());
+  }
+
+  instance.search(phrase, columns);
+}
+
+document.getElementById('advanced-search-button').addEventListener('click', (e) => {
+  search(advancedSearchInput.value)
+});
+
+advancedSearchInput.addEventListener('keydown', (e) => {
+  if (e.keyCode === 13) {
+    search(e.target.value);
+  }
+});
+
+</script>
 {{.TemplatePageFooter}}

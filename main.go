@@ -625,6 +625,8 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 
 	e.CanOverrideID = getProperty("canoverrideid", props)
 
+	e.WrapContext = wrapVariable("Context")
+	e.HasCrossval = getProperty("crossvalidate", props)
 	//spew.Dump(e)
 	fmt.Printf("e: %v\n", e)
 	return e

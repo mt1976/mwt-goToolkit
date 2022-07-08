@@ -47,16 +47,52 @@ const (
 	{{.ObjectName}}_PathSave   = "/{{.ObjectName}}Save/"
 	{{.ObjectName}}_PathDelete = "/{{.ObjectName}}Delete/"
 	///
+	//{{.ObjectName}}_Redirect provides a page to return to aftern an action
+	{{if .CanList}}{{.ObjectName}}_Redirect = {{.ObjectName}}_PathList
+	{{else}}{{.ObjectName}}_Redirect = {{.ObjectName}}_PathView{{end}}
+	///
 	///
 	/// SQL Field Definitions
 	///
-{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}_sql   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
+{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}_sql   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
 {{end}}
 	/// Definitions End
-
+	///
 	/// Application Field Definitions
 	///
-{{range .FieldsList}}{{$.ObjectName}}_{{.FieldName}}_scrn   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
+{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}_scrn   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
 {{end}}
 	/// Definitions End
+	///
 )
+
+//{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
+type {{.ObjectName}}_PageList struct {
+	SessionInfo      SessionInfo
+	UserMenu         AppMenuItem
+	UserRole         string
+	Title            string
+	PageTitle        string
+	ItemsOnPage 	 int
+	ItemList  		 []{{.ObjectName}}
+	Context	 appContext
+}
+
+//{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
+type {{.ObjectName}}_Page struct {
+	SessionInfo      SessionInfo
+	UserMenu    	 AppMenuItem
+	UserRole    	 string
+	Title       	 string
+	PageTitle   	 string
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//	
+	{{range .FieldsList}}{{.FieldName}}         string{{if or .IsLookup .IsListLookup}}
+	{{.FieldName}}_lookup    []Lookup_Item{{end}}
+	{{.FieldName}}_props     FieldProperties
+	{{end}}// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+	Context	 appContext
+}

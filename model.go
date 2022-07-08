@@ -79,6 +79,8 @@ type ObjectEnrichments struct {
 	CanDo                  bool
 	DoesLookup             bool
 	ObjectPackage          string
+	WrapContext            string
+	HasCrossval            bool
 }
 
 type ObjectFields struct {

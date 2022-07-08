@@ -1,6 +1,6 @@
 {{.TemplateHeader}}
 {{.TemplateBody}}
-
+{{.WrapContext}}
 <form action="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"
   method="GET" class="form">
   <div class="card">

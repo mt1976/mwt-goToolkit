@@ -33,7 +33,7 @@ func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 	{{if .HasFetchAdaptor}}
 	count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_impl()
 	{{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
 	return count, {{.ObjectNameLower}}List, nil
@@ -57,14 +57,14 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 {{if .HasFetchAdaptor}}
 	 _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByID_impl(id)
 	{{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 {{end}}
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -76,7 +76,7 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 {{if .HasFetchAdaptor}}
 	  _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
 {{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " WHERE {{.ReverseLookup}} = '" + id + "'"
 
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
@@ -90,7 +90,7 @@ func {{.ObjectName}}_Delete(id string) {
 {{if or .HasStoreAdaptor .HasFetchAdaptor}}
 	adaptor.{{.ObjectName}}_Delete_impl(id)
 	{{else}}
-	object_Table := core.ApplicationPropertiesDB["schema"] + "." + dm.{{.ObjectName}}_SQLTable
+	object_Table := core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB) + "." + dm.{{.ObjectName}}_SQLTable
 	tsql := "DELETE FROM " + object_Table
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
 
@@ -127,14 +127,26 @@ func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
 
 // {{.ObjectName}}_Validate() validates for saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (error,dm.{{.ObjectName}}) {
+	var err error
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
-	return nil,r
+	//
+	{{if .HasCrossval}}
+	// START
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	r, _, _ = adaptor.{{$.ObjectName}}_ObjectValidation_impl(adaptor.PUT, r.{{.QueryFieldID}}, r)
+	// 
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+	{{end}}
+
+	return err,r
 }
 //
 
@@ -187,7 +199,7 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
 
-	tsql := "INSERT INTO " + get_TableName(core.{{.PropertiesName}}PropertiesDB["schema"], dm.{{.ObjectName}}_SQLTable)
+	tsql := "INSERT INTO " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
 	tsql = tsql + " (" + fields(ts) + ")"
 	tsql = tsql + " VALUES (" + values(ts) + ")"
 
@@ -266,7 +278,7 @@ func {{.ObjectName}}_New() (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_Impl (adaptor.NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
