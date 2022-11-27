@@ -5,8 +5,8 @@ import (
 	"log"
 	"strconv"
 
-	logs "github.com/mt1976/templateBuilder/logs"
-	"github.com/mt1976/templatebuiler/core"
+	"github.com/mt1976/mwt-goToolkit/core"
+	logs "github.com/mt1976/mwt-goToolkit/logs"
 )
 
 func Query(db *sql.DB, query string) ([]map[string]interface{}, int, error) {
@@ -66,7 +66,7 @@ func Poke(DB *sql.DB) error {
 	return errordb
 }
 
-//TODO: implement
+// TODO: implement
 func Execute(tsql string) {
 
 	logs.Database("Delete :", tsql)

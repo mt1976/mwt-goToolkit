@@ -1,0 +1,2 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Override,ConfidenceID,,,,true,,,,true,false,,true,,

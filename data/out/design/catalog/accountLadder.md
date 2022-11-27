@@ -8,7 +8,7 @@
 |Endpoint Query |**AccountNo**|
 Glyph|**fas fa-landmark** ()
 Friendly Name|**Account Ladder**|
-|For Project    |github.com/mt1976/mwt-go-dev/|
+|For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
 * **List** (/AccountLadder/AccountLadderList) [Exportable]

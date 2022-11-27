@@ -9,7 +9,7 @@
 |REST API|**/API/Inbox/**|
 Glyph|**fas fa-inbox** ()
 Friendly Name|**Inbox**|
-|For Project    |github.com/mt1976/mwt-go-dev/|
+|For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
 * **List** (/Inbox/InboxList) [Exportable]

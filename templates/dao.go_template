@@ -90,13 +90,44 @@ func {{.ObjectName}}_Delete(id string) {
 {{if or .HasStoreAdaptor .HasFetchAdaptor}}
 	adaptor.{{.ObjectName}}_Delete_impl(id)
 	{{else}}
+
+
+// Uses Hard Delete
 	object_Table := core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB) + "." + dm.{{.ObjectName}}_SQLTable
 	tsql := "DELETE FROM " + object_Table
 	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
 
 	das.Execute(tsql)
+	
+	
 {{end}}
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	{{if .CanSoftDelete}}
+	// {{.ObjectName}}_SoftDeleteByID() soft deletes a single {{.ObjectName}} record
+func {{.ObjectName}}_SoftDelete(id string) {
+	//Uses Soft Delete
+		_,{{.ObjectNameLower}}Item,_ := {{.ObjectName}}_GetByID(id)
+		{{.ObjectNameLower}}Item.SYSDeletedBy = Audit_Update("", Audit_Host())
+		{{.ObjectNameLower}}Item.SYSDeleted = Audit_Update("", Audit_TimeStamp())
+		{{.ObjectNameLower}}Item.SYSDeletedHost = Audit_Update("", Audit_Host())
+		{{.ObjectName}}_StoreSystem({{.ObjectNameLower}}Item)
+}
+	{{end}}
 
 
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database

@@ -50,6 +50,7 @@ type ObjectEnrichments struct {
 	CanDelete              bool
 	CanList                bool
 	CanAPI                 bool
+	CanSoftDelete          bool
 	PropertiesName         string
 	HasStoreAdaptor        bool
 	HasFetchAdaptor        bool

@@ -10,7 +10,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/google/uuid"
 
-	core "github.com/mt1976/templateBuilder/core"
+	core "github.com/mt1976/mwt-goToolkit/core"
 )
 
 func wrapVariable(in string) string {

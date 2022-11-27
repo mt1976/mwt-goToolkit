@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	logs "github.com/mt1976/templateBuilder/logs"
+	logs "github.com/mt1976/mwt-goToolkit/logs"
 )
 
 func extractCreate(in string) string {

@@ -15,9 +15,9 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 
-	core "github.com/mt1976/templateBuilder/core"
-	"github.com/mt1976/templateBuilder/das"
-	"github.com/mt1976/templateBuilder/logs"
+	core "github.com/mt1976/mwt-goToolkit/core"
+	"github.com/mt1976/mwt-goToolkit/das"
+	"github.com/mt1976/mwt-goToolkit/logs"
 )
 
 func main() {
@@ -76,7 +76,7 @@ func main() {
 	logs.Break()
 }
 
-//Get list of files from a folder
+// Get list of files from a folder
 func seekTableDefinitions(dir string) []string {
 	logs.Information("Searching...", "")
 	dir = getPWD() + dir + "/"
@@ -666,7 +666,10 @@ func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrich
 	e.CanExport = getProperty("can_export", props)
 	e.CanAPI = getProperty("can_api", props)
 	e.CanDo = getProperty("can_do", props)
-
+	e.CanSoftDelete = getProperty("can_softdelete", props)
+	if e.CanSoftDelete {
+		e.CanDelete = false
+	}
 	//spew.Dump(e)
 	//spew.Dump(e)
 
@@ -962,7 +965,6 @@ func buildRangeHTML(inObject string) string {
 	//		wrapParentVariable(inObject))
 }
 
-//
 func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOverride []string) []ObjectFields {
 
 	// log parameters

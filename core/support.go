@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/leekchan/accounting"
-	logs "github.com/mt1976/templateBuilder/logs"
+	logs "github.com/mt1976/mwt-goToolkit/logs"
 )
 
 // Converts a siena style date, as a user readable date
@@ -150,7 +150,7 @@ func StrArrayToString(inArray []string) string {
 	return StrArrayToStringWithSep(inArray, "\n")
 }
 
-//StrArrayToStringWithSep converts a string array to a string using a given separator
+// StrArrayToStringWithSep converts a string array to a string using a given separator
 func StrArrayToStringWithSep(inArray []string, inSep string) string {
 
 	outString := ""
@@ -171,7 +171,7 @@ func QmBundleToString(inBundle []string) string {
 	return StrArrayToStringWithSep(inBundle, ";")
 }
 
-//ipRange - a structure that holds the start and end of a range of ip addresses
+// ipRange - a structure that holds the start and end of a range of ip addresses
 type ipRange struct {
 	start net.IP
 	end   net.IP
@@ -478,7 +478,7 @@ func finAbbrToNumeric(str string) int {
 	return retNum
 }
 
-//Convert time.Time to string
+// Convert time.Time to string
 func TimeToString(t time.Time) string {
 	//fmt.Printf("t: %v\n", t)
 	return t.Format(DATEFORMATSIENA)

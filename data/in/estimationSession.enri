@@ -1,0 +1,5 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Override,EstimationSessionID,,,,true,,,,true,false,,true,,
+Lookup,ProjectID,Project,Project_ProjectID,Project_Name,true,,,,,,,,,
+Lookup,EstimationStateID,EstimationState,EstimationState_EstimationStateID,,true,,,,,,,,,
+Override,Notes,,,,true,,,textarea,,,,,,

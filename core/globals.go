@@ -9,7 +9,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/jimlawless/cfg"
-	logs "github.com/mt1976/templateBuilder/logs"
+	logs "github.com/mt1976/mwt-goToolkit/logs"
 )
 
 var startTime = time.Now()
@@ -125,7 +125,7 @@ type sienaDBItem struct {
 	SYSUpdated string
 }
 
-//SienaBusinessDateItem is cheese
+// SienaBusinessDateItem is cheese
 type DateItem struct {
 	Today     string
 	Internal  time.Time

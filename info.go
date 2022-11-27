@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 
-	core "github.com/mt1976/templateBuilder/core"
-	"github.com/mt1976/templateBuilder/logs"
+	core "github.com/mt1976/mwt-goToolkit/core"
+	"github.com/mt1976/mwt-goToolkit/logs"
 )
 
 func displayApplicationHeader() {

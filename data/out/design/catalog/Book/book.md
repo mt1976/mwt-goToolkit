@@ -9,7 +9,7 @@
 |REST API|**/API/Book/**|
 Glyph|**fas fa-book** ()
 Friendly Name|**Book**|
-|For Project    |github.com/mt1976/mwt-go-dev/|
+|For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
 * **List** (/Book/BookList) [Exportable]

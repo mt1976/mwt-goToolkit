@@ -8,7 +8,7 @@
 |Endpoint Query |**ID**|
 Glyph|**fas fa-user-cog** ()
 Friendly Name|**Credentials Update**|
-|For Project    |github.com/mt1976/mwt-go-dev/|
+|For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
 

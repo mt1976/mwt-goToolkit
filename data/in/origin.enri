@@ -1,0 +1,9 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Override,OriginID,,,,true,,,,true,false,,true,3,4
+Lookup,StateID,OriginState,OriginState_OriginStateID,OriginState_Name,true,,,,,,,,,
+Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,,,,,
+Override,Code,,,,true,,,,true,false,,,2,4
+Override,FullName,,,,true,,,,,,,,2,50
+Override,Notes,,,,true,,,textarea,,,,,,
+Override,StartDate,,,,true,,,date,,,yyyy-mm-dd,,,
+Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,

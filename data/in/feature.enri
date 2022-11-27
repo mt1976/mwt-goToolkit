@@ -1,0 +1,5 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Override,FeatureID,,,,true,,,,true,false,,true,,
+Lookup,EstimationSessionID,EstimationSession,EstimationSession_EstimationSessionID,EstimationSession_Name,true,,,,,,,,,
+Lookup,ConfidenceID,Confidence,Confidence_ConfidenceID,,true,,,,,,,,,
+Override,Notes,,,,true,,,textarea,,,,,,

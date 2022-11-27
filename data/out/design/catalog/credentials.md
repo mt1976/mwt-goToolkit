@@ -9,7 +9,7 @@
 |REST API|**/API/Credentials/**|
 Glyph|**fas fa-key** (text-danger)
 Friendly Name|**Credential**|
-|For Project    |github.com/mt1976/mwt-go-dev/|
+|For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
 * **List** (/Credentials/CredentialsList) [Exportable]
