@@ -1,0 +1,5 @@
+Name,Type,,Mandatory,NoInput
+ID,String,,true,false
+EstimationSession,String,,true,false
+Action,String,,true,false
+Notes,String,,true,false
