@@ -696,8 +696,9 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 	noinput := ""
 	hidden := ""
 	userField := true
-
-	if string(fn[0]) == "_" {
+	logs.Processing("fn: " + fn)
+	if isAudit(fn) {
+		logs.Processing("isAudit: " + fn)
 		//Convert fn to Title Case
 		fn = strings.Replace(fn, "_", "", -1)
 		fn = strings.ToUpper(fn[:1]) + fn[1:]

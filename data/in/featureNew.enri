@@ -1,0 +1,5 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
+Lookup,EstimationSession,EstimationSession,EstimationSessionID_EstimationSessionID,EstimationSession_Name,true,true,,,,,,,,
+Lookup,Confidence,Confidence,Confidence_Code,EstimationState_Name,true,true,,,,,true,,,
+Override,ID,,,,false,true,,,,,,true,,
+Lookup,Developer,Resource,Resource_Code,Resource_Name,true,,,,,,,,,50
