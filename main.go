@@ -248,10 +248,10 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	fullPath := data_out() + dfp //+ "/" + e.ObjectPackage
 	fullname := fullPath + "/" + e.ObjectCamelCase + out_extn
 
-	fmt.Printf("dfp: %v\n", dfp)
-	fmt.Printf("dest: %v\n", dest)
-	fmt.Printf("fullname: %v\n", fullname)
-	fmt.Printf("fullPath: %v\n", fullPath)
+	//fmt.Printf("dfp: %v\n", dfp)
+	//fmt.Printf("dest: %v\n", dest)
+	//fmt.Printf("fullname: %v\n", fullname)
+	//fmt.Printf("fullPath: %v\n", fullPath)
 
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 		logs.Created(fullPath)
@@ -515,6 +515,7 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 	e.Host = getHostName()
 	e.Who = getUsername()
 	e.DoesLookup = false
+	e.DoesListLookup = false
 
 	e.FriendlyName = props["friendlyname"]
 	if e.FriendlyName == "" {
@@ -628,7 +629,7 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 	e.WrapContext = wrapVariable("Context")
 	e.HasCrossval = getProperty("crossvalidate", props)
 	//spew.Dump(e)
-	fmt.Printf("e: %v\n", e)
+	//fmt.Printf("e: %v\n", e)
 	return e
 }
 
@@ -727,8 +728,8 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 	}
 
 	isKey := false
-	fmt.Printf("fn: %v\n", fn)
-	fmt.Printf("en.SearchKey: %v\n", en.SearchKey)
+	//fmt.Printf("fn: %v\n", fn)
+	//fmt.Printf("en.SearchKey: %v\n", en.SearchKey)
 	//spew.Dump(en)
 	if fn == en.SearchKey {
 		isKey = true
@@ -824,7 +825,7 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 		switch {
 		case enrichmentType(thisEnrichment[enri_Type], listField):
 			logs.Processing(listField + " " + thisEnrichment[enri_Field])
-			en.DoesLookup = true
+			en.DoesListLookup = true
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		case enrichmentType(thisEnrichment[enri_Type], lookupField):

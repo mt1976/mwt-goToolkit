@@ -16,24 +16,31 @@ import (
 
 	"fmt"
 	"net/http"
-{{if not .HasFetchAdaptor}}core "{{.ProjectRepo}}core"{{end}}
-{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
-{{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
+	core "{{.ProjectRepo}}core"
+	{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
+	{{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
 	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{else}}
-	{{/* {{if or .DoesLookup}} 
-	// Does Lookup
-	adaptor   "{{.ProjectRepo}}adaptor"{{end}} */}}
+		{{if .DoesLookup}} 
+		// Does Lookup
+		adaptor   "{{.ProjectRepo}}adaptor"{{end}}
 	{{end}}
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
 )
+
+var {{.ObjectName}}_SQLbase string
+var {{.ObjectName}}_QualifiedName string
+func init(){
+	{{.ObjectName}}_QualifiedName = get_TableName(core.ApplicationSQLSchema(), dm.{{.ObjectName}}_SQLTable)
+	{{.ObjectName}}_SQLbase =  core.DB_SELECT + " "+ core.DB_ALL + " " + core.DB_FROM + " " + {{.ObjectName}}_QualifiedName
+}
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 	{{if .HasFetchAdaptor}}
 	count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_impl()
 	{{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
+	tsql := {{.ObjectName}}_SQLbase
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
 	return count, {{.ObjectNameLower}}List, nil
@@ -57,8 +64,8 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 {{if .HasFetchAdaptor}}
 	 _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByID_impl(id)
 	{{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
-	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + "='" + id + "'"
+	tsql := {{.ObjectName}}_SQLbase
+	tsql = tsql + " " + core.DB_WHERE + " " + dm.{{.ObjectName}}_SQLSearchID + core.DB_EQ + "'" + id + "'"
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 {{end}}
 	// START
@@ -76,8 +83,8 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 {{if .HasFetchAdaptor}}
 	  _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
 {{else}}
-	tsql := "SELECT * FROM " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
-	tsql = tsql + " WHERE {{.ReverseLookup}} = '" + id + "'"
+	tsql := {{.ObjectName}}_SQLbase
+	tsql = tsql + " "+ core.DB_WHERE " {{.ReverseLookup}} " + core.DB_EQ + " '" + id + "'"
 
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
@@ -93,9 +100,9 @@ func {{.ObjectName}}_Delete(id string) {
 
 
 // Uses Hard Delete
-	object_Table := core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB) + "." + dm.{{.ObjectName}}_SQLTable
-	tsql := "DELETE FROM " + object_Table
-	tsql = tsql + " WHERE " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
+	object_Table := {{.ObjectName}}_QualifiedName
+	tsql := core.DB_DELETE+" "+core.DB_FROM+" " + object_Table
+	tsql = tsql + " " + core.DB_WHERE + " " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
 
 	das.Execute(tsql)
 	
@@ -133,7 +140,7 @@ func {{.ObjectName}}_SoftDelete(id string) {
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
 
-	err, r := {{.ObjectName}}_Validate(r)
+	r, err := {{.ObjectName}}_Validate(r)
 	if err == nil {
 		err = {{.ObjectNameLower}}_Save(r, Audit_User(req))
 	} else {
@@ -146,7 +153,7 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
 // {{.ObjectName}}_StoreSystem() saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
 	
-	err, r := {{.ObjectName}}_Validate(r)
+	r, err := {{.ObjectName}}_Validate(r)
 	if err == nil {
 		err = {{.ObjectNameLower}}_Save(r, Audit_Host())
 	} else {
@@ -157,7 +164,7 @@ func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
 }
 
 // {{.ObjectName}}_Validate() validates for saves/stores a {{.ObjectName}} record to the database
-func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (error,dm.{{.ObjectName}}) {
+func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) {
 	var err error
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
@@ -171,13 +178,13 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (error,dm.{{.ObjectName}}) {
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-	r, _, _ = adaptor.{{$.ObjectName}}_ObjectValidation_impl(adaptor.PUT, r.{{.QueryFieldID}}, r)
+	r, _, err = adaptor.{{$.ObjectName}}_ObjectValidation_impl(adaptor.PUT, r.{{.QueryFieldID}}, r)
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
 	{{end}}
 
-	return err,r
+	return r,err
 }
 //
 
@@ -205,8 +212,9 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	r.SYSUpdated = Audit_Update("", Audit_TimeStamp())
 	r.SYSUpdatedBy = Audit_Update("",usr)
 	r.SYSUpdatedHost = Audit_Update("",Audit_Host())
+	r.SYSDbVersion = core.DB_Version()
 	{{end}}
-logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
+logs.Storing("{{.ObjectName}}",fmt.Sprintf("%v", r))
 {{if .HasStoreAdaptor}}
 // Please Create Functions Below in the adaptor/{{.ObjectName}}_impl.go file
 	err1 := adaptor.{{.ObjectName}}_Delete_impl(r.{{.QueryFieldID}})
@@ -230,9 +238,9 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%s", r))
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
 
-	tsql := "INSERT INTO " + get_TableName(core.GetSQLSchema(core.{{.PropertiesName}}PropertiesDB), dm.{{.ObjectName}}_SQLTable)
+	tsql := core.DB_INSERT + " " + core.DB_INTO + " " + {{.ObjectName}}_QualifiedName
 	tsql = tsql + " (" + fields(ts) + ")"
-	tsql = tsql + " VALUES (" + values(ts) + ")"
+	tsql = tsql + " "+core.DB_VALUES +" (" + values(ts) + ")"
 
 	{{.ObjectName}}_Delete(r.{{.QueryFieldID}})
 	das.Execute(tsql)

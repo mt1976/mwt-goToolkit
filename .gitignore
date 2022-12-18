@@ -24,3 +24,5 @@
 /data/out/design/menu/*
 /data/in/temp/*
 /data/out/design/catalog/.obsidian/*
+.DS_Store
+data/.DS_Store

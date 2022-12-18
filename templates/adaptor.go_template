@@ -87,7 +87,7 @@ func {{.ObjectNameLower}}_Simulator_ProcessResponse_impl (tokens []string,latest
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END - Validation API/Callout
 
-func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm.{{$.ObjectName}}) (dm.{{$.ObjectName}}, error, string) {
+func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm.{{$.ObjectName}}) (dm.{{$.ObjectName}}, string, error) {
 	logs.Callout("{{$.ObjectName}}", "ObjectValidation", VAL +"-"+iAction, iId)
 	switch iAction {
 		case VAL:
@@ -101,6 +101,6 @@ func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm
 		default:
 			logs.Warning("Tmpl_TDate_impl" + " - Invalid Action")
 		}
-	return iRec,nil,""
+	return iRec,"",nil
 	}
 	

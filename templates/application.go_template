@@ -22,12 +22,12 @@ import (
 	logs    "{{.ProjectRepo}}logs"
 )
 
-
-
-
-
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
+//{{.ObjectName}}_Publish - Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// 
 	{{if .CanAPI}}mux.HandleFunc(dm.{{.ObjectName}}_Path, {{.ObjectName}}_Handler){{else}}//No API{{end}}
 	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{else}}//Cannot List via GUI{{end}}
 	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{else}}//Cannot View via GUI{{end}}
@@ -37,16 +37,26 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
 	logs.Publish("{{.SourceType}}", dm.{{.ObjectName}}_Title)
     {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }
 
 {{if .CanList}}
 //{{.ObjectName}}_HandlerList is the handler for the list page
+//Allows Listing of {{.ObjectName}} records
+//{{.ObjectName}}_HandlerList - Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// 
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
+	// Code Continues Below
 
 	inUTL := r.URL.Path
 	w.Header().Set("Content-Type", "text/html")
@@ -67,13 +77,22 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 	
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 
 }
 {{end}}
 {{if .CanView}}
 //{{.ObjectName}}_HandlerView is the handler used to View a page
+//Allows Viewing for an existing {{.ObjectName}} record
+//{{.ObjectName}}_HandlerView - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// 
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
@@ -98,13 +117,21 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
-
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }
 {{end}}
 {{if .CanEdit}}
 //{{.ObjectName}}_HandlerEdit is the handler used generate the Edit page
+//Allows Editing for an existing {{.ObjectName}} record and then allows the user to save the changes
+//{{.ObjectName}}_HandlerEdit - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
@@ -129,12 +156,21 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }
 {{end}}
 {{if .CanSave}}
 //{{.ObjectName}}_HandlerSave is the handler used process the saving of an {{.ObjectName}}
+//It is called from the Edit and New pages
+//{{.ObjectName}}_HandlerSave  - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// 
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
@@ -144,23 +180,25 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	logs.Servicing(r.URL.Path+r.FormValue("{{.QueryFieldID}}"))
 
-	var item dm.{{.ObjectName}}
-	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
-	{{end}}
-	// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
+	item := {{.ObjectNameLower}}_DataFromRequest(r)
+	
 	dao.{{.ObjectName}}_Store(item,r)	
 	http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }
 {{end}}
 {{if .CanNew}}
 //{{.ObjectName}}_HandlerNew is the handler used process the creation of an {{.ObjectName}}
+//It will create a new {{.ObjectName}} and then redirect to the Edit page
+//{{.ObjectName}}_HandlerNew  - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
@@ -183,32 +221,44 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
-
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }	
 {{end}}
 {{if .CanDelete}}
 //{{.ObjectName}}_HandlerDelete is the handler used process the deletion of an {{.ObjectName}}
+// It will delete the {{.ObjectName}} and then redirect to the List page
+//{{.ObjectName}}_HandlerDelete - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
 	// Mandatory Security Validation
+	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
+	//
 	// Code Continues Below
-
+	//
 	logs.Servicing(r.URL.Path)
 	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
 
 	dao.{{.ObjectName}}_Delete(searchID)	
 
 	http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+	// END
 }
 {{end}}
 
-// Builds/Popuplates the {{.ObjectName}} Page 
+//{{.ObjectNameLower}}_PopulatePage Builds/Populates the {{.ObjectName}} Page 
 func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.ObjectName}}_Page) dm.{{.ObjectName}}_Page {
 	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
 	{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 	{{end}}{{end}}
@@ -227,8 +277,26 @@ func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.O
 	{{range .FieldsList}}pageDetail.{{.FieldName}}_props = rD.{{.FieldName}}_props
 	{{end}}
 	// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}}
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
-	//spew.Dump(pageDetail)
 return pageDetail
 }	
+
+{{if .CanSave}}
+//{{.ObjectNameLower}}_DataFromRequest is used process the content of an HTTP Request and return an instance of an {{.ObjectName}}
+func {{.ObjectNameLower}}_DataFromRequest(r *http.Request) dm.{{.ObjectName}} {
+	// START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	var item dm.{{.ObjectName}}
+	// FIELD SET START
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
+	{{end}}
+	// 
+	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// END
+	return item
+}
+{{end}}

@@ -79,6 +79,7 @@ type ObjectEnrichments struct {
 	CanImport              bool
 	CanDo                  bool
 	DoesLookup             bool
+	DoesListLookup         bool
 	ObjectPackage          string
 	WrapContext            string
 	HasCrossval            bool
