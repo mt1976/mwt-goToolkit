@@ -1073,6 +1073,9 @@ func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFi
 	if commonOverrides[enri_FieldType] != "" {
 		fieldsList.FieldType = core.FieldTypes[commonOverrides[enri_FieldType]]
 	}
+	if commonOverrides[enri_FieldType] == "number" {
+		fieldsList.NumericStep = "0.25"
+	}
 	if commonOverrides[enri_Mask] != "" {
 		fieldsList.FieldMask = commonOverrides[enri_Mask]
 	}

@@ -120,6 +120,7 @@ type ObjectFields struct {
 	WrapPropsMsgFeedBackType string
 	WrapPropsMsgMessage      string
 	WrapPropsMsgGlyph        string
+	NumericStep              string
 }
 
 type messages struct {

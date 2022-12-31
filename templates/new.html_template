@@ -33,7 +33,7 @@
             {{if eq .FieldType "textarea"}}
                 <textarea class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true" {{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}" rows="4" maxlength="255">{{.ValueID}}</textarea>
             {{else}}
-                <input type="{{.FieldType}}" class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}">
+                <input type="{{.FieldType}}" class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} value="{{if eq .FieldName "SYSId"}}new{{else}}{{.ValueID}}{{end}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}" {{if .NumericStep }}step="{{.NumericStep}}"{{end}}>
             {{end}}
            
            

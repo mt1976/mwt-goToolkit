@@ -30,7 +30,7 @@
                         {{if eq .FieldType "textarea"}}
                             <textarea class="form-control" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{if .IsNoChange}}readonly="true"{{end}} disabled value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} data-mdb-input-mask="{{.FieldMask}}" rows="4" maxlength="255">{{.ValueID}}</textarea>
                         {{else}}
-                            <input type="{{.FieldType}}" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}" data-mdb-input-mask="{{.FieldMask}}"></input>
+                            <input type="{{.FieldType}}" class="form-control" id="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" disabled value="{{.ValueID}}" data-mdb-input-mask="{{.FieldMask}}" {{if .NumericStep }}step="{{.NumericStep}}"{{end}}></input>
                         {{end}}
                         <label class="form-label" for="{{.FieldName}}">{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
                         {{if .IsHelper}}<div class="form-helper">{{.HelperHTML}}</div>{{end}}
