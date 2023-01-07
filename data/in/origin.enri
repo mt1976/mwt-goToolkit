@@ -1,7 +1,7 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
 Extra,NoActiveProjects,,,,false,,,,,true,,,,
 Override,OriginID,,,,true,,,,true,false,,true,3,4
-Lookup,StateID,OriginState,OriginState_OriginStateID,OriginState_Name,true,,,,,,,,,
+Lookup,StateID,OriginState,OriginState_OriginStateID,OriginState_Name,true,,,,,true,,,,
 Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,,,,,
 Override,Code,,,,true,,,,true,false,,,2,4
 Override,FullName,,,,true,,,,,,,,2,50
@@ -11,3 +11,4 @@ Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,
 List,Currency,ccy,,,true,true,GBP,,,,,,,
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
 Lookup,AccountManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
+Override,Rate,,,,true,,,,,true,,,,

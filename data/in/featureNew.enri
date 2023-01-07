@@ -3,3 +3,8 @@ Lookup,EstimationSession,EstimationSession,EstimationSessionID_EstimationSession
 Lookup,Confidence,Confidence,Confidence_Code,EstimationState_Name,true,true,,,,,true,,,
 Override,ID,,,,false,true,,,,,,true,,
 Lookup,Developer,Resource,Resource_Code,Resource_Name,true,,,,,,,,,50
+Lookup,Analyst,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
+Lookup,ProductManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
+Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
+Lookup,DefaultProfile,Profile,Profile_ProfileID,Profile_Name,false,,,,,,,,,
+Lookup,ActualProfile,Profile,Profile_ProfileID,Profile_Name,true,,,,,,,,,

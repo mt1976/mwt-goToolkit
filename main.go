@@ -208,8 +208,8 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	}
 
 	if destFolder == "monitor" {
-		destFolder = "adaptor/monitors"
-		out_extn = "_core.go"
+		destFolder = "application"
+		out_extn = "_monitor_impl.go_template"
 		in_extn = ".go_template"
 	}
 
@@ -220,8 +220,8 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	}
 
 	if destFolder == "adaptor" {
-		destFolder = "adaptor"
-		out_extn = "_impl.go_template"
+		destFolder = "dao"
+		out_extn = "_adaptor.go_template"
 		in_extn = ".go_template"
 	}
 

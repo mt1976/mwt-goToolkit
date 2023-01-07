@@ -19,11 +19,7 @@ import (
 	core "{{.ProjectRepo}}core"
 	{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
 	{{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
-	{{if or .HasStoreAdaptor .HasFetchAdaptor}} adaptor   "{{.ProjectRepo}}adaptor"{{else}}
-		{{if .DoesLookup}} 
-		// Does Lookup
-		adaptor   "{{.ProjectRepo}}adaptor"{{end}}
-	{{end}}
+
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
 )
@@ -38,7 +34,7 @@ func init(){
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
 	{{if .HasFetchAdaptor}}
-	count, {{.ObjectNameLower}}List, _ := adaptor.{{.ObjectName}}_GetList_impl()
+	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList_impl()
 	{{else}}
 	tsql := {{.ObjectName}}_SQLbase
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
@@ -62,7 +58,7 @@ func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
 func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 
 {{if .HasFetchAdaptor}}
-	 _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByID_impl(id)
+	 _, {{.ObjectNameLower}}Item, _ := {{.ObjectName}}_GetByID_impl(id)
 	{{else}}
 	tsql := {{.ObjectName}}_SQLbase
 	tsql = tsql + " " + core.DB_WHERE + " " + dm.{{.ObjectName}}_SQLSearchID + core.DB_EQ + "'" + id + "'"
@@ -71,7 +67,7 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -81,7 +77,7 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 {{if .ProvidesReverseLookup}}// {{.ObjectName}}_GetByReverseLookup(id string) returns a single {{.ObjectName}} record using the {{.ReverseLookup}} field as key.
 func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, error) {
 {{if .HasFetchAdaptor}}
-	  _, {{.ObjectNameLower}}Item, _ := adaptor.{{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
+	  _, {{.ObjectNameLower}}Item, _ := {{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
 {{else}}
 	tsql := {{.ObjectName}}_SQLbase
 	tsql = tsql + " "+ core.DB_WHERE " {{.ReverseLookup}} " + core.DB_EQ + " '" + id + "'"
@@ -95,7 +91,7 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 func {{.ObjectName}}_Delete(id string) {
 
 {{if or .HasStoreAdaptor .HasFetchAdaptor}}
-	adaptor.{{.ObjectName}}_Delete_impl(id)
+	{{.ObjectName}}_Delete_impl(id)
 	{{else}}
 
 
@@ -169,7 +165,7 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) 
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -178,7 +174,7 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) 
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-	r, _, err = adaptor.{{$.ObjectName}}_ObjectValidation_impl(adaptor.PUT, r.{{.QueryFieldID}}, r)
+	r, _, err = {{$.ObjectName}}_ObjectValidation_impl(PUT, r.{{.QueryFieldID}}, r)
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -202,7 +198,7 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	}
 
 // If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .HasCallout}}  r.{{.FieldName}},err = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end}}
+{{range .FieldsList}}{{if .HasCallout}}  r.{{.FieldName}},err = {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end}}
 {{end}}
 
 	{{if .HasAudit}}
@@ -217,8 +213,8 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 logs.Storing("{{.ObjectName}}",fmt.Sprintf("%v", r))
 {{if .HasStoreAdaptor}}
 // Please Create Functions Below in the adaptor/{{.ObjectName}}_impl.go file
-	err1 := adaptor.{{.ObjectName}}_Delete_impl(r.{{.QueryFieldID}})
-	err2 := adaptor.{{.ObjectName}}_Update_impl(r.{{.QueryFieldID}},r,usr)
+	err1 := {{.ObjectName}}_Delete_impl(r.{{.QueryFieldID}})
+	err2 := {{.ObjectName}}_Update_impl(r.{{.QueryFieldID}},r,usr)
 	if err1 != nil {
 		err = err1
 	}
@@ -273,7 +269,7 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}_sql, "{{.Default}}"){{else}}{{end}}
 	{{end}}
 	// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-	{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = adaptor.{{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
+	{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
 	{{end}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
@@ -298,7 +294,7 @@ func {{.ObjectName}}_NewID(r dm.{{.ObjectName}}) string {
 		// override should return id - override function should be defined as
 		// {{.ObjectName}}_NewID_impl(r dm.{{.ObjectName}}) string {...}
 		//
-		id := adaptor.{{.ObjectName}}_NewID_impl(r)
+		id := {{.ObjectName}}_NewID_impl(r)
 	{{else}}
 			id := uuid.New().String()
 	{{end}}
@@ -317,7 +313,7 @@ func {{.ObjectName}}_New() (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = adaptor.{{$.ObjectName}}_{{.FieldName}}_impl (adaptor.NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END

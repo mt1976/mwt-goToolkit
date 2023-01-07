@@ -1,7 +1,8 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
 Override,EstimationSessionID,,,,true,,,,true,false,,true,,
 Lookup,ProjectID,Project,Project_ProjectID,Project_Name,true,,,,,,,,,
-Lookup,EstimationStateID,EstimationState,EstimationState_EstimationStateID,,true,,,,,,,,,
+Lookup,EstimationStateID,EstimationState,EstimationState_EstimationStateID,,true,,,,,true,,,,
+Override,EstimationStateID,,,,true,,,,,true,,,,
 Override,Notes,,,,false,,,textarea,,,,,,
 Override,Name,,,,true,true,,,true,,,,,20
 Extra,Origin,,,,false,,,,,,,true,,
@@ -32,4 +33,6 @@ Extra,NoActiveFeatures,,,,false,,0,,,true,,,,
 Override,Comments,,,,true,,,textarea,,,,,,
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
 Lookup,ProductManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
-Lookup,Approver,Resource,Resource_Code,Resource_Name,true,,,,,,,,,
+Lookup,Approver,Resource,Resource_Code,Resource_Name,true,,,,,true,,,,
+Override,IssueDate,,,,true,,,date,,true,yyyy-mm-dd,,,
+Override,ExpiryDate,,,,true,,,date,,true,yyyy-mm-dd,,,
