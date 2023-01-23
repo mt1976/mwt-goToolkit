@@ -1,7 +1,6 @@
 # **ExternalMessage** - Object Definition
----
 ##  Information
-|   |   |
+| Information  | Value  |
 |---|---|
 |Object         |**ExternalMessage** (externalmessage) |
 |Endpoint 	    |**/ExternalMessage...** [^1]|
@@ -34,7 +33,7 @@ Friendly Name|**ExternalMessage**|
 
 
 ##  Data Source 
-|   |   |
+| Information  | Value  |
 |---|---|
 SQL Table Name       | **externalMessageStore**
 SQL Table Key | **MessageID**
@@ -92,12 +91,13 @@ SQL Table Key | **MessageID**
 
 
 ## Audit Information
-|   |   |
+| Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **10:58:42**
+Date & Time		     | **23/01/2023** at **11:04:15**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
+---
 ### Footnotes
 [^1]: **Endpoint**
     * The full list of endpoints can be found in the [Actions](#action-id) section

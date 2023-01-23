@@ -1,7 +1,6 @@
 # **Catalog** - Object Definition
----
 ##  Information
-|   |   |
+| Information  | Value  |
 |---|---|
 |Object         |**Catalog** (catalog) |
 |Endpoint 	    |**/Catalog...** [^1]|
@@ -34,7 +33,7 @@ Friendly Name|**API Catalog**|
 
 
 ##  Data Source 
-|   |   |
+| Information  | Value  |
 |---|---|
 
 
@@ -61,12 +60,13 @@ Friendly Name|**API Catalog**|
 
 
 ## Audit Information
-|   |   |
+| Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **10:58:38**
+Date & Time		     | **23/01/2023** at **11:04:14**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
+---
 ### Footnotes
 [^1]: **Endpoint**
     * The full list of endpoints can be found in the [Actions](#action-id) section

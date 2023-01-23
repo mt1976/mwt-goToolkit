@@ -1,7 +1,6 @@
 # **{{.ObjectName}}** - Object Definition
----
 ##  Information
-|   |   |
+| Information  | Value  |
 |---|---|
 |Object         |**{{.ObjectName}}** ({{.ObjectNameLower}}) |
 |Endpoint 	    |**/{{.EndpointRoot}}...** [^1]|
@@ -34,7 +33,7 @@ Friendly Name|**{{.FriendlyName}}**|
 
 
 ##  Data Source 
-|   |   |
+| Information  | Value  |
 |---|---|
 {{if .SQLTableName}}SQL Table Name       | **{{.SQLTableName}}**
 SQL Table Key | **{{.SQLSearchID}}**{{end}}
@@ -54,12 +53,13 @@ SQL Table Key | **{{.SQLSearchID}}**{{end}}
 {{end}}
 
 ## Audit Information
-|   |   |
+| Information  | Value |
 |---|---|
 Template Generator Version   | **{{.Version}}**
 Date & Time		     | **{{.Date}}** at **{{.Time}}**
 Who & Where		     | **{{.Who}}** on **{{.Host}}**
 
+---
 ### Footnotes
 [^1]: **Endpoint**
     * The full list of endpoints can be found in the [Actions](#action-id) section

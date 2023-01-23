@@ -1,7 +1,6 @@
 # **Data** - Object Definition
----
 ##  Information
-|   |   |
+| Information  | Value  |
 |---|---|
 |Object         |**Data** (data) |
 |Endpoint 	    |**/Data...** [^1]|
@@ -33,7 +32,7 @@ Friendly Name|**System Properties**|
 
 
 ##  Data Source 
-|   |   |
+| Information  | Value  |
 |---|---|
 SQL Table Name       | **dataStore**
 SQL Table Key | **dataID**
@@ -75,12 +74,13 @@ SQL Table Key | **dataID**
 
 
 ## Audit Information
-|   |   |
+| Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **10:58:39**
+Date & Time		     | **23/01/2023** at **11:04:14**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
+---
 ### Footnotes
 [^1]: **Endpoint**
     * The full list of endpoints can be found in the [Actions](#action-id) section

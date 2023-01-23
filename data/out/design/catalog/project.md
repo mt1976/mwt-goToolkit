@@ -1,7 +1,6 @@
 # **Project** - Object Definition
----
 ##  Information
-|   |   |
+| Information  | Value  |
 |---|---|
 |Object         |**Project** (project) |
 |Endpoint 	    |**/Project...** [^1]|
@@ -34,7 +33,7 @@ Friendly Name|**Project**|
 
 
 ##  Data Source 
-|   |   |
+| Information  | Value  |
 |---|---|
 SQL Table Name       | **projectStore**
 SQL Table Key | **projectID**
@@ -92,12 +91,13 @@ SQL Table Key | **projectID**
 
 
 ## Audit Information
-|   |   |
+| Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **10:58:44**
+Date & Time		     | **23/01/2023** at **11:04:16**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
+---
 ### Footnotes
 [^1]: **Endpoint**
     * The full list of endpoints can be found in the [Actions](#action-id) section
