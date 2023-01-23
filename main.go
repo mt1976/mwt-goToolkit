@@ -133,9 +133,9 @@ func processObjectDefinition(configFile string) {
 		e = mergeEnrichmentDefinitions(enriPath, e)
 	}
 
-	for i := 0; i < len(e.FieldsList); i++ {
-		logs.Information(e.FieldsList[i].FieldName, strconv.Itoa(i))
-	}
+	// for i := 0; i < len(e.FieldsList); i++ {
+	// 	logs.Information(e.FieldsList[i].FieldName, strconv.Itoa(i))
+	// }
 	logs.Break()
 	logs.Header("Generating Artifacts")
 	logs.Break()
@@ -697,9 +697,9 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 	noinput := ""
 	hidden := ""
 	userField := true
-	logs.Processing("fn: " + fn)
+	//logs.Processing("fn: " + fn)
 	if isAudit(fn) {
-		logs.Processing("isAudit: " + fn)
+		//logs.Processing("isAudit: " + fn)
 		//Convert fn to Title Case
 		fn = strings.Replace(fn, "_", "", -1)
 		fn = strings.ToUpper(fn[:1]) + fn[1:]
@@ -827,17 +827,17 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 
 		switch {
 		case enrichmentType(thisEnrichment[enri_Type], listField):
-			logs.Processing(listField + " " + thisEnrichment[enri_Field])
+			//logs.Processing(listField + " " + thisEnrichment[enri_Field])
 			en.DoesListLookup = true
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		case enrichmentType(thisEnrichment[enri_Type], lookupField):
-			logs.Processing(lookupField + " " + thisEnrichment[enri_Field])
+			//logs.Processing(lookupField + " " + thisEnrichment[enri_Field])
 			en.DoesLookup = true
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		case enrichmentType(thisEnrichment[enri_Type], helperField):
-			logs.Processing(helperField + " " + thisEnrichment[enri_Field])
+			//logs.Processing(helperField + " " + thisEnrichment[enri_Field])
 			en.DoesLookup = true
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
@@ -847,17 +847,17 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 
 		case enrichmentType(thisEnrichment[enri_Type], overrideField):
 			// Do Nothing
-			logs.Information(overrideField, thisEnrichment[enri_Field])
+			//logs.Information(overrideField, thisEnrichment[enri_Field])
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		case enrichmentType(thisEnrichment[enri_Type], fetchField):
 			// Do Nothing
-			logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
+			//logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
 		case enrichmentType(thisEnrichment[enri_Type], defaultField):
 
-			logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
+			//logs.Processing(fetchField + " " + thisEnrichment[enri_Field])
 
 			en.FieldsList = mergeComplexField(en, thisEnrichment[enri_Field], thisEnrichment[enri_Type], thisEnrichment)
 
