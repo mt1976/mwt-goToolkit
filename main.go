@@ -679,12 +679,12 @@ func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrich
 
 func addField(en ObjectEnrichments, fn string, tp string, df string, mand bool, noInput bool) []ObjectFields {
 
-	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false, false, false, false)
+	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false, false, false, false, false)
 
 	return en.FieldsList
 }
 
-func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool, isListLookup bool, isFetch bool, isHidden bool) []ObjectFields {
+func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool, isListLookup bool, isFetch bool, isHidden bool, isFiltered bool) []ObjectFields {
 
 	// log parameters
 
@@ -762,7 +762,10 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 		WrapPropsMsgType:         wrapVariable(fn + "_props.MsgType"),
 		WrapPropsMsgFeedBackType: wrapVariable(fn + "_props.MsgFeedBackType"),
 		WrapPropsMsgMessage:      wrapVariable(fn + "_props.MsgMessage"),
-		WrapPropsMsgGlyph:        wrapVariable(fn + "_props.MsgGlyph")})
+		WrapPropsMsgGlyph:        wrapVariable(fn + "_props.MsgGlyph"),
+		IsFilteredLookup:         isFiltered,
+		IsCheckedHTML:            wrapVariable(fn + "_checked"),
+	})
 
 	//logs.Information(info, "")
 
@@ -911,6 +914,7 @@ func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
 	lkValueField := ""
 	lkRange := ""
 	isHidden := false
+	isFilteredLookup := false
 
 	suffix := "_Unknown"
 	if enrichmentType(record[enri_Type], lookupField) {
@@ -954,8 +958,11 @@ func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
 		noInput = false
 
 	}
+	if record[enri_Filter] == "true" {
+		isFilteredLookup = true
+	}
 
-	return addComplexField(en, record[enri_Field]+suffix, "String", record[enri_DefaultValue], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride, isListLookup, isFetch, isHidden)
+	return addComplexField(en, record[enri_Field]+suffix, "String", record[enri_DefaultValue], colMand, false, isLookup, lkObject, lkKeyField, lkValueField, lkRange, noInput, isExtra, isOverride, isListLookup, isFetch, isHidden, isFilteredLookup)
 }
 
 func buildRangeHTML(inObject string) string {
@@ -1081,6 +1088,10 @@ func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFi
 	}
 	if commonOverrides[enri_Hidden] != "" {
 		fieldsList.Hidden = "hidden"
+	}
+	fieldsList.IsFilteredLookup = false
+	if commonOverrides[enri_Filter] == "true" {
+		fieldsList.IsFilteredLookup = true
 	}
 	//}
 	return fieldsList

@@ -1,4 +1,4 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
-Override,DataID,,,,false,,,,,true,,true,,
-Override,Class,,,,,true,,,true,,,,,
-Override,Field,,,,,true,,,true,,,,,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
+Override,DataID,,,,false,,,,,true,,true,,,
+Override,Class,,,,,true,,,true,,,,,,
+Override,Field,,,,,true,,,true,,,,,,

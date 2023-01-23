@@ -76,6 +76,12 @@ type {{.ObjectName}}_PageList struct {
 	ItemsOnPage 	 int
 	ItemList  		 []{{.ObjectName}}
 	Context	 appContext
+	BlockEdit		 bool
+	BlockSave 		 bool
+	BlockCreate		 bool
+	BlockDelete		 bool
+	BlockValidate	 bool
+	BlockView		 bool
 }
 
 //{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
@@ -94,5 +100,11 @@ type {{.ObjectName}}_Page struct {
 	{{end}}// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
-	Context	 appContext
+	Context	 		 appContext
+	BlockEdit		 bool
+	BlockSave 		 bool
+	BlockCreate		 bool
+	BlockDelete		 bool
+	BlockValidate	 bool
+	BlockView		 bool
 }

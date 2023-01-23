@@ -1,4 +1,4 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
-Override,EstimationStateID,,,,true,,,,true,false,,true,,
-List,IsLocked,tf,,,,,,,,,,,,
-List,Notify,tf,,,,,,,,,,,,
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
+Override,EstimationStateID,,,,true,,,,true,false,,true,,,
+List,IsLocked,tf,,,,,,,,,,,,,
+List,Notify,tf,,,,,,,,,,,,,

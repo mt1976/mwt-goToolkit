@@ -44,7 +44,7 @@ SQL Table Key | **{{.SQLSearchID}}**{{end}}
 ##  Properties / Fields
 | Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
 | -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
-{{range .FieldsList}}|**{{.FieldName}}**|{{.Type}}|{{.IsMandatory}}|{{.IsBaseField}}|{{.IsExtra}}|{{.IsOverride}}|{{if .IsLookup}}OL{{end}}{{if .IsListLookup}}LL{{end}}{{if .IsFetch}}FL{{end}}|{{.LookupObject}}|{{.LookupField}}|{{.LookupValue}}|{{if or .Disabled .Hidden}}{{if .Disabled}}N{{end}}{{if .Hidden}}H{{end}}{{else}}Y{{end}}|{{if .IsBaseField}}{{.FieldSQL}}{{end}}|{{.Default}}|{{.IsNoChange}}|{{.HasCallout}}|{{.IsAudit}}|{{.FieldType}}|{{.FieldMask}}|
+{{range .FieldsList}}|**{{.FieldName}}**|{{.Type}}|{{.IsMandatory}}|{{.IsBaseField}}|{{.IsExtra}}|{{.IsOverride}}|{{if .IsLookup}}OL{{end}}{{if .IsListLookup}}LL{{end}}{{if .IsFetch}}FL{{end}}{{if .IsFilteredLookup}}∀{{end}}|{{.LookupObject}}|{{.LookupField}}|{{.LookupValue}}|{{if or .Disabled .Hidden}}{{if .Disabled}}N{{end}}{{if .Hidden}}H{{end}}{{else}}Y{{end}}|{{if .IsBaseField}}{{.FieldSQL}}{{end}}|{{.Default}}|{{.IsNoChange}}|{{.HasCallout}}|{{.IsAudit}}|{{.FieldType}}|{{.FieldMask}}|
 {{end}}
 
 ##  Artifacts Generated
@@ -67,6 +67,7 @@ Who & Where		     | **{{.Who}}** on **{{.Host}}**
     * LL = A List Lookup. Define list in lits.cfg
     * OL = An Object Lookup. Get a list of values from an Object
     * FL = Fetches 1 value from an object based on the content of the field. 
+    * ∀ = This lookup has a filter that can be defined in the Data Object
 [^3]: **Inputtable**   
     * H = Hidden Field
     * N = No Input Field

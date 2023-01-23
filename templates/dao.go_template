@@ -33,10 +33,21 @@ func init(){
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
+	
+	count, {{.ObjectNameLower}}List, err := {{.ObjectName}}_GetListFiltered("")
+	
+	return count, {{.ObjectNameLower}}List, err
+}
+
+// {{.ObjectName}}_GetListFiltered() returns a filtered list of all {{.ObjectName}} records
+func {{.ObjectName}}_GetListFiltered(filter string) (int, []dm.{{.ObjectName}}, error) {
 	{{if .HasFetchAdaptor}}
-	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList_impl()
+	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetList_impl(filter)
 	{{else}}
 	tsql := {{.ObjectName}}_SQLbase
+	if filter != "" {
+		tsql = tsql + " " + core.DB_WHERE + " " + filter
+	}
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
 	return count, {{.ObjectNameLower}}List, nil
@@ -52,6 +63,23 @@ func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
 	}
 	return returnList
 }
+
+// {{.ObjectName}}_GetFilteredLookup() returns a lookup list of all {{.ObjectName}} items in lookup format
+func {{.ObjectName}}_GetFilteredLookup(requestObject string,requestField string) []dm.Lookup_Item {
+	var returnList []dm.Lookup_Item
+	reqClass := "{{.ObjectName}}-Filter"
+	reqField := requestObject+"-"+requestField
+	filter,_ := Data_GetString(reqClass, reqField)
+	if filter == "" {
+		logs.Warning("{{.ObjectName}}_GetFilteredLookup() - No filter found for " + reqClass + " " + reqField)
+	} 
+	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetListFiltered(filter)
+	for i := 0; i < count; i++ {
+		returnList = append(returnList, dm.Lookup_Item{ID: {{.ObjectNameLower}}List[i].{{.LookupID}}, Name: {{.ObjectNameLower}}List[i].{{.LookupName}}})
+	}
+	return returnList
+}
+
 {{end}}
 
 // {{.ObjectName}}_GetByID() returns a single {{.ObjectName}} record

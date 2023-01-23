@@ -1,7 +1,7 @@
-Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max
-List,MailUnread,tf,,,true,false,,,,,,,,
-List,MailAcknowledged,tf,,,true,false,,,,,,,,
-Override,MailId,,,,,,,,,,,true,,
-Override,MailSource,,,,,,,,,,,true,,
-Override,MailSent,,,,,,,datetime,,,dd/mm/yyy hh:mm,,,
-Override,MailContent,,,,,,,textarea,,,,,,255
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
+List,MailUnread,tf,,,true,false,,,,,,,,,
+List,MailAcknowledged,tf,,,true,false,,,,,,,,,
+Override,MailId,,,,,,,,,,,true,,,
+Override,MailSource,,,,,,,,,,,true,,,
+Override,MailSent,,,,,,,datetime,,,dd/mm/yyy hh:mm,,,,
+Override,MailContent,,,,,,,textarea,,,,,,255,

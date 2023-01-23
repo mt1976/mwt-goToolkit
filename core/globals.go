@@ -179,6 +179,7 @@ func buildFieldTypes(in map[string]string) map[string]string {
 	in["https"] = "url"
 	in["textarea"] = "textarea"
 	in["textbox"] = "textarea"
+	in["toggle"] = "toggle"
 
 	return in
 }

@@ -267,8 +267,11 @@ func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.O
 	//
 	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
 	//
-	{{range .FieldsList}}{{if .IsLookup}}
+	{{range .FieldsList}}{{if .IsLookup}} {{if .IsFilteredLookup}}
+	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetFilteredLookup("{{$.ObjectName}}","{{.FieldName}}")
+	{{else}}
 	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetLookup()
+	{{end}}
 	{{end}}
 	{{if .IsListLookup}}
 	pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")

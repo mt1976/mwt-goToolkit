@@ -83,6 +83,7 @@ type ObjectEnrichments struct {
 	ObjectPackage          string
 	WrapContext            string
 	HasCrossval            bool
+	IsFilteredLookup       bool
 }
 
 type ObjectFields struct {
@@ -121,6 +122,8 @@ type ObjectFields struct {
 	WrapPropsMsgMessage      string
 	WrapPropsMsgGlyph        string
 	NumericStep              string
+	IsFilteredLookup         bool
+	IsCheckedHTML            string
 }
 
 type messages struct {
@@ -164,6 +167,7 @@ const (
 	enri_Hidden       = 12
 	enri_Min          = 13
 	enri_Max          = 14
+	enri_Filter       = 15
 
 	html_disabled  = "readonly=\"true\""
 	html_hidden    = "hidden"
