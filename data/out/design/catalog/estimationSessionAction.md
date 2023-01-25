@@ -67,7 +67,7 @@ Store|<ul><li>**Implement in Adaptor**</li><li>func EstimationSessionAction_NewI
 | Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **11:04:15**
+Date & Time		     | **23/01/2023** at **11:31:01**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ---

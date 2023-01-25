@@ -1,5 +1,5 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
-Override,EstimationSessionID,,,,true,,,,true,false,,true,,,
+Override,EstimationSessionID,,,,true,,,,true,true,,true,,,
 Lookup,ProjectID,Project,Project_ProjectID,Project_Name,true,,,,,,,,,,
 Lookup,EstimationStateID,EstimationState,EstimationState_EstimationStateID,,true,,,,,true,,,,,
 Override,EstimationStateID,,,,true,,,,,true,,,,,

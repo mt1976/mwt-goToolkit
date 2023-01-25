@@ -47,8 +47,8 @@ SQL Table Key | **originID**
 |**OriginID**|String|false|true|false|true|||||H|originID||true|false|false|text||
 |**StateID**|String|false|true|false|false|OL∀|OriginState|OriginState_OriginStateID|OriginState_Name|Y|stateID||false|true|false|text||
 |**DocTypeID**|String|false|true|false|false|OL∀|DocType|DocType_DocTypeID||Y|docTypeID||false|false|false|text||
-|**Code**|String|false|true|false|true|||||Y|code||true|false|false|text||
-|**FullName**|String|false|true|false|true|||||Y|fullName||false|false|false|text||
+|**Code**|String|false|true|false|true|||||H|code||true|false|false|text||
+|**FullName**|String|false|true|false|true|||||H|fullName||false|false|false|text||
 |**Rate**|String|false|true|false|true|||||Y|rate||false|true|false|text||
 |**Notes**|String|false|true|false|true|||||Y|notes||false|false|false|textarea||
 |**StartDate**|String|false|true|false|true|||||Y|startDate||false|false|false|date|yyyy-mm-dd|
@@ -91,7 +91,7 @@ SQL Table Key | **originID**
 | Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **11:04:16**
+Date & Time		     | **23/01/2023** at **11:31:03**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ---

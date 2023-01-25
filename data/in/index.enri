@@ -1,0 +1,9 @@
+Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
+Override,ID,,,,false,true,,,,,,true,,,
+Override,IndexID,,,,false,,,,,true,,true,,,
+Override,KeyClass,,,,false,,,,,,,,,,
+Override,KeyName,,,,false,,,,,,,,,,
+Override,KeyID,,,,false,,,,,,,,,,
+Override,Link,,,,false,,,,,true,,true,,,
+Override,LinkView,,,,false,,,,,true,,true,,,
+Override,LinkEdit,,,,false,,,,,true,,true,,,

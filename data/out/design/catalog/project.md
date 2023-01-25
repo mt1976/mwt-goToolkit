@@ -44,12 +44,12 @@ SQL Table Key | **projectID**
 | Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
 | -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
 |**SYSId**|Int|true|true|false|false|||||NH|_id|0|false|false|true|text||
-|**ProjectID**|String|false|true|false|true|||||H|projectID||true|false|false|text||
+|**ProjectID**|String|false|true|false|true|||||H|projectID||true|true|false|text||
 |**OriginID**|String|true|true|false|false|OL|Origin|Origin_OriginID|Origin_FullName|Y|originID||true|false|false|text||
 |**ProjectStateID**|String|false|true|false|false|OL∀|ProjectState|ProjectState_ProjectStateID|ProjectState_Name|Y|projectStateID||false|false|false|text||
 |**ProfileID**|String|false|true|false|false|OL∀|Profile|Profile_ProfileID|Profile_Name|Y|profileID||false|false|false|text||
 |**Name**|String|true|true|false|false|||||Y|name||false|false|false|text||
-|**Description**|String|false|true|false|true|||||Y|description||false|false|false|textarea||
+|**Description**|String|false|true|false|true|||||Y|description||false|true|false|textarea||
 |**StartDate**|String|false|true|false|true|||||Y|startDate||false|false|false|date|yyyy-mm-dd|
 |**EndDate**|String|false|true|false|true|||||Y|endDate||false|false|false|date|yyyy-mm-dd|
 |**SYSCreated**|String|false|true|false|false|||||NH|_created||false|false|true|text||
@@ -94,7 +94,7 @@ SQL Table Key | **projectID**
 | Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **11:04:16**
+Date & Time		     | **23/01/2023** at **11:31:04**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ---

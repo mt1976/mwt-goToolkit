@@ -44,7 +44,7 @@ SQL Table Key | **estimationSessionID**
 | Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
 | -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
 |**SYSId**|Int|true|true|false|false|||||NH|_id|0|false|false|true|text||
-|**EstimationSessionID**|String|false|true|false|true|||||H|estimationSessionID||true|false|false|text||
+|**EstimationSessionID**|String|false|true|false|true|||||H|estimationSessionID||true|true|false|text||
 |**ProjectID**|String|false|true|false|false|OL|Project|Project_ProjectID|Project_Name|Y|projectID||false|false|false|text||
 |**EstimationStateID**|String|false|true|false|true|OL|EstimationState|EstimationState_EstimationStateID||Y|estimationStateID||false|true|false|text||
 |**Notes**|String|false|true|false|true|||||N|notes||false|false|false|textarea||
@@ -132,7 +132,7 @@ SQL Table Key | **estimationSessionID**
 | Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **11:04:15**
+Date & Time		     | **23/01/2023** at **11:31:00**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ---

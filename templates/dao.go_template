@@ -67,9 +67,10 @@ func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
 // {{.ObjectName}}_GetFilteredLookup() returns a lookup list of all {{.ObjectName}} items in lookup format
 func {{.ObjectName}}_GetFilteredLookup(requestObject string,requestField string) []dm.Lookup_Item {
 	var returnList []dm.Lookup_Item
-	reqClass := "{{.ObjectName}}-Filter"
+	reqClass := "{{.ObjectName}}"
 	reqField := requestObject+"-"+requestField
-	filter,_ := Data_GetString(reqClass, reqField)
+	reqCategory := "Filter"
+	filter,_ := Data_GetString(reqClass, reqField, reqCategory)
 	if filter == "" {
 		logs.Warning("{{.ObjectName}}_GetFilteredLookup() - No filter found for " + reqClass + " " + reqField)
 	} 

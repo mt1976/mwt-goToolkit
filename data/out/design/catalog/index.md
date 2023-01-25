@@ -1,20 +1,20 @@
-# **Schedule** - Object Definition
+# **Index** - Object Definition
 ##  Information
 | Information  | Value  |
 |---|---|
-|Object         |**Schedule** (schedule) |
-|Endpoint 	    |**/Schedule...** [^1]|
-|Endpoint Query |**Schedule**|
-|REST API|**/API/Schedule/**|
-Glyph|**far fa-clock** (text-info)
-Friendly Name|**Scheduler**|
+|Object         |**Index** (index) |
+|Endpoint 	    |**/Index...** [^1]|
+|Endpoint Query |**IndexID**|
+|REST API|**/API/Index/**|
+Glyph|**fas fa-search** ()
+Friendly Name|**Index**|
 |For Project    |github.com/mt1976/ebEstimates/|
 
 ##  Actions {#action-id}
-* **List** (/Schedule/ScheduleList) [Exportable]
-* **View** (/Schedule/ScheduleView)
+* **List** (/Index/IndexList) [Exportable]
+* **View** (/Index/IndexView)
 
-* **Save** (/Schedule/ScheduleSave)
+
 
 
 
@@ -35,8 +35,8 @@ Friendly Name|**Scheduler**|
 ##  Data Source 
 | Information  | Value  |
 |---|---|
-SQL Table Name       | **scheduleStore**
-SQL Table Key | **id**
+SQL Table Name       | **indexStore**
+SQL Table Key | **indexID**
 
 
 
@@ -44,15 +44,13 @@ SQL Table Key | **id**
 | Field Name| Type | Mandatory | Core | Virtual | Overide | Lookup [^2]| Lookup Object      | Lookup Field Source         | Lookup Return Value                | Inputable [^3]|DB Column|Default Value| No Change | Callout | Internal | Display | Mask |
 | -- | --  | :--: | :--: | :--: |:--: |:--: |:--: |-- |-- |:--: |-- | --| :--: | :--: | :--: | -- | -- |
 |**SYSId**|Int|true|true|false|false|||||NH|_id|0|false|false|true|text||
-|**Id**|String|false|true|false|true|||||H|id||true|false|false|text||
-|**Name**|String|false|true|false|false|||||Y|name||false|false|false|text||
-|**Description**|String|false|true|false|false|||||Y|description||false|false|false|text||
-|**Schedule**|String|false|true|false|false|||||Y|schedule||false|false|false|text||
-|**Started**|String|false|true|false|false|||||Y|started||false|false|false|text||
-|**Lastrun**|String|false|true|false|false|||||Y|lastrun||false|false|false|text||
-|**Message**|String|false|true|false|false|||||Y|message||false|false|false|text||
-|**Type**|String|false|true|false|false|||||Y|type||false|false|false|text||
-|**Human**|String|false|true|false|false|||||Y|human||false|false|false|text||
+|**IndexID**|String|false|true|false|true|||||N|indexID||false|true|false|text||
+|**KeyClass**|String|false|true|false|true|||||N|keyClass||false|false|false|text||
+|**KeyName**|String|false|true|false|true|||||N|keyName||false|false|false|text||
+|**KeyID**|String|false|true|false|true|||||N|keyID||false|false|false|text||
+|**Link**|String|false|true|false|true|||||N|link||false|true|false|text||
+|**LinkView**|String|false|true|false|true|||||N|linkView||false|true|false|text||
+|**LinkEdit**|String|false|true|false|true|||||N|linkEdit||false|true|false|text||
 |**SYSCreated**|String|false|true|false|false|||||NH|_created||false|false|true|text||
 |**SYSCreatedBy**|String|false|true|false|false|||||NH|_createdBy||false|false|true|text||
 |**SYSCreatedHost**|String|false|true|false|false|||||NH|_createdHost||false|false|true|text||
@@ -68,20 +66,21 @@ SQL Table Key | **id**
 ##  Artifacts Generated
 | Type | Artifact | Path|
 | :--: | -- | -- |
-| code | **application** | /application/schedule_core.go_tmp |
-| code | **api** | /application/schedule_api.go_tmp |
-| code | **dao** | /dao/schedule_core.go_tmp |
-| code | **datamodel** | /datamodel/schedule_core.go_tmp |
-| code | **menu** | /design/menu/schedule.json_tmp |
-| html | **list** | /Schedule_List.html |
-| html | **view** | /Schedule_View.html |
+| code | **application** | /application/index_core.go_tmp |
+| code | **adaptor** | /dao/index_adaptor.go_template_tmp |
+| code | **api** | /application/index_api.go_tmp |
+| code | **dao** | /dao/index_core.go_tmp |
+| code | **datamodel** | /datamodel/index_core.go_tmp |
+| code | **menu** | /design/menu/index.json_tmp |
+| html | **list** | /Index_List.html |
+| html | **view** | /Index_View.html |
 
 
 ## Audit Information
 | Information  | Value |
 |---|---|
 Template Generator Version   | **Einsteinium [r5-23.01.23]**
-Date & Time		     | **23/01/2023** at **11:31:05**
+Date & Time		     | **23/01/2023** at **11:31:02**
 Who & Where		     | **matttownsend (Matt Townsend)** on **silicon.local**
 
 ---
