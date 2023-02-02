@@ -37,3 +37,5 @@ Lookup,Approver,Resource,Resource_Code,Resource_Name,true,,,,,true,,,,,true
 Override,IssueDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,ExpiryDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,TrackerID,,,,true,,,,,true,,,,,
+Override,AdoID,,,,,,,,,true,,,,,
+Override,FreshdeskID,,,,,,,,,true,,,,,
