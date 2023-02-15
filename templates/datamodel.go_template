@@ -29,8 +29,9 @@ type {{.ObjectName}} struct {
 	//
  	// Any lookups will be added below
 	//
-{{range .FieldsList}}{{- if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item{{else}}{{end -}}
-{{end}}
+	{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item
+	{{end -}}
+	{{end -}}
 }
 
 const (
@@ -126,8 +127,9 @@ type {{.ObjectName}}_Page struct {
 	{{range .FieldsList}}{{.FieldName}}_props     FieldProperties
 	{{end -}}
 	/// Lookups
-	{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup    []Lookup_Item{{end -}}
+	{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup    []Lookup_Item
 	{{end -}}
+	{{end}}
 	/// END OF DEFINITIONS
 	///
 }

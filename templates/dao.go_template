@@ -13,7 +13,6 @@ package dao
 // ----------------------------------------------------------------
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	core "{{.ProjectRepo}}core"
