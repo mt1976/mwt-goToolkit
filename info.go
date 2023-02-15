@@ -36,22 +36,3 @@ func displayApplicationHeader() {
 	logs.Default("Input", data_in())
 	logs.Default("Output", data_out())
 }
-
-func displayTableHeader(in string) {
-	// logs.Break()
-	// logs.Header(in + " Information")
-	// logs.Break()
-	// logs.Information("MD ", "Mandatory")
-	// logs.Information("CR ", "Core Fields")
-	// logs.Information("EX ", "Extra Fields")
-	// logs.Information("OV", " Override of a Core Field")
-	// logs.Information("OL", " You can use this field to lookup a value from a table")
-	// logs.Information("LL", " You can use this field to lookup from a fixed list in lists.cfg")
-	// logs.Information("FL", " The display value of this field is displayed a value from a lookup")
-	// logs.Information("IN", " Input Field")
-
-	// logs.Break()
-	// info := fmt.Sprintf(tableHeader, "Field Name", "Type", "Default", "MD", "CR", "EX", "OV", "L⬆", "⬆ Object", "⬆ Field", "⬇ Value", "IN")
-	// logs.Information(info, "")
-	// logs.Break()
-}

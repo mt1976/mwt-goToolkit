@@ -13,13 +13,12 @@ package dao
 // ----------------------------------------------------------------
 
 import (
-
+	"errors"
 	"fmt"
 	"net/http"
 	core "{{.ProjectRepo}}core"
 	{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
-	{{if and .HasFetchAdaptor .HasStoreAdaptor}}{{else}}das  "{{.ProjectRepo}}das"{{end}}
-
+	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
 )
@@ -28,14 +27,12 @@ var {{.ObjectName}}_SQLbase string
 var {{.ObjectName}}_QualifiedName string
 func init(){
 	{{.ObjectName}}_QualifiedName = get_TableName(core.ApplicationSQLSchema(), dm.{{.ObjectName}}_SQLTable)
-	{{.ObjectName}}_SQLbase =  core.DB_SELECT + " "+ core.DB_ALL + " " + core.DB_FROM + " " + {{.ObjectName}}_QualifiedName
+	{{.ObjectName}}_SQLbase =  das.SELECTALL + das.FROM + {{.ObjectName}}_QualifiedName
 }
 
 // {{.ObjectName}}_GetList() returns a list of all {{.ObjectName}} records
 func {{.ObjectName}}_GetList() (int, []dm.{{.ObjectName}}, error) {
-	
 	count, {{.ObjectNameLower}}List, err := {{.ObjectName}}_GetListFiltered("")
-	
 	return count, {{.ObjectNameLower}}List, err
 }
 
@@ -46,7 +43,7 @@ func {{.ObjectName}}_GetListFiltered(filter string) (int, []dm.{{.ObjectName}}, 
 	{{else}}
 	tsql := {{.ObjectName}}_SQLbase
 	if filter != "" {
-		tsql = tsql + " " + core.DB_WHERE + " " + filter
+		tsql = tsql + " " + das.WHERE + filter
 	}
 	count, {{.ObjectNameLower}}List, _, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
@@ -90,18 +87,26 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 	 _, {{.ObjectNameLower}}Item, _ := {{.ObjectName}}_GetByID_impl(id)
 	{{else}}
 	tsql := {{.ObjectName}}_SQLbase
-	tsql = tsql + " " + core.DB_WHERE + " " + dm.{{.ObjectName}}_SQLSearchID + core.DB_EQ + "'" + id + "'"
+	tsql = tsql + " " + das.WHERE + dm.{{.ObjectName}}_SQLSearchID + das.EQ + das.ID(id)
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 {{end}}
+
+	{{.ObjectNameLower}}Item = {{.ObjectName}}_PostGet({{.ObjectNameLower}}Item,id)
+
+	return 1, {{.ObjectNameLower}}Item, nil
+}
+
+func {{.ObjectName}}_PostGet({{.ObjectNameLower}}Item dm.{{.ObjectName}},id string) dm.{{.ObjectName}} {
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_validate_impl (GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
-	return 1, {{.ObjectNameLower}}Item, nil
+	return {{.ObjectNameLower}}Item
 }
+
 
 {{if .ProvidesReverseLookup}}// {{.ObjectName}}_GetByReverseLookup(id string) returns a single {{.ObjectName}} record using the {{.ReverseLookup}} field as key.
 func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, error) {
@@ -109,7 +114,7 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 	  _, {{.ObjectNameLower}}Item, _ := {{.ObjectName}}_GetByReverseLookup_impl(id,"{{.ReverseLookup}}")
 {{else}}
 	tsql := {{.ObjectName}}_SQLbase
-	tsql = tsql + " "+ core.DB_WHERE " {{.ReverseLookup}} " + core.DB_EQ + " '" + id + "'"
+	tsql = tsql + " " + das.WHERE + "{{.ReverseLookup}} " + das.EQ + das.ID(id)
 
 	_, _, {{.ObjectNameLower}}Item, _ := {{.ObjectNameLower}}_Fetch(tsql)
 	{{end}}
@@ -122,32 +127,14 @@ func {{.ObjectName}}_Delete(id string) {
 {{if or .HasStoreAdaptor .HasFetchAdaptor}}
 	{{.ObjectName}}_Delete_impl(id)
 	{{else}}
-
-
 // Uses Hard Delete
 	object_Table := {{.ObjectName}}_QualifiedName
-	tsql := core.DB_DELETE+" "+core.DB_FROM+" " + object_Table
-	tsql = tsql + " " + core.DB_WHERE + " " + dm.{{.ObjectName}}_SQLSearchID + " = '" + id + "'"
-
-	das.Execute(tsql)
-	
-	
+	tsql := das.DELETE + das.FROM + object_Table
+	tsql = tsql + " " + das.WHERE + dm.{{.ObjectName}}_SQLSearchID + das.EQ + das.ID(id)
+	das.Execute(tsql)	
 {{end}}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	{{if .CanSoftDelete}}
 	// {{.ObjectName}}_SoftDeleteByID() soft deletes a single {{.ObjectName}} record
@@ -157,13 +144,16 @@ func {{.ObjectName}}_SoftDelete(id string) {
 		{{.ObjectNameLower}}Item.SYSDeletedBy = Audit_Update("", Audit_Host())
 		{{.ObjectNameLower}}Item.SYSDeleted = Audit_Update("", Audit_TimeStamp())
 		{{.ObjectNameLower}}Item.SYSDeletedHost = Audit_Update("", Audit_Host())
-		{{.ObjectName}}_StoreSystem({{.ObjectNameLower}}Item)
+		_,err := {{.ObjectName}}_StoreSystem({{.ObjectNameLower}}Item)
+		if err != nil {
+			logs.Error("{{.ObjectName}}_SoftDelete()",err)
+		}
 }
 	{{end}}
 
 
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
-func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
+func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) (dm.{{.ObjectName}},error) {
 
 	r, err := {{.ObjectName}}_Validate(r)
 	if err == nil {
@@ -172,11 +162,11 @@ func {{.ObjectName}}_Store(r dm.{{.ObjectName}},req *http.Request) error {
 		logs.Information("{{.ObjectName}}_Store()", err.Error())
 	}
 
-	return err
+	return r, err
 }
 
 // {{.ObjectName}}_StoreSystem() saves/stores a {{.ObjectName}} record to the database
-func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
+func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) (dm.{{.ObjectName}},error) {
 	
 	r, err := {{.ObjectName}}_Validate(r)
 	if err == nil {
@@ -185,7 +175,7 @@ func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) error {
 		logs.Information("{{.ObjectName}}_Store()", err.Error())
 	}
 
-	return err
+	return r, err
 }
 
 // {{.ObjectName}}_Validate() validates for saves/stores a {{.ObjectName}} record to the database
@@ -194,7 +184,10 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) 
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_validate_impl (PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+	if r.{{.FieldName}}_props.MsgMessage != "" {
+		err = errors.New(r.{{.FieldName}}_props.MsgMessage)
+	}
 {{end}}{{end}}	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -218,18 +211,13 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 
     var err error
 
-
-
-	
-
 	if len(r.{{.QueryFieldID}}) == 0 {
 		r.{{.QueryFieldID}} = {{.ObjectName}}_NewID(r)
 	}
 
 // If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
-{{range .FieldsList}}{{if .HasCallout}}  r.{{.FieldName}},err = {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end}}
-{{end}}
-
+{{- range .FieldsList}}{{- if .HasCallout}}  r.{{.FieldName}},err = {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end -}}
+{{end -}}
 	{{if .HasAudit}}
 	r.SYSCreated = Audit_Update(r.SYSCreated, Audit_TimeStamp())
 	r.SYSCreatedBy = Audit_Update(r.SYSCreatedBy, usr)
@@ -263,9 +251,9 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%v", r))
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
 
-	tsql := core.DB_INSERT + " " + core.DB_INTO + " " + {{.ObjectName}}_QualifiedName
+	tsql := das.INSERT + das.INTO + {{.ObjectName}}_QualifiedName
 	tsql = tsql + " (" + fields(ts) + ")"
-	tsql = tsql + " "+core.DB_VALUES +" (" + values(ts) + ")"
+	tsql = tsql + " "+das.VALUES +"(" + values(ts) + ")"
 
 	{{.ObjectName}}_Delete(r.{{.QueryFieldID}})
 	das.Execute(tsql)
@@ -298,8 +286,8 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}_sql, "{{.Default}}"){{else}}{{end}}
 	{{end}}
 	// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-	{{range .FieldsList}}{{if .HasCallout}}   recItem.{{.FieldName}}  = {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end}}
-	{{end}}
+	{{- range .FieldsList}}{{- if .HasCallout}}   recItem.{{.FieldName}}  = {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end -}}
+	{{end -}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
@@ -312,20 +300,20 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	return noitems, recList, recItem, nil
 }
 	{{else}}
-// {{.ObjectNameLower}}_Fetch is not required as GetByID, GetAll etc... have been diverted to _impl
+	// {{.ObjectNameLower}}_Fetch is not required as GetByID, GetAll etc... have been diverted to _impl
 	{{end}}
 
 
 func {{.ObjectName}}_NewID(r dm.{{.ObjectName}}) string {
 	{{if .CanOverrideID}}
-		// {{.ObjectName}}_NewID_impl should be specified in dao/{{.ObjectName}}_impl.go
-		// to provide the implementation for the special case.
-		// override should return id - override function should be defined as
-		// {{.ObjectName}}_NewID_impl(r dm.{{.ObjectName}}) string {...}
-		//
-		id := {{.ObjectName}}_NewID_impl(r)
+	// {{.ObjectName}}_NewID_impl should be specified in dao/{{.ObjectName}}_impl.go
+	// to provide the implementation for the special case.
+	// override should return id - override function should be defined as
+	// {{.ObjectName}}_NewID_impl(r dm.{{.ObjectName}}) string {...}
+	//
+	id := {{.ObjectName}}_NewID_impl(r)
 	{{else}}
-			id := uuid.New().String()
+	id := uuid.New().String()
 	{{end}}
 	return id
 }
@@ -342,13 +330,11 @@ func {{.ObjectName}}_New() (int, []dm.{{.ObjectName}}, dm.{{.ObjectName}}, error
 	// START
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	//
-{{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_impl (NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
-{{end}}{{end}}	// 
+{{range .FieldsList}}{{- if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_validate_impl (NEW,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
+{{end -}}{{end}}	
+	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
 	// END
-
-
 	rList = append(rList, r)
-
 	return 1, rList, r, nil
 }

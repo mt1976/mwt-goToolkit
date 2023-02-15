@@ -70,28 +70,7 @@ import (
 	}
 	//
 {{end}}
-	// ----------------------------------------------------------------
-	// {{$.ObjectName}}_ObjectValidation_impl provides Record/Object level validation for {{$.ObjectName}}
-	func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm.{{$.ObjectName}}) (dm.{{$.ObjectName}}, string, error) {
-		logs.Callout("{{$.ObjectName}}", "ObjectValidation", VAL +"-"+iAction, iId)
-		switch iAction {
-			case VAL:
-				
-			case NEW:
 
-			case PUT:
-
-			case GET:
-
-			default:
-				logs.Warning("{{$.ObjectName}}" + " - Invalid Action ["+iAction+"]")
-			}
-		return iRec,"",nil
-	}
-	//
-	// ----------------------------------------------------------------
-	// If there are fields below, create the methods in adaptor\{{$.ObjectNameLower}}_impl.go
-	// These are the the default implementations, which do nothing
 {{range .FieldsList}}{{if .HasCallout}}
 	// ----------------------------------------------------------------
 	// BEGIN {{$.ObjectName}}_{{.FieldName}}
@@ -108,12 +87,6 @@ import (
 	func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {
 		logs.Callout("{{$.ObjectName}}", dm.{{$.ObjectName}}_{{.FieldName}}_scrn, GET, rec.{{$.QueryFieldID}})
 		return rec.{{.FieldName}}
-	}
-	// ----------------------------------------------------------------
-	// {{$.ObjectName}}_{{.FieldName}}_impl provides validation/actions for {{.FieldName}}
-	func {{$.ObjectName}}_{{.FieldName}}_impl (iAction string, iId string, iValue string, iRec dm.{{$.ObjectName}}, fP dm.FieldProperties) (string, dm.FieldProperties) {
-		logs.Callout("{{$.ObjectName}}", dm.{{$.ObjectName}}_{{.FieldName}}_scrn, VAL +"-"+iAction, iId)
-		return iValue,fP
 	}
 	// ----------------------------------------------------------------
 	// END   {{$.ObjectName}}_{{.FieldName}}

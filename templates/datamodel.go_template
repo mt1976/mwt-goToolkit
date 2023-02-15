@@ -13,31 +13,44 @@ package datamodel
 // Who & Where		    : {{.Who}} on {{.Host}}
 // ----------------------------------------------------------------
 
-//{{.ObjectName}} defines the datamolde for the {{.ObjectName}} object
+//{{.ObjectName}} defines the datamodel for the {{.ObjectName}} object
 type {{.ObjectName}} struct {
-
-{{range .FieldsList}}
-{{.FieldName}}       string
-{{.FieldName}}_props FieldProperties{{end}}
- // Any lookups will be added below{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item{{else}}{{end}}
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	//
+	// Field Definitions
+	//
+	{{range .FieldsList}}{{.FieldName}}       string
+	{{end -}}
+	//
+	// Field Properties
+	//
+	{{range .FieldsList}}{{.FieldName}}_props FieldProperties
+	{{end -}}
+	//
+ 	// Any lookups will be added below
+	//
+{{range .FieldsList}}{{- if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup []Lookup_Item{{else}}{{end -}}
 {{end}}
 }
 
 const (
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// Page Infrastructure
+	{{.ObjectName}}_Name      = "{{.ObjectName}}"
 	{{.ObjectName}}_Title       = "{{.FriendlyName}}"
 	{{.ObjectName}}_SQLTable    = "{{.SQLTableName}}"
 	{{.ObjectName}}_SQLSearchID = "{{.SQLSearchID}}"
 	{{.ObjectName}}_QueryString = "{{.QueryString}}"
 	///
-	/// Handler Defintions
+	/// Template Path Defintions
 	///
 	{{.ObjectName}}_Template     = "{{.ObjectName}}"
-	{{.ObjectName}}_TemplateList = "/{{.ObjectName}}/{{.ObjectName}}_List"
-	{{.ObjectName}}_TemplateView = "/{{.ObjectName}}/{{.ObjectName}}_View"
-	{{.ObjectName}}_TemplateEdit = "/{{.ObjectName}}/{{.ObjectName}}_Edit"
-	{{.ObjectName}}_TemplateNew  = "/{{.ObjectName}}/{{.ObjectName}}_New"
+	{{.ObjectName}}_TemplateList = "/{{.ObjectName}}/{{.ObjectName}}List"
+	{{.ObjectName}}_TemplateView = "/{{.ObjectName}}/{{.ObjectName}}View"
+	{{.ObjectName}}_TemplateEdit = "/{{.ObjectName}}/{{.ObjectName}}Edit"
+	{{.ObjectName}}_TemplateNew  = "/{{.ObjectName}}/{{.ObjectName}}New"
 	///
-	/// Handler Monitor Paths
+	/// URI Handler Paths
 	///
 	{{.ObjectName}}_Path       = "/API/{{.ObjectName}}/"
 	{{.ObjectName}}_PathList   = "/{{.ObjectName}}List/"
@@ -46,35 +59,37 @@ const (
 	{{.ObjectName}}_PathNew    = "/{{.ObjectName}}New/"
 	{{.ObjectName}}_PathSave   = "/{{.ObjectName}}Save/"
 	{{.ObjectName}}_PathDelete = "/{{.ObjectName}}Delete/"
-	///
+	// Redirects - On Server Side Error
+	{{.ObjectName}}_PathEditException   = "/{{.ObjectName}}EditException/"
+	{{.ObjectName}}_PathNewException    = "/{{.ObjectName}}NewException/"
+	//
 	//{{.ObjectName}}_Redirect provides a page to return to aftern an action
 	{{if .CanList}}{{.ObjectName}}_Redirect = {{.ObjectName}}_PathList
 	{{else}}{{.ObjectName}}_Redirect = {{.ObjectName}}_PathView{{end}}
-	///
-	///
-	/// SQL Field Definitions
-	///
-{{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}_sql   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
-{{end}}
-	/// Definitions End
+	//
+	//
+	// SQL Field Definitions
+	//
+{{ range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}_sql   = "{{.FieldSQL}}" // {{.FieldName}} is a {{.Type}}
+{{end -}}
 	///
 	/// Application Field Definitions
 	///
 {{range .FieldsList}}	{{$.ObjectName}}_{{.FieldName}}_scrn   = "{{.FieldName}}" // {{.FieldName}} is a {{.Type}}
-{{end}}
-	/// Definitions End
+{{end -}}
 	///
 )
 
-//{{.ObjectNameLower}}_PageList provides the information for the template for a list of {{.ObjectName}}s
+//{{.ObjectName}}_PageList provides the information for the template for a list of {{.ObjectName}}s
 type {{.ObjectName}}_PageList struct {
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	// Page Infrastructure
 	SessionInfo      SessionInfo
 	UserMenu         AppMenuItem
 	UserRole         string
 	Title            string
 	PageTitle        string
-	ItemsOnPage 	 int
-	ItemList  		 []{{.ObjectName}}
+	// Context & Permisions
 	Context	 appContext
 	BlockEdit		 bool
 	BlockSave 		 bool
@@ -82,24 +97,21 @@ type {{.ObjectName}}_PageList struct {
 	BlockDelete		 bool
 	BlockValidate	 bool
 	BlockView		 bool
+	// Page Data
+	ItemsOnPage 	 int
+	ItemList  		 []{{.ObjectName}}
 }
 
-//{{.ObjectNameLower}}_Page provides the information for the template for an individual {{.ObjectName}}
+//{{.ObjectName}}_Page provides the information for the template for an individual {{.ObjectName}}
 type {{.ObjectName}}_Page struct {
+	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
+	/// Page Infrastructure
 	SessionInfo      SessionInfo
 	UserMenu    	 AppMenuItem
 	UserRole    	 string
 	Title       	 string
 	PageTitle   	 string
-	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//	
-	{{range .FieldsList}}{{.FieldName}}         string{{if or .IsLookup .IsListLookup}}
-	{{.FieldName}}_lookup    []Lookup_Item{{end}}
-	{{.FieldName}}_props     FieldProperties
-	{{end}}// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
+	/// Context & Permisions
 	Context	 		 appContext
 	BlockEdit		 bool
 	BlockSave 		 bool
@@ -107,4 +119,15 @@ type {{.ObjectName}}_Page struct {
 	BlockDelete		 bool
 	BlockValidate	 bool
 	BlockView		 bool
+	/// Fields Definitions
+	{{range .FieldsList}}{{.FieldName}}         string
+	{{end -}}
+	/// Field Properties
+	{{range .FieldsList}}{{.FieldName}}_props     FieldProperties
+	{{end -}}
+	/// Lookups
+	{{range .FieldsList}}{{if or .IsLookup .IsListLookup}}{{.FieldName}}_lookup    []Lookup_Item{{end -}}
+	{{end -}}
+	/// END OF DEFINITIONS
+	///
 }

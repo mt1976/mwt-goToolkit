@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -81,7 +80,7 @@ func seekTableDefinitions(dir string) []string {
 	logs.Information("Searching...", "")
 	dir = getPWD() + dir + "/"
 	//logs.Information("In Queue Path", dir)
-	files, err := ioutil.ReadDir(dir)
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -143,6 +142,8 @@ func processObjectDefinition(configFile string) {
 	e = generateCodeArtifact("application", props, configFile, e)
 
 	e = generateCodeArtifact("adaptor", props, configFile, e)
+
+	e = generateCodeArtifact("validation", props, configFile, e)
 
 	if e.CanAPI {
 		e = generateCodeArtifact("api", props, configFile, e)
@@ -222,6 +223,12 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	if destFolder == "adaptor" {
 		destFolder = "dao"
 		out_extn = "_adaptor.go_template"
+		in_extn = ".go_template"
+	}
+
+	if destFolder == "validation" {
+		destFolder = "dao"
+		out_extn = "_validation.go_template"
 		in_extn = ".go_template"
 	}
 
@@ -335,7 +342,7 @@ func generateHTMLArtifact(w string, p string, destFolder string, e ObjectEnrichm
 	}
 
 	dfp := "/" + destFolder + "/" + e.ObjectName
-	dest := "/" + e.ObjectName + "_" + userAction + ".html"
+	dest := "/" + e.ObjectName + userAction + ".html"
 
 	//dest := dfp + "/" + e.ObjectCamelCase
 
@@ -506,7 +513,8 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 	logs.Default("Object Name", e.ObjectName)
 	logs.Created("Object Name " + e.ObjectName)
 
-	e.ObjectName = strings.Title(e.ObjectName)
+	//caser := cases.Title(language.English)
+	//e.ObjectName = caser.String(e.ObjectName)
 	e.ObjectCamelCase = strings.ToLower(e.ObjectName[:1]) + e.ObjectName[1:]
 	e.ObjectNameLower = strings.ToLower(e.ObjectName)
 	e.Version = genReleaseName()

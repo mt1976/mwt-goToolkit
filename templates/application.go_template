@@ -142,7 +142,15 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	logs.Servicing(r.URL.Path)
 
 	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
-	_, rD, _ := dao.{{.ObjectName}}_GetByID(searchID)
+	action := core.GetURLparam(r, core.ContextState)
+
+	var rD dm.{{.ObjectName}}
+	if action == core.ContextState_ERROR {
+		rD = core.SessionManager.Get(r.Context(), searchID).(dm.{{.ObjectName}})
+	} else {
+		_, rD, _ = dao.{{.ObjectName}}_GetByID(searchID)
+	}
+
 	
 	pageDetail := dm.{{.ObjectName}}_Page{
 		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
@@ -178,12 +186,19 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	// Code Continues Below
 
 	w.Header().Set("Content-Type", "text/html")
-	logs.Servicing(r.URL.Path+r.FormValue("{{.QueryFieldID}}"))
+	itemID := r.FormValue("{{.QueryFieldID}}")
+	logs.Servicing(r.URL.Path+itemID)
 
 	item := {{.ObjectNameLower}}_DataFromRequest(r)
 	
-	dao.{{.ObjectName}}_Store(item,r)	
-	http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	item, errStore := dao.{{.ObjectName}}_Store(item,r)
+	if errStore == nil {	
+		http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	} else {
+		logs.Information(dm.{{.ObjectName}}_Name, errStore.Error())
+		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		ExecuteRedirect(r.Referer(), w, r,dm.{{.ObjectName}}_QueryString,itemID,item)
+	}
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
@@ -207,7 +222,18 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	logs.Servicing(r.URL.Path)
-	_, _, rD, _ := dao.{{.ObjectName}}_New()
+
+	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
+	action := core.GetURLparam(r, core.ContextState)
+
+	var rD dm.{{.ObjectName}}
+	if action == core.ContextState_ERROR {
+		rD = core.SessionManager.Get(r.Context(), searchID).(dm.{{.ObjectName}})
+	} else {
+		_, _, rD, _ = dao.{{.ObjectName}}_New()
+	}
+
+
 
 	pageDetail := dm.{{.ObjectName}}_Page{
 		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_New),
@@ -256,50 +282,38 @@ func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 {{end}}
 
 //{{.ObjectNameLower}}_PopulatePage Builds/Populates the {{.ObjectName}} Page 
+//{{.ObjectNameLower}}_PopulatePage Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.ObjectName}}_Page) dm.{{.ObjectName}}_Page {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
+	// Real DB Fields
 	{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-	{{end}}{{end}}
+	{{end -}}{{end -}}
+	// Add Pseudo/Extra Fields
 	{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
-	{{end}}{{end}}
-	//
-	// Automatically generated {{.Date}} by {{.Who}} on {{.Host}} - Enrichment Fields Below
-	//
+	{{end -}}{{end -}}
+	// Enrichment Fields 
 	{{range .FieldsList}}{{if .IsLookup}} {{if .IsFilteredLookup}}
 	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetFilteredLookup("{{$.ObjectName}}","{{.FieldName}}")
 	{{else}}
 	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetLookup()
-	{{end}}
-	{{end}}
+	{{end -}}
+	{{end -}}
 	{{if .IsListLookup}}
 	pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")
-	{{end}}
-	{{end}}
+	{{end -}}
+	{{end -}}
 	{{range .FieldsList}}pageDetail.{{.FieldName}}_props = rD.{{.FieldName}}_props
-	{{end}}
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
-return pageDetail
+	{{end -}}
+	return pageDetail
 }	
 
 {{if .CanSave}}
 //{{.ObjectNameLower}}_DataFromRequest is used process the content of an HTTP Request and return an instance of an {{.ObjectName}}
+//{{.ObjectNameLower}}_DataFromRequest Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectNameLower}}_DataFromRequest(r *http.Request) dm.{{.ObjectName}} {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
+
 	var item dm.{{.ObjectName}}
-	// FIELD SET START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
 	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
-	{{end}}
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
+	{{end -}}
 	return item
 }
 {{end}}

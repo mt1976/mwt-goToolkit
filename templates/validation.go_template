@@ -1,0 +1,78 @@
+package dao
+
+import (
+	"strings"
+
+	core "{{.ProjectRepo}}core"
+	logs "{{.ProjectRepo}}logs"
+    dm "{{.ProjectRepo}}datamodel"
+)
+	// ----------------------------------------------------------------
+	// Automatically generated  "/dao/{{.ObjectNameLower}}.go"
+	// ----------------------------------------------------------------
+	// Package              : dao
+	// Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
+	// Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
+	// For Project          : {{.ProjectRepo}}
+	// ----------------------------------------------------------------
+	// Template Generator   : {{.Version}}
+	// Date & Time		    : {{.Date}} at {{.Time}}
+	// Who & Where		    : {{.Who}} on {{.Host}}
+	// ----------------------------------------------------------------
+	// The following functions should be created in {{.ObjectNameLower}}_impl.go
+	// ----------------------------------------------------------------
+
+
+	// ----------------------------------------------------------------
+	// {{$.ObjectName}}_ObjectValidation_impl provides Record/Object level validation for {{$.ObjectName}}
+	func {{$.ObjectName}}_ObjectValidation_impl (iAction string, iId string, iRec dm.{{$.ObjectName}}) (dm.{{$.ObjectName}}, string, error) {
+		logs.Callout("{{$.ObjectName}}", "ObjectValidation", VAL +"-"+iAction, iId)
+		switch iAction {
+			case VAL:
+				
+			case NEW:
+
+			case PUT:
+
+			case GET:
+
+			default:
+				logs.Warning("{{$.ObjectName}}" + " - Invalid Action ["+iAction+"]")
+			}
+		return iRec,"",nil
+	}
+	//
+	// ----------------------------------------------------------------
+	// These are the the default implementations, which do nothing
+{{range .FieldsList}}{{if .HasCallout}}
+	// ----------------------------------------------------------------
+	// BEGIN {{$.ObjectName}}_{{.FieldName}}
+	// BEGIN {{$.ObjectName}}_{{.FieldName}}
+	// BEGIN {{$.ObjectName}}_{{.FieldName}}
+	// ----------------------------------------------------------------
+	// {{$.ObjectName}}_{{.FieldName}}_OnStore_impl provides the implementation for the callout
+	func {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (fieldval string,rec dm.{{$.ObjectName}},usr string) (string,error)  {
+		logs.Callout("{{$.ObjectName}}", dm.{{$.ObjectName}}_{{.FieldName}}_scrn, PUT, rec.{{$.QueryFieldID}})
+		return fieldval,nil
+	}
+	// ----------------------------------------------------------------
+	// {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl provides the implementation for the callout	
+	func {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (rec dm.{{$.ObjectName}})(string) {
+		logs.Callout("{{$.ObjectName}}", dm.{{$.ObjectName}}_{{.FieldName}}_scrn, GET, rec.{{$.QueryFieldID}})
+		return rec.{{.FieldName}}
+	}
+	// ----------------------------------------------------------------
+	// {{$.ObjectName}}_{{.FieldName}}_validate_impl provides validation/actions for {{.FieldName}}
+	func {{$.ObjectName}}_{{.FieldName}}_validate_impl (iAction string, iId string, iValue string, iRec dm.{{$.ObjectName}}, fP dm.FieldProperties) (string, dm.FieldProperties) {
+		logs.Callout("{{$.ObjectName}}", dm.{{$.ObjectName}}_{{.FieldName}}_scrn, VAL +"-"+iAction, iId)
+		return iValue,fP
+	}
+	// ----------------------------------------------------------------
+	// END   {{$.ObjectName}}_{{.FieldName}}
+	// END   {{$.ObjectName}}_{{.FieldName}}
+	// END   {{$.ObjectName}}_{{.FieldName}}
+	// ----------------------------------------------------------------
+{{end}}{{end}}
+	// ----------------------------------------------------------------
+	// Automatically generated code ends here
+	// ----------------------------------------------------------------
