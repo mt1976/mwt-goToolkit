@@ -781,6 +781,9 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 }
 
 func isAudit(fn string) bool {
+	if len(fn) < 1 {
+		return false
+	}
 	return fn[0:1] == "_"
 }
 
