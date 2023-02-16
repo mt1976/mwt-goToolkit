@@ -284,8 +284,9 @@ func {{.ObjectNameLower}}_Fetch(tsql string) (int, []dm.{{.ObjectName}}, dm.{{.O
 	//
 	{{range .FieldsList}}{{if .IsBaseField}}   recItem.{{.FieldName}}  = get_{{.Type}}(rec, dm.{{$.ObjectName}}_{{.FieldName}}_sql, "{{.Default}}"){{else}}{{end}}
 	{{end}}
-	// If there are fields below, create the methods in adaptor\{{$.ObjectName}}_impl.go
-	{{- range .FieldsList}}{{- if .HasCallout}}   recItem.{{.FieldName}}  = {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem){{end -}}
+	// If there are fields below, create the methods in dao\{{$.ObjectName}}_adaptor.go
+	{{range .FieldsList}}{{- if .HasCallout}}   recItem.{{.FieldName}}  = {{$.ObjectName}}_{{.FieldName}}_OnFetch_impl (recItem)
+	{{end -}}
 	{{end -}}
 	// 
 	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 

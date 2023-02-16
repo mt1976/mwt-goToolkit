@@ -6,9 +6,10 @@ Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,,,,,,true
 Override,Code,,,,true,,,,true,true,,true,2,4,
 Override,FullName,,,,true,,,,,true,,true,2,50,
 Override,Notes,,,,true,,,textarea,,,,,,,
-Override,StartDate,,,,true,,,date,,,yyyy-mm-dd,,,,
+Override,StartDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,,
 List,Currency,ccy,,,true,true,GBP,,,,,,,,
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,AccountManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Override,Rate,,,,true,,,,,true,,,,,
+Override,NoActiveProjects,,,,false,,,,,true,,,,,
