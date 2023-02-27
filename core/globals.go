@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/hako/durafmt"
 	"github.com/jimlawless/cfg"
 	logs "github.com/mt1976/mwt-goToolkit/logs"
 )
@@ -308,7 +309,9 @@ func Uptime() time.Duration {
 }
 
 func Log_uptime() {
-	logs.System("App Uptime : " + Uptime().String())
+	uptime := durafmt.Parse(Uptime()).String()
+
+	logs.System("App Uptime : " + uptime)
 }
 
 /* the Pad2Len functions are generally assumed to be padded with short sequences of strings

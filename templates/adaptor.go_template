@@ -24,7 +24,7 @@ import (
 {{if .HasFetchAdaptor}}
 	// ----------------------------------------------------------------
 	// {{.ObjectName}}_GetList_impl provides the implementation to get a list of records
-	func {{.ObjectName}}_GetList_impl() (int, []dm.{{.ObjectName}}, error) {return 0, nil, nil}
+	func {{.ObjectName}}_GetList_impl(filter string) (int, []dm.{{.ObjectName}}, error) {return 0, nil, nil}
 	// ----------------------------------------------------------------
 	// {{.ObjectName}}_GetByID_impl provides the implementation to get a record by ID
 	func {{.ObjectName}}_GetByID_impl(id string) (int, dm.{{.ObjectName}}, error) {return 0, dm.{{.ObjectName}}{}, nil}

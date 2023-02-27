@@ -4,7 +4,7 @@ Override,OriginID,,,,true,,,,true,false,,true,3,4,
 Lookup,StateID,OriginState,OriginState_OriginStateID,OriginState_Name,true,,,,,true,,,,,true
 Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,,,,,,true
 Override,Code,,,,true,,,,true,true,,true,2,4,
-Override,FullName,,,,true,,,,,true,,true,2,50,
+Override,FullName,,,,true,,,,,true,,,2,50,
 Override,Notes,,,,true,,,textarea,,,,,,,
 Override,StartDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,,

@@ -215,7 +215,8 @@ func {{.ObjectNameLower}}_Save(r dm.{{.ObjectName}},usr string) error {
 	}
 
 // If there are fields below, create the methods in dao\{{$.ObjectNameLower}}_impl.go
-{{- range .FieldsList}}{{- if .HasCallout}}  r.{{.FieldName}},err = {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr){{end -}}
+{{range .FieldsList}}{{- if .HasCallout}}    r.{{.FieldName}},err = {{$.ObjectName}}_{{.FieldName}}_OnStore_impl (r.{{.FieldName}},r,usr)
+{{end -}}
 {{end -}}
 	{{if .HasAudit}}
 	r.SYSCreated = Audit_Update(r.SYSCreated, Audit_TimeStamp())
