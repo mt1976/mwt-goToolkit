@@ -196,7 +196,7 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
 	} else {
 		logs.Information(dm.{{.ObjectName}}_Name, errStore.Error())
-		http.Redirect(w, r, r.Referer(), http.StatusFound)
+		//http.Redirect(w, r, r.Referer(), http.StatusFound)
 		ExecuteRedirect(r.Referer(), w, r,dm.{{.ObjectName}}_QueryString,itemID,item)
 	}
 	// 
