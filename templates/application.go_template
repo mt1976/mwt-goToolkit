@@ -306,7 +306,7 @@ func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.O
 	return pageDetail
 }	
 
-{{if .CanSave}}
+{{- if .CanSave}}
 //{{.ObjectNameLower}}_DataFromRequest is used process the content of an HTTP Request and return an instance of an {{.ObjectName}}
 //{{.ObjectNameLower}}_DataFromRequest Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectNameLower}}_DataFromRequest(r *http.Request) dm.{{.ObjectName}} {
@@ -316,4 +316,4 @@ func {{.ObjectNameLower}}_DataFromRequest(r *http.Request) dm.{{.ObjectName}} {
 	{{end -}}
 	return item
 }
-{{end}}
+{{end -}}
