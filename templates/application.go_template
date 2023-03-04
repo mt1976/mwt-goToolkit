@@ -63,7 +63,15 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	core.ServiceMessage(inUTL)
 
 	var returnList []dm.{{.ObjectName}}
-	noItems, returnList, _ := dao.{{.ObjectName}}_GetList()
+
+	objectName := dao.Translate("ObjectName", "{{.ObjectName}}")
+	reqField := "Base"
+	filter,_ := dao.Data_GetString(objectName, reqField, dm.Data_Category_FilterRule)
+	if filter == "" {
+		logs.Warning("No filter found : " + reqField + " for Object: " + objectName)
+	} 
+
+	noItems, returnList, _ := dao.{{.ObjectName}}_GetListFiltered(filter)
 
 	pageDetail := dm.{{.ObjectName}}_PageList{
 		Title:            CardTitle(dm.{{.ObjectName}}_Title, core.Action_List),

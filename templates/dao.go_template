@@ -20,6 +20,7 @@ import (
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
+	"github.com/pkg/errors"
 )
 
 var {{.ObjectName}}_SQLbase string
@@ -63,12 +64,11 @@ func {{.ObjectName}}_GetLookup() []dm.Lookup_Item {
 // {{.ObjectName}}_GetFilteredLookup() returns a lookup list of all {{.ObjectName}} items in lookup format
 func {{.ObjectName}}_GetFilteredLookup(requestObject string,requestField string) []dm.Lookup_Item {
 	var returnList []dm.Lookup_Item
-	reqClass := "{{.ObjectName}}"
-	reqField := requestObject+"-"+requestField
-	reqCategory := "Filter"
-	filter,_ := Data_GetString(reqClass, reqField, reqCategory)
+	objectName := Translate("ObjectName", requestObject)
+	reqField := requestField+"_{{.ObjectName}}_Filter"
+	filter,_ := Data_GetString(objectName, reqField, dm.Data_Category_FilterRule)
 	if filter == "" {
-		logs.Warning("{{.ObjectName}}_GetFilteredLookup() - No filter found for " + reqClass + " " + reqField)
+		logs.Warning("{{.ObjectName}}_GetFilteredLookup() - No filter found : " + reqField + " for Object: " + objectName)
 	} 
 	count, {{.ObjectNameLower}}List, _ := {{.ObjectName}}_GetListFiltered(filter)
 	for i := 0; i < count; i++ {
@@ -122,21 +122,18 @@ func {{.ObjectName}}_GetByReverseLookup(id string) (int, dm.{{.ObjectName}}, err
 
 // {{.ObjectName}}_DeleteByID() deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_Delete(id string) {
-
-{{if or .HasStoreAdaptor .HasFetchAdaptor}}
+{{- if or .HasStoreAdaptor .HasFetchAdaptor}}
 	{{.ObjectName}}_Delete_impl(id)
+{{else}}
+	{{- if .CanSoftDelete}}
+		{{.ObjectName}}_SoftDelete(id)
 	{{else}}
-// Uses Hard Delete
-	object_Table := {{.ObjectName}}_QualifiedName
-	tsql := das.DELETE + das.FROM + object_Table
-	tsql = tsql + " " + das.WHERE + dm.{{.ObjectName}}_SQLSearchID + das.EQ + das.ID(id)
-	das.Execute(tsql)	
-{{end}}
-	
+		{{.ObjectName}}_HardDelete(id)
+	{{end -}}	
+{{end -}}
 }
 
-	{{if .CanSoftDelete}}
-	// {{.ObjectName}}_SoftDeleteByID() soft deletes a single {{.ObjectName}} record
+// {{.ObjectName}}_SoftDelete(id string) soft deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_SoftDelete(id string) {
 	//Uses Soft Delete
 		_,{{.ObjectNameLower}}Item,_ := {{.ObjectName}}_GetByID(id)
@@ -148,7 +145,18 @@ func {{.ObjectName}}_SoftDelete(id string) {
 			logs.Error("{{.ObjectName}}_SoftDelete()",err)
 		}
 }
-	{{end}}
+
+// {{.ObjectName}}_HardDelete(id string) soft deletes a single {{.ObjectName}} record
+func {{.ObjectName}}_HardDelete(id string) {
+			// Uses Hard Delete
+		object_Table := {{.ObjectName}}_QualifiedName
+		tsql := das.DELETE + das.FROM + object_Table
+		tsql = tsql + " " + das.WHERE + dm.{{.ObjectName}}_SQLSearchID + das.EQ + das.ID(id)
+		das.Execute(tsql)
+		//if err != nil {
+		//	logs.Error("{{.ObjectName}}_SoftDelete()",err)
+		//}
+}
 
 
 // {{.ObjectName}}_Store() saves/stores a {{.ObjectName}} record to the database
@@ -172,6 +180,19 @@ func {{.ObjectName}}_StoreSystem(r dm.{{.ObjectName}}) (dm.{{.ObjectName}},error
 		err = {{.ObjectNameLower}}_Save(r, Audit_Host())
 	} else {
 		logs.Information("{{.ObjectName}}_Store()", err.Error())
+	}
+
+	return r, err
+}
+
+// {{.ObjectName}}_StoreProcess() saves/stores a {{.ObjectName}} record to the database
+func {{.ObjectName}}_StoreProcess(r dm.{{.ObjectName}}, operator string) (dm.{{.ObjectName}},error) {
+	
+	r, err := {{.ObjectName}}_Validate(r)
+	if err == nil {
+		err = {{.ObjectNameLower}}_Save(r, operator)
+	} else {
+		logs.Information("{{.ObjectName}}_StoreProcess()", err.Error())
 	}
 
 	return r, err
@@ -255,7 +276,7 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%v", r))
 	tsql = tsql + " (" + fields(ts) + ")"
 	tsql = tsql + " "+das.VALUES +"(" + values(ts) + ")"
 
-	{{.ObjectName}}_Delete(r.{{.QueryFieldID}})
+	{{.ObjectName}}_HardDelete(r.{{.QueryFieldID}})
 	das.Execute(tsql)
 
 {{end}}

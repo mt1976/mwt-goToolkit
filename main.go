@@ -676,9 +676,9 @@ func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrich
 	e.CanAPI = getProperty("can_api", props)
 	e.CanDo = getProperty("can_do", props)
 	e.CanSoftDelete = getProperty("can_softdelete", props)
-	if e.CanSoftDelete {
-		e.CanDelete = false
-	}
+	//if e.CanSoftDelete {
+	//	e.CanDelete = false
+	//}
 	//spew.Dump(e)
 	//spew.Dump(e)
 

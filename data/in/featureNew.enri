@@ -1,10 +1,10 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
-Lookup,EstimationSession,EstimationSession,EstimationSessionID_EstimationSessionID,EstimationSession_Name,true,true,,,,,,,,,
-Lookup,Confidence,Confidence,Confidence_Code,EstimationState_Name,true,true,,,,,true,,,,true
+Lookup,EstimationSessionID,EstimationSession,EstimationSessionID_EstimationSessionID,EstimationSession_Name,true,true,,,,,,,,,true
+Lookup,ConfidenceCODE,Confidence,Confidence_Code,EstimationState_Name,true,true,,,,,true,,,,true
 Override,ID,,,,false,true,,,,,,true,,,
-Lookup,Developer,Resource,Resource_Code,Resource_Name,true,,,,,,,,,50,true
-Lookup,Analyst,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
-Lookup,ProductManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
-Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
+Lookup,DeveloperResource,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
+Lookup,AnalystResource,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
+Lookup,ProductManagerResource,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
+Lookup,ProjectManagerResource,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,DefaultProfile,Profile,Profile_ProfileID,Profile_Name,false,,,,,,,,,,true
 Lookup,ActualProfile,Profile,Profile_ProfileID,Profile_Name,true,,,,,,,,,,true
