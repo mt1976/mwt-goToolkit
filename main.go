@@ -596,6 +596,11 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 		}
 	}
 
+	e.HasPostPutAction = false
+	if props["haspostputaction"] == "y" {
+		e.HasPostPutAction = true
+	}
+
 	e = setupTemplateEnrichment(e, props)
 
 	e = setupPermissions(e, props)

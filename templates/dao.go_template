@@ -132,7 +132,7 @@ func {{.ObjectName}}_Delete(id string) {
 	{{end -}}	
 {{end -}}
 }
-
+	{{- if .CanSoftDelete}}
 // {{.ObjectName}}_SoftDelete(id string) soft deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_SoftDelete(id string) {
 	//Uses Soft Delete
@@ -145,6 +145,7 @@ func {{.ObjectName}}_SoftDelete(id string) {
 			logs.Error("{{.ObjectName}}_SoftDelete()",err)
 		}
 }
+	{{end}}
 
 // {{.ObjectName}}_HardDelete(id string) soft deletes a single {{.ObjectName}} record
 func {{.ObjectName}}_HardDelete(id string) {
@@ -209,17 +210,14 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) 
 		err = errors.New(r.{{.FieldName}}_props.MsgMessage)
 	}
 {{end}}{{end}}	// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
-	//
+
 	{{if .HasCrossval}}
-	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
-	r, _, err = {{$.ObjectName}}_ObjectValidation_impl(PUT, r.{{.QueryFieldID}}, r)
-	// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
+	// Cross Validation
+	var errVal error
+	r, _, errVal = {{$.ObjectName}}_ObjectValidation_impl(PUT, r.{{.QueryFieldID}}, r)
+	if errVal != nil {
+		err = errVal
+	}
 	{{end}}
 
 	return r,err
@@ -278,6 +276,10 @@ logs.Storing("{{.ObjectName}}",fmt.Sprintf("%v", r))
 
 	{{.ObjectName}}_HardDelete(r.{{.QueryFieldID}})
 	das.Execute(tsql)
+
+	{{if .HasPostPutAction}}
+		{{$.ObjectNameLower}}_PostPutAction_impl(r.{{.QueryFieldID}},r,usr)
+	{{end}}
 
 {{end}}
 

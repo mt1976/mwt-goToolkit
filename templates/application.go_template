@@ -84,7 +84,9 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 	
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
 	
-	ExecuteTemplate(dm.{{.ObjectName}}_TemplateList, w, r, pageDetail)
+	nextTemplate :=  NextTemplate("{{.ObjectName}}", "List", dm.{{.ObjectName}}_TemplateList)
+
+	ExecuteTemplate(nextTemplate, w, r, pageDetail)
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
@@ -124,7 +126,9 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
-	ExecuteTemplate(dm.{{.ObjectName}}_TemplateView, w, r, pageDetail)
+	nextTemplate :=  NextTemplate("{{.ObjectName}}", "View", dm.{{.ObjectName}}_TemplateView)
+
+	ExecuteTemplate(nextTemplate, w, r, pageDetail)
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
@@ -171,7 +175,10 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
-	ExecuteTemplate(dm.{{.ObjectName}}_TemplateEdit, w, r, pageDetail)
+
+	nextTemplate :=  NextTemplate("{{.ObjectName}}", "Edit", dm.{{.ObjectName}}_TemplateEdit)
+
+	ExecuteTemplate(nextTemplate, w, r, pageDetail)
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
@@ -200,8 +207,9 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	item := {{.ObjectNameLower}}_DataFromRequest(r)
 	
 	item, errStore := dao.{{.ObjectName}}_Store(item,r)
-	if errStore == nil {	
-		http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	if errStore == nil {
+		nextTemplate :=  NextTemplate("{{.ObjectName}}", "Save", dm.{{.ObjectName}}_Redirect)
+		http.Redirect(w, r, nextTemplate, http.StatusFound)
 	} else {
 		logs.Information(dm.{{.ObjectName}}_Name, errStore.Error())
 		//http.Redirect(w, r, r.Referer(), http.StatusFound)
@@ -254,7 +262,8 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
-	ExecuteTemplate(dm.{{.ObjectName}}_TemplateNew, w, r, pageDetail)
+	nextTemplate :=  NextTemplate("{{.ObjectName}}", "New", dm.{{.ObjectName}}_TemplateNew)
+	ExecuteTemplate(nextTemplate, w, r, pageDetail)
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END
@@ -282,7 +291,8 @@ func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
 
 	dao.{{.ObjectName}}_Delete(searchID)	
 
-	http.Redirect(w, r, dm.{{.ObjectName}}_Redirect, http.StatusFound)
+	nextTemplate :=  NextTemplate("{{.ObjectName}}", "Delete", dm.{{.ObjectName}}_Redirect)
+	http.Redirect(w, r, nextTemplate, http.StatusFound)
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END

@@ -84,6 +84,7 @@ type ObjectEnrichments struct {
 	WrapContext            string
 	HasCrossval            bool
 	IsFilteredLookup       bool
+	HasPostPutAction       bool
 }
 
 type ObjectFields struct {
