@@ -4,24 +4,24 @@
 <form action="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}"
   method="GET" class="form">
   <div class="card">
-    <div class="card-header align-items-center">
-      <div class="row align-items-center">
-        <div class="col h3">
-          <i class="{{.ObjectGlyph}} me-2"
+    <div class="card-header align-items-center" style="padding-bottom:0;">
+        <div class="row d-flex align-items-center">
+          <div class="col h4 align-items-center">
+          <i class="{{.ObjectGlyph}} me-2 text-primary"
             title="{{.QueryString}}={{.QueryField}}"></i><span class="me-3">{{.Title}}</span>
-        </div>
-        <div class="col d-flex justify-content-end">
-          <div class="btn-group">
+          </div>
+          <div class="col d-flex justify-content-end">
+            <div class="btn-group float-right" style="margin-bottom:1rem;">
             {{if .CanSave}}
-            <button type="submit" value="" class="btn btn-danger" method="GET" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"><i class="fas fa-save me-2"></i>Save</button>
+              <button type="submit" value="" class="btn btn-danger" method="GET" formaction="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" onclick="/{{.ObjectName}}Save/?{{.QueryString}}={{.QueryField}}" title="Save {{.FriendlyName}}"><i class="fas fa-save me-2"></i>Save</button>
             {{end}}
-            <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print me-2"></i>Print</button>
-            <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times me-2"></i>Cancel</button>
+              <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}}"><i class="fas fa-print me-2"></i>Print</button>
+              <button type="button" value="" class="btn btn-light" onclick="history.back()" title="Back"><i class="fas fa-times me-2"></i>Cancel</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="card-body">
+    <div class="card-body">
     {{range .FieldsList}}{{if or .IsBaseField .IsExtra}} 
         <div class="row mb-3" {{.Disabled}} {{.Hidden}}><div class="col">
         {{if or .IsLookup .IsListLookup}}

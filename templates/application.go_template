@@ -36,7 +36,7 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{else}}//Cannot Save via GUI{{end}}
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
 	logs.Publish("{{.SourceType}}", dm.{{.ObjectName}}_Title)
-    {{if .CanAPI}}core.Catalog_Add(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
+    {{if .CanAPI}}core.API = core.API.AddRoute(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
 	// 
 	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 	// END

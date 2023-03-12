@@ -1,13 +1,13 @@
 {{.TemplateHeader}} {{.TemplateBody}}
 <form action="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}" method="POST" class="form">
     <div class="card">
-        <div class="card-header align-items-center" >
-            <div class="row align-items-center">
-                <div class="col h3 align-items-center">
-                    <i class="{{.ObjectGlyph}} me-2" title="{{.QueryString}} = {{.QueryField}}"></i><span class="me-3">{{.Title}}</span>
+        <div class="card-header align-items-center" style="padding-bottom:0;">
+            <div class="row d-flex align-items-center">
+                <div class="col h4 align-items-center">
+                  <i class="{{.ObjectGlyph}} me-2 text-primary" title="{{.QueryString}}={{.QueryField}}"></i><span class="me-3">{{.Title}}</span>
                 </div>
                 <div class="col d-flex justify-content-end">
-                    <div class="btn-group float-right">
+                  <div class="btn-group float-right" style="margin-bottom:1rem;">
                         {{if .CanEdit}}
                         <button type="submit" class="btn btn-warning" method="get" formaction="/{{.ObjectName}}Edit/?{{.QueryString}}={{.QueryField}}"  title="Edit {{.FriendlyName}} {{.QueryField}}"><i class="fas fa-pen me-2"></i>Edit</button>{{end}}
                         <button id="print" type="button" class="btn btn-info" onclick="window.print()" title="Print {{.FriendlyName}} {{.QueryField}}"><i class="fas fa-print me-2"></i>Print</button>

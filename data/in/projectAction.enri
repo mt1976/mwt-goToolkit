@@ -14,3 +14,7 @@ Lookup,ProjectEngineer,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Override,Comments,,,,true,,,textarea,,,,,,,
 Override,Notes,,,,false,,,textarea,,,,,,,
+Extra,OriginName,,,,false,,,,,true,,true,,,
+Override,OriginName,,,,false,,,,,true,,,,,
+Extra,OriginKey,,,,false,,,,,true,,true,,,
+Overide,OriginKey,,,,false,,,,,true,,true,,,

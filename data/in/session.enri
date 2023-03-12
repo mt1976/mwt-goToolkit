@@ -1,2 +1,7 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
 Override,Id,,,,true,,,,true,false,,true,,,
+Override,UniqueId,,,,,,,,,,,true,,,
+Override,Apptoken,,,,,,,,,,,true,,,
+Override,SessionToken,,,,,,,,,,,true,,,
+Override,Password,,,,,,,,,,,true,,,
+Override,Brand,,,,,,,,,,,true,,,
