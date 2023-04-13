@@ -1,8 +1,10 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
 Override,ProjectID,,,,true,,,,true,false,,true,,,
 Lookup,OriginID,Origin,Origin_OriginID,Origin_FullName,true,true,,,true,,,,,,
-Lookup,ProjectStateID,ProjectState,ProjectState_ProjectStateID,ProjectState_Name,true,,,,,,,,,,true
-Lookup,ProfileID,Profile,Profile_ProfileID,Profile_Name,true,,,,,,,,,,true
+Lookup,ProjectStateID,ProjectState,ProjectState_ProjectStateID,ProjectState_Name,true,,,,,true,,,,,true
+Overide,ProjectStateID,,,,true,,,,,true,,,,,
+Lookup,ProfileID,Profile,Profile_ProfileID,Profile_Name,true,,,,,true,,,,,true
+Override,ProfileID,,,,true,,,,,true,,,,,
 Override,Description,,,,true,,,textarea,,,,,,,
 Override,StartDate,,,,true,,,date,,,yyyy-mm-dd,,,,
 Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,,

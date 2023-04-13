@@ -4,7 +4,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-type ObjectEnrichments struct {
+type ObjectDefinition struct {
 	ObjectName             string
 	ObjectNameLower        string
 	ObjectCamelCase        string
@@ -20,7 +20,7 @@ type ObjectEnrichments struct {
 	Time                   string
 	Who                    string
 	Host                   string
-	FieldsList             []ObjectFields
+	FieldsList             []FieldProperties
 	FriendlyName           string
 	SQLTableName           string
 	SQLSearchID            string
@@ -87,7 +87,7 @@ type ObjectEnrichments struct {
 	HasPostPutAction       bool
 }
 
-type ObjectFields struct {
+type FieldProperties struct {
 	FieldName                string
 	Type                     string
 	Default                  string
@@ -174,5 +174,5 @@ const (
 	html_hidden    = "hidden"
 	html_mandatory = "required"
 
-	rangeHTMLString = "{{range .%s}}<option value=\"%s\" {{if eq .ID %s}}selected{{end}} data-mdb-secondary-text=\"{{.ID}}\">%s</option>{{end}}"
+	rangeHTMLString = "{{range .%s}}<option value=\"%s\" {{if eq .ID %s}}selected{{end}} data-mdb-secondary-text=\"{{.ID}}\">%s</option>{{end}}<option value=\"\" {{if eq \"\" .%s}}selected{{end}} data-mdb-secondary-text=\"\"></option>"
 )

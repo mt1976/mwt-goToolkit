@@ -2,3 +2,4 @@ Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,Default
 Override,EstimationStateID,,,,true,,,,true,false,,true,,,
 List,IsLocked,tf,,,,,,,,,,,,,
 List,Notify,tf,,,,,,,,,,,,,
+List,Migrate,tf,,,true,,,,,,,,,,

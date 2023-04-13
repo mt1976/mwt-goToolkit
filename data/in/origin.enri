@@ -2,13 +2,15 @@ Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,Default
 Extra,NoActiveProjects,,,,false,,,,,true,,,,,
 Override,OriginID,,,,true,,,,true,false,,true,3,4,
 Lookup,StateID,OriginState,OriginState_OriginStateID,OriginState_Name,true,,,,,true,,,,,true
-Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,,,,,,true
+Override,StateID,,,,true,,,,,true,,,,,
+Lookup,DocTypeID,DocType,DocType_DocTypeID,,true,,,,,true,,,,,true
+Override,DocTypeID,,,,true,,,,,true,,,,,
 Override,Code,,,,true,,,,true,true,,true,2,4,
 Override,FullName,,,,true,,,,,true,,,2,50,
 Override,Notes,,,,true,,,textarea,,,,,,,
 Override,StartDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,EndDate,,,,true,,,date,,,yyyy-mm-dd,,,,
-List,Currency,ccy,,,true,true,GBP,,,,,,,,
+List,Currency,ccy,,,true,true,GBP,,,true,,,,,
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,AccountManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Override,Rate,,,,true,,,number,,true,,,,,

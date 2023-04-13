@@ -29,14 +29,14 @@
             <div class="form-outline">
               <input type="{{.FieldType}}" class="form-control {{.WrapPropsMsgType}}" id="{{.FieldName}}" name="{{.FieldName}}" aria-describedby="{{.FieldName}}Help" placeholder="{{.Default}}" {{.Disabled}} {{if .IsNoChange}}readonly="true" {{end}} value="{{.ValueID}}" {{if .IsMandatory}}required{{end}} />
               <label class="form-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
-                <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+              <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
             </div>
             {{else}}
             <select id="{{.FieldName}}" name="{{.FieldName}}" class="select" data-mdb-filter="true" {{.Disabled}} {{if .IsMandatory}}required{{end}}>
                 {{.RangeHTML}}
             </select>
             <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{.FieldName}}</label>
-            <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+            <div class="text-danger small">{{.WrapPropsMsgMessage}}</div>
             {{end}}
         {{else}}
             <div class="form-outline">
@@ -56,9 +56,10 @@
       {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div
           class="col"><select id="{{.FieldName}}" name="{{.FieldName}}"
             class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}}
-            data-mdb-filter="true">{{.RangeHTML}}</select>
-          <label class="form-label select-label" for="{{.FieldName}}" }>{{if
-            .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+            data-mdb-filter="true">{{.RangeHTML}}
+            </select>
+          <label class="form-label select-label" for="{{.FieldName}}" }>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
+          <div class="text-danger small">{{.WrapPropsMsgMessage}}</div>
         </div></div>
       {{end}}
 

@@ -1,3 +1,4 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
 Override,DocTypeID,,,,true,,,,true,false,,true,,,
 Override,Code,,,,true,true,,,,true,,,,,
+List,Migrate,tf,,,true,,,,,,,,,,

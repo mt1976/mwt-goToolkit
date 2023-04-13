@@ -15,12 +15,14 @@ package dao
 import (
 	"fmt"
 	"net/http"
+	{{if .HasCrossval }}"errors"
+	{{end -}}
 	core "{{.ProjectRepo}}core"
-	{{if not .CanOverrideID}}"github.com/google/uuid"{{end}}
+	{{if not .CanOverrideID}}"github.com/google/uuid"
+	{{end -}}
 	das  "{{.ProjectRepo}}das"
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
-	"github.com/pkg/errors"
 )
 
 var {{.ObjectName}}_SQLbase string
@@ -66,7 +68,14 @@ func {{.ObjectName}}_GetFilteredLookup(requestObject string,requestField string)
 	var returnList []dm.Lookup_Item
 	objectName := Translate("ObjectName", requestObject)
 	reqField := requestField+"_{{.ObjectName}}_Filter"
-	filter,_ := Data_GetString(objectName, reqField, dm.Data_Category_FilterRule)
+	
+	usage := "Defines a filter for a lookup list of {{.ObjectName}} records, when requested by "+requestField+"." + core.TEXTAREA_CR
+	usage = usage + "Fields can be any of those in the underlying DB table." + core.TEXTAREA_CR
+	usage = usage + "Examples Below:" + core.TEXTAREA_CR
+	usage = usage + "* datalength(_deleted) = 0 or " + core.TEXTAREA_CR 
+	usage = usage + "* class IN ('x','y','z')"
+
+	filter,_ := Data_GetString(objectName, reqField, dm.Data_Category_FilterRule,usage)
 	if filter == "" {
 		logs.Warning("{{.ObjectName}}_GetFilteredLookup() - No filter found : " + reqField + " for Object: " + objectName)
 	} 
@@ -96,13 +105,8 @@ func {{.ObjectName}}_GetByID(id string) (int, dm.{{.ObjectName}}, error) {
 }
 
 func {{.ObjectName}}_PostGet({{.ObjectNameLower}}Item dm.{{.ObjectName}},id string) dm.{{.ObjectName}} {
-	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
 {{range .FieldsList}}{{if .HasCallout}}	{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_validate_impl (GET,id,{{$.ObjectNameLower}}Item.{{.FieldName}},{{$.ObjectNameLower}}Item,{{$.ObjectNameLower}}Item.{{.FieldName}}_props)
-{{end}}{{end}}	// 
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	// END
+{{end}}{{end}}
 	return {{.ObjectNameLower}}Item
 }
 
@@ -202,15 +206,12 @@ func {{.ObjectName}}_StoreProcess(r dm.{{.ObjectName}}, operator string) (dm.{{.
 // {{.ObjectName}}_Validate() validates for saves/stores a {{.ObjectName}} record to the database
 func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) {
 	var err error
-	// START
-	// Dynamically generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
 {{range .FieldsList}}{{if .HasCallout}}	r.{{.FieldName}},r.{{.FieldName}}_props = {{$.ObjectName}}_{{.FieldName}}_validate_impl (PUT,r.{{$.QueryFieldID}},r.{{.FieldName}},r,r.{{.FieldName}}_props)
 	if r.{{.FieldName}}_props.MsgMessage != "" {
 		err = errors.New(r.{{.FieldName}}_props.MsgMessage)
 	}
-{{end}}{{end}}	// 
-
+{{end -}}
+{{end -}}
 	{{if .HasCrossval}}
 	// Cross Validation
 	var errVal error
@@ -218,7 +219,7 @@ func {{.ObjectName}}_Validate(r dm.{{.ObjectName}}) (dm.{{.ObjectName}}, error) 
 	if errVal != nil {
 		err = errVal
 	}
-	{{end}}
+	{{end -}}
 
 	return r,err
 }

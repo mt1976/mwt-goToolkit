@@ -34,6 +34,7 @@ Override,Comments,,,,true,,,textarea,,,,,,,
 Lookup,ProjectManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,ProductManager,Resource,Resource_Code,Resource_Name,true,,,,,,,,,,true
 Lookup,Approver,Resource,Resource_Code,Resource_Name,true,,,,,true,,,,,true
+Override,Approver,,,,true,,,,,true,,,,,true
 Override,IssueDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,ExpiryDate,,,,true,,,date,,true,yyyy-mm-dd,,,,
 Override,TrackerID,,,,true,,,,,true,,,,,

@@ -1,8 +1,10 @@
 Type,Field,LookupObject,LookupKey,LookupReturns,IsInputtable,IsMandatory,DefaultValue,InputType,NoChange,HasApi,Mask,Hidden,Min,Max,Filter
 Lookup,EstimationSessionID,EstimationSession,EstimationSessionID_EstimationSessionID,EstimationSession_Name,true,true,,,,,,,,,true
 Lookup,ConfidenceCODE,Confidence,Confidence_Code,EstimationState_Name,true,true,,,,,true,,,,true
+Override,ConfidenceCODE,,,,true,true,,,,true,,,,,
 Override,ID,,,,false,true,,,,,,true,,,
 Lookup,DeveloperResource,Resource,Resource_Code,Resource_Name,true,true,,,,true,,,,,true
+Override,DeveloperResource,,,,true,true,,,,true,,,,,true
 Lookup,AnalystResource,Resource,Resource_Code,Resource_Name,true,true,,,,true,,,,,true
 Lookup,ProfileDefault,Profile,Profile_ProfileID,Profile_Name,false,,,,,,,,,,true
 Lookup,ProfileSelected,Profile,Profile_ProfileID,Profile_Name,true,,,,,,,,,,true

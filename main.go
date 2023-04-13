@@ -166,7 +166,7 @@ func processObjectDefinition(configFile string) {
 	//spew.Dump(e)
 }
 
-func generateCodeArtifact(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
+func generateCodeArtifact(a string, props map[string]string, configFile string, e ObjectDefinition) ObjectDefinition {
 
 	if getProperty("create_"+a, props) || a == "catalog" {
 		e = processCodeArtifact(a, configFile, a, e)
@@ -176,7 +176,7 @@ func generateCodeArtifact(a string, props map[string]string, configFile string, 
 	return e
 }
 
-func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichments) ObjectEnrichments {
+func processCodeArtifact(w string, p string, destFolder string, e ObjectDefinition) ObjectDefinition {
 	//logs.Processing(w)
 
 	in_extn := ".go_template"
@@ -285,13 +285,13 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectEnrichme
 	return e
 }
 
-func logArtifact(inName string, fileName string, e ObjectEnrichments, inType string, filePath string) ObjectEnrichments {
+func logArtifact(inName string, fileName string, e ObjectDefinition, inType string, filePath string) ObjectDefinition {
 	art := artifact{Name: inName, Path: fileName, Type: inType, FilePath: filePath}
 	e.Artifacts = append(e.Artifacts, art)
 	return e
 }
 
-func generateHTMLArtifacts(a string, props map[string]string, configFile string, e ObjectEnrichments) ObjectEnrichments {
+func generateHTMLArtifacts(a string, props map[string]string, configFile string, e ObjectDefinition) ObjectDefinition {
 	destinationFolder := "html/base"
 	if strings.ToUpper(props["create_html"]) == "Y" {
 		if e.CanList {
@@ -328,7 +328,7 @@ func generateHTMLArtifacts(a string, props map[string]string, configFile string,
 	return e
 }
 
-func generateHTMLArtifact(w string, p string, destFolder string, e ObjectEnrichments) ObjectEnrichments {
+func generateHTMLArtifact(w string, p string, destFolder string, e ObjectDefinition) ObjectDefinition {
 	//logs.Processing(w + html_template)
 
 	userAction := strings.ToUpper(w[:1]) + w[1:]
@@ -390,7 +390,7 @@ func generateHTMLArtifact(w string, p string, destFolder string, e ObjectEnrichm
 	return e
 }
 
-func getFieldDefinitions_CSV(filePath string, e ObjectEnrichments) ObjectEnrichments {
+func getFieldDefinitions_CSV(filePath string, e ObjectDefinition) ObjectDefinition {
 	// Load a csv file.
 	//logs.Information("Read CSV", filePath)
 	f, _ := os.Open(filePath)
@@ -433,7 +433,7 @@ func getFieldDefinitions_CSV(filePath string, e ObjectEnrichments) ObjectEnrichm
 	return e
 }
 
-func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnrichments {
+func getFieldDefinitions_DB(e ObjectDefinition, p map[string]string) ObjectDefinition {
 	// Open Database Connection
 	db, err := core.GlobalsDatabaseConnect(p)
 	if err != nil {
@@ -501,9 +501,9 @@ func getFieldDefinitions_DB(e ObjectEnrichments, p map[string]string) ObjectEnri
 	return e
 }
 
-func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
+func setupObjectEnrichment(props map[string]string) ObjectDefinition {
 
-	e := ObjectEnrichments{ObjectName: props["objectname"]}
+	e := ObjectDefinition{ObjectName: props["objectname"]}
 	//capitalize first character of enrichment.ObjectName
 	logs.Information("Object Name", e.ObjectName)
 	logs.Accessing("Object Name " + e.ObjectName)
@@ -646,7 +646,7 @@ func setupObjectEnrichment(props map[string]string) ObjectEnrichments {
 	return e
 }
 
-func setupTemplateEnrichment(e ObjectEnrichments, props map[string]string) ObjectEnrichments {
+func setupTemplateEnrichment(e ObjectDefinition, props map[string]string) ObjectDefinition {
 	e.Title = wrapVariable("Title")
 	e.PageTitle = wrapVariable("PageTitle")
 	e.UserMenu = wrapVariable("UserMenu")
@@ -664,7 +664,7 @@ func setupTemplateEnrichment(e ObjectEnrichments, props map[string]string) Objec
 	return e
 }
 
-func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrichments {
+func setupPermissions(e ObjectDefinition, props map[string]string) ObjectDefinition {
 
 	e.CanView = getProperty("can_view", props)
 	e.CanEdit = getProperty("can_edit", props)
@@ -690,14 +690,14 @@ func setupPermissions(e ObjectEnrichments, props map[string]string) ObjectEnrich
 	return e
 }
 
-func addField(en ObjectEnrichments, fn string, tp string, df string, mand bool, noInput bool) []ObjectFields {
+func addField(en ObjectDefinition, fn string, tp string, df string, mand bool, noInput bool) []FieldProperties {
 
 	en.FieldsList = addComplexField(en, fn, tp, df, mand, true, false, "", "", "", "", noInput, false, false, false, false, false, false)
 
 	return en.FieldsList
 }
 
-func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool, isListLookup bool, isFetch bool, isHidden bool, isFiltered bool) []ObjectFields {
+func addComplexField(en ObjectDefinition, fn string, tp string, df string, mand bool, baseField bool, isLookup bool, lkObject string, lkKeyField string, lkValueField string, lkRange string, noinp bool, isExtra bool, isOverride bool, isListLookup bool, isFetch bool, isHidden bool, isFiltered bool) []FieldProperties {
 
 	// log parameters
 
@@ -748,7 +748,7 @@ func addComplexField(en ObjectEnrichments, fn string, tp string, df string, mand
 		isKey = true
 	}
 
-	en.FieldsList = append(en.FieldsList, ObjectFields{FieldName: fn,
+	en.FieldsList = append(en.FieldsList, FieldProperties{FieldName: fn,
 		Type:                     tp,
 		Default:                  df,
 		FieldSQL:                 origfn,
@@ -792,7 +792,7 @@ func isAudit(fn string) bool {
 	return fn[0:1] == "_"
 }
 
-func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnrichments {
+func mergeEnrichmentDefinitions(filePath string, en ObjectDefinition) ObjectDefinition {
 
 	//logs.Information("Read CSV", filePath)
 	f, _ := os.Open(filePath)
@@ -914,7 +914,7 @@ func mergeEnrichmentDefinitions(filePath string, en ObjectEnrichments) ObjectEnr
 	return en
 }
 
-func addExtraTypeFields(record []string, en ObjectEnrichments) []ObjectFields {
+func addExtraTypeFields(record []string, en ObjectDefinition) []FieldProperties {
 	colMand := false
 	if record[enri_IsMandatory] == "true" {
 		colMand = true
@@ -986,11 +986,11 @@ func buildRangeHTML(inObject string) string {
 		inObject+"_lookup",
 		wrapVariable("ID"),
 		"$."+inObject,
-		wrapVariable("Name"))
+		wrapVariable("Name"), inObject)
 	//		wrapParentVariable(inObject))
 }
 
-func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOverride []string) []ObjectFields {
+func mergeComplexField(en ObjectDefinition, fn string, tp string, enrichmentOverride []string) []FieldProperties {
 
 	// log parameters
 
@@ -1070,7 +1070,7 @@ func mergeComplexField(en ObjectEnrichments, fn string, tp string, enrichmentOve
 	return en.FieldsList
 }
 
-func commonOverrides(commonOverrides []string, fieldsList ObjectFields) ObjectFields {
+func commonOverrides(commonOverrides []string, fieldsList FieldProperties) FieldProperties {
 	//if commonOverrides[enri_IsInputtable] != "" {
 
 	if commonOverrides[enri_IsInputtable] == "false" {

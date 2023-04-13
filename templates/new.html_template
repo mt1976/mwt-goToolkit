@@ -29,7 +29,7 @@
                 {{.RangeHTML}}
             </select>
             <label class="form-label select-label" for="{{.FieldName}}" {{.Disabled}}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>
-            <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>
+            <div class="text-danger small">{{.WrapPropsMsgMessage}}</div>
           {{else}}
             <div class="form-outline">
 
@@ -48,9 +48,10 @@
 {{end}}{{end}}
 {{range .FieldsList}}{{if not .IsBaseField}}            
               
-                {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div class="col"><select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}} data-mdb-filter="true">{{.RangeHTML}}</select>
+                {{if or .IsLookup .IsListLookup}} <div class="row mb-3" {{.Disabled}}><div class="col"><select id="{{.FieldName}}" name="{{.FieldName}}" class="select" {{.Disabled}} {{if .IsMandatory}}required{{end}} data-mdb-filter="true">{{.RangeHTML}}
+                </select>
                 <label class="form-label select-label" for="{{.FieldName}}"}>{{if .IsKey}}<i class="fas fa-key me-2"></i>{{end}}{{.FieldName}}</label>   
-                <div class="{{.WrapPropsMsgFeedBackType}}">{{.WrapPropsMsgMessage}}</div>         </div></div>
+                <div class="text-danger small">{{.WrapPropsMsgMessage}}</div>         </div></div>
                 {{end}}
 
 {{end}}{{end}}     

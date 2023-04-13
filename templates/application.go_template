@@ -15,6 +15,7 @@ package application
 import (
 	
 	"net/http"
+	"strings"
 
 	core    "{{.ProjectRepo}}core"
 	dao     "{{.ProjectRepo}}dao"
@@ -23,11 +24,7 @@ import (
 )
 
 //{{.ObjectName}}_Publish annouces the endpoints available for this object
-//{{.ObjectName}}_Publish - Auto generated {{.Date}} by {{.Who}} on {{.Host}}
 func {{.ObjectName}}_Publish(mux http.ServeMux) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// 
 	{{if .CanAPI}}mux.HandleFunc(dm.{{.ObjectName}}_Path, {{.ObjectName}}_Handler){{else}}//No API{{end}}
 	{{if .CanList}}mux.HandleFunc(dm.{{.ObjectName}}_PathList, {{.ObjectName}}_HandlerList){{else}}//Cannot List via GUI{{end}}
 	{{if .CanView}}mux.HandleFunc(dm.{{.ObjectName}}_PathView, {{.ObjectName}}_HandlerView){{else}}//Cannot View via GUI{{end}}
@@ -35,29 +32,18 @@ func {{.ObjectName}}_Publish(mux http.ServeMux) {
 	{{if .CanNew}}mux.HandleFunc(dm.{{.ObjectName}}_PathNew, {{.ObjectName}}_HandlerNew){{else}}//Cannot Create via GUI{{end}}
 	{{if .CanSave}}mux.HandleFunc(dm.{{.ObjectName}}_PathSave, {{.ObjectName}}_HandlerSave){{else}}//Cannot Save via GUI{{end}}
 	{{if .CanDelete}}mux.HandleFunc(dm.{{.ObjectName}}_PathDelete, {{.ObjectName}}_HandlerDelete){{else}}//Cannot Delete via GUI{{end}}
-	logs.Publish("{{.SourceType}}", dm.{{.ObjectName}}_Title)
     {{if .CanAPI}}core.API = core.API.AddRoute(dm.{{.ObjectName}}_Title, dm.{{.ObjectName}}_Path, "", dm.{{.ObjectName}}_QueryString, "{{.SourceType}}"){{else}}//No API{{end}}
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
+	logs.Publish("{{.SourceType}}", dm.{{.ObjectName}}_Title)
 }
-
 {{if .CanList}}
-//{{.ObjectName}}_HandlerList is the handler for the list page
-//Allows Listing of {{.ObjectName}} records
-//{{.ObjectName}}_HandlerList - Auto generated {{.Date}} by {{.Who}} on {{.Host}}
+//{{.ObjectName}}_HandlerList is the handler for the {{.ObjectName}} list page
 func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// 
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
-
 	inUTL := r.URL.Path
 	w.Header().Set("Content-Type", "text/html")
 	core.ServiceMessage(inUTL)
@@ -66,7 +52,13 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 
 	objectName := dao.Translate("ObjectName", "{{.ObjectName}}")
 	reqField := "Base"
-	filter,_ := dao.Data_GetString(objectName, reqField, dm.Data_Category_FilterRule)
+	usage := "Defines a filter for the list of {{.ObjectName}} records." + core.TEXTAREA_CR
+	usage = usage + "Fields can be any of those in the underlying DB table." + core.TEXTAREA_CR
+	usage = usage + "Examples Below:" + core.TEXTAREA_CR
+	usage = usage + "* datalength(_deleted) = 0 or " + core.TEXTAREA_CR 
+	usage = usage + "* class IN ('x','y','z')"
+	
+	filter,_ := dao.Data_GetString(objectName, reqField, dm.Data_Category_FilterRule,usage)
 	if filter == "" {
 		logs.Warning("No filter found : " + reqField + " for Object: " + objectName)
 	} 
@@ -81,34 +73,21 @@ func {{.ObjectName}}_HandlerList(w http.ResponseWriter, r *http.Request) {
 		UserMenu:         UserMenu_Get(r),
 		UserRole:         Session_GetUserRole(r),
 	}
-	
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
-	
+
 	nextTemplate :=  NextTemplate("{{.ObjectName}}", "List", dm.{{.ObjectName}}_TemplateList)
-
 	ExecuteTemplate(nextTemplate, w, r, pageDetail)
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
-
 }
-{{end}}
+{{end -}}
 {{if .CanView}}
-//{{.ObjectName}}_HandlerView is the handler used to View a page
-//Allows Viewing for an existing {{.ObjectName}} record
-//{{.ObjectName}}_HandlerView - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+//{{.ObjectName}}_HandlerView is the handler used to View a {{.ObjectName}} database record
 func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// 
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
-
 	w.Header().Set("Content-Type", "text/html")
 	logs.Servicing(r.URL.Path)
 
@@ -121,35 +100,24 @@ func {{.ObjectName}}_HandlerView(w http.ResponseWriter, r *http.Request) {
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
 	}
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
-
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	nextTemplate :=  NextTemplate("{{.ObjectName}}", "View", dm.{{.ObjectName}}_TemplateView)
+	nextTemplate = {{.ObjectNameLower}}_URIQueryData(nextTemplate,rD,searchID)
 
 	ExecuteTemplate(nextTemplate, w, r, pageDetail)
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 }
-{{end}}
+{{end -}}
 {{if .CanEdit}}
-//{{.ObjectName}}_HandlerEdit is the handler used generate the Edit page
-//Allows Editing for an existing {{.ObjectName}} record and then allows the user to save the changes
-//{{.ObjectName}}_HandlerEdit - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+//{{.ObjectName}}_HandlerEdit is the handler used to Edit of an existing {{.ObjectName}} database record
 func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
-
 	w.Header().Set("Content-Type", "text/html")
 	logs.Servicing(r.URL.Path)
 
@@ -162,7 +130,6 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 	} else {
 		_, rD, _ = dao.{{.ObjectName}}_GetByID(searchID)
 	}
-
 	
 	pageDetail := dm.{{.ObjectName}}_Page{
 		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_Edit),
@@ -170,36 +137,24 @@ func {{.ObjectName}}_HandlerEdit(w http.ResponseWriter, r *http.Request) {
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
 	}
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
-
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
-
 	nextTemplate :=  NextTemplate("{{.ObjectName}}", "Edit", dm.{{.ObjectName}}_TemplateEdit)
+	nextTemplate = {{.ObjectNameLower}}_URIQueryData(nextTemplate,rD,searchID)
 
 	ExecuteTemplate(nextTemplate, w, r, pageDetail)
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 }
-{{end}}
+{{end -}}
 {{if .CanSave}}
-//{{.ObjectName}}_HandlerSave is the handler used process the saving of an {{.ObjectName}}
-//It is called from the Edit and New pages
-//{{.ObjectName}}_HandlerSave  - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+//{{.ObjectName}}_HandlerSave is the handler used process the saving of an {{.ObjectName}} database record, either new or existing, referenced by Edit & New Handlers.
 func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// 
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
-
 	w.Header().Set("Content-Type", "text/html")
 	itemID := r.FormValue("{{.QueryFieldID}}")
 	logs.Servicing(r.URL.Path+itemID)
@@ -209,33 +164,23 @@ func {{.ObjectName}}_HandlerSave(w http.ResponseWriter, r *http.Request) {
 	item, errStore := dao.{{.ObjectName}}_Store(item,r)
 	if errStore == nil {
 		nextTemplate :=  NextTemplate("{{.ObjectName}}", "Save", dm.{{.ObjectName}}_Redirect)
+		nextTemplate = {{.ObjectNameLower}}_URIQueryData(nextTemplate,item,itemID)
 		http.Redirect(w, r, nextTemplate, http.StatusFound)
 	} else {
 		logs.Information(dm.{{.ObjectName}}_Name, errStore.Error())
-		//http.Redirect(w, r, r.Referer(), http.StatusFound)
 		ExecuteRedirect(r.Referer(), w, r,dm.{{.ObjectName}}_QueryString,itemID,item)
 	}
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 }
-{{end}}
+{{end -}}
 {{if .CanNew}}
-//{{.ObjectName}}_HandlerNew is the handler used process the creation of an {{.ObjectName}}
-//It will create a new {{.ObjectName}} and then redirect to the Edit page
-//{{.ObjectName}}_HandlerNew  - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+//{{.ObjectName}}_HandlerNew is the handler used process the creation of an new {{.ObjectName}} database record, then redirect to Edit
 func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
 	// Code Continues Below
-
 	w.Header().Set("Content-Type", "text/html")
 	logs.Servicing(r.URL.Path)
 
@@ -249,76 +194,57 @@ func {{.ObjectName}}_HandlerNew(w http.ResponseWriter, r *http.Request) {
 		_, _, rD, _ = dao.{{.ObjectName}}_New()
 	}
 
-
-
 	pageDetail := dm.{{.ObjectName}}_Page{
 		Title:       CardTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		PageTitle:   PageTitle(dm.{{.ObjectName}}_Title, core.Action_New),
 		UserMenu:    UserMenu_Get(r),
 		UserRole:    Session_GetUserRole(r),
 	}
-
 	pageDetail.SessionInfo, _ = Session_GetSessionInfo(r)
-
 	pageDetail = {{.ObjectNameLower}}_PopulatePage(rD , pageDetail) 
 
 	nextTemplate :=  NextTemplate("{{.ObjectName}}", "New", dm.{{.ObjectName}}_TemplateNew)
+	nextTemplate = {{.ObjectNameLower}}_URIQueryData(nextTemplate,dm.{{.ObjectName}}{},searchID)
+
 	ExecuteTemplate(nextTemplate, w, r, pageDetail)
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 }	
-{{end}}
+{{end -}}
 {{if .CanDelete}}
-//{{.ObjectName}}_HandlerDelete is the handler used process the deletion of an {{.ObjectName}}
-// It will delete the {{.ObjectName}} and then redirect to the List page
-//{{.ObjectName}}_HandlerDelete - Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+//{{.ObjectName}}_HandlerDelete is the handler used process the deletion of an {{.ObjectName}} database record. May be Hard or SoftDelete.
 func {{.ObjectName}}_HandlerDelete(w http.ResponseWriter, r *http.Request) {
-	// START
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
-	//
 	// Mandatory Security Validation
-	//
 	if !(Session_Validate(w, r)) {
 		core.Logout(w, r)
 		return
 	}
-	//
 	// Code Continues Below
-	//
 	logs.Servicing(r.URL.Path)
 	searchID := core.GetURLparam(r, dm.{{.ObjectName}}_QueryString)
-
+	// DAO Call to Delete {{.ObjectName}} Record, may be SoftDelete or HardDelete depending on the DAO implementation
 	dao.{{.ObjectName}}_Delete(searchID)	
 
 	nextTemplate :=  NextTemplate("{{.ObjectName}}", "Delete", dm.{{.ObjectName}}_Redirect)
+	nextTemplate = {{.ObjectNameLower}}_URIQueryData(nextTemplate,dm.{{.ObjectName}}{},searchID)
 	http.Redirect(w, r, nextTemplate, http.StatusFound)
-	// 
-	// Auto generated {{.Date}} by {{.Who}} on {{.Host}}
-	// END
 }
-{{end}}
-
-//{{.ObjectNameLower}}_PopulatePage Builds/Populates the {{.ObjectName}} Page 
-//{{.ObjectNameLower}}_PopulatePage Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
+{{end -}}
+//{{.ObjectNameLower}}_PopulatePage Builds/Populates the {{.ObjectName}} Page from an instance of {{.ObjectName}} from the Data Model
 func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.ObjectName}}_Page) dm.{{.ObjectName}}_Page {
 	// Real DB Fields
 	{{range .FieldsList}}{{if .IsBaseField}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 	{{end -}}{{end -}}
-	// Add Pseudo/Extra Fields
+	// Add Pseudo/Extra Fields, fields that are not in the DB but are used in the UI
 	{{range .FieldsList}}{{if .IsExtra}}pageDetail.{{.FieldName}} = rD.{{.FieldName}}
 	{{end -}}{{end -}}
-	// Enrichment Fields 
-	{{range .FieldsList}}{{if .IsLookup}} {{if .IsFilteredLookup}}
-	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetFilteredLookup("{{$.ObjectName}}","{{.FieldName}}")
-	{{else}}
-	pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetLookup()
+	// Enrichment content, content used provide lookups,lists etc
+	{{range .FieldsList}}{{if .IsLookup}}{{if .IsFilteredLookup}}pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetFilteredLookup("{{$.ObjectName}}","{{.FieldName}}")
+	{{else}}pageDetail.{{.FieldName}}_lookup = dao.{{.LookupObject}}_GetLookup()
 	{{end -}}
 	{{end -}}
-	{{if .IsListLookup}}
-	pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")
+	{{if .IsListLookup}}pageDetail.{{.FieldName}}_lookup = dao.StubLists_Get("{{.LookupObject}}")
 	{{end -}}
 	{{end -}}
+	// Add the Properties for the Fields
 	{{range .FieldsList}}pageDetail.{{.FieldName}}_props = rD.{{.FieldName}}_props
 	{{end -}}
 	return pageDetail
@@ -326,12 +252,22 @@ func {{.ObjectNameLower}}_PopulatePage(rD dm.{{.ObjectName}}, pageDetail dm.{{.O
 
 {{- if .CanSave}}
 //{{.ObjectNameLower}}_DataFromRequest is used process the content of an HTTP Request and return an instance of an {{.ObjectName}}
-//{{.ObjectNameLower}}_DataFromRequest Auto generated {{.Date}} by {{.Who}} on {{.Host}} 
 func {{.ObjectNameLower}}_DataFromRequest(r *http.Request) dm.{{.ObjectName}} {
-
 	var item dm.{{.ObjectName}}
-	{{range .FieldsList}}	item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
+	{{range .FieldsList}}item.{{.FieldName}} = r.FormValue(dm.{{$.ObjectName}}_{{.FieldName}}_scrn)
 	{{end -}}
 	return item
 }
 {{end -}}
+
+//{{.ObjectNameLower}}_URIQueryData is used to replace the wildcards in the URI Query Path with the values from the {{.ObjectName}} Data Model
+func {{.ObjectNameLower}}_URIQueryData(queryPath string,item dm.{{.ObjectName}},itemID string) string {
+	if queryPath == "" {
+		return ""
+	}
+	queryPath = core.ReplaceWildcard(queryPath, strings.ToUpper("ID"), itemID)
+	{{range .FieldsList}}{{if not .IsAudit }}queryPath = core.ReplaceWildcard(queryPath, "!"+strings.ToUpper(dm.{{$.ObjectName}}_{{.FieldName}}_scrn), item.{{.FieldName}})
+	{{end -}}
+	{{end -}}
+	return queryPath
+}
