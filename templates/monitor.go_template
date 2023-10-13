@@ -6,7 +6,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	core "{{.ProjectRepo}}core"
-	application "{{.ProjectRepo}}application"
+	routes "{{.ProjectRepo}}routes"
 	adaptor   "{{.ProjectRepo}}adaptor"
 	dm   "{{.ProjectRepo}}datamodel"
 	logs   "{{.ProjectRepo}}logs"
@@ -44,7 +44,7 @@ func Simulator_{{.ObjectName}}_Watch() {
 	}
 	defer watcher.Close()
 
-	application.Schedule_Register(Simulator_{{.ObjectName}}_Job())
+	routes.Schedule_Register(Simulator_{{.ObjectName}}_Job())
 
 	done := make(chan bool)
 	go func() {

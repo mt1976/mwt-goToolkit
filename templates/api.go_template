@@ -1,9 +1,9 @@
-package application
+package routes
 
 // ----------------------------------------------------------------
-// Automatically generated  "/application/{{.ObjectNameLower}}_api.go"
+// Automatically generated  "/routes/{{.ObjectNameLower}}_api.go"
 // ----------------------------------------------------------------
-// Package              : application
+// Package              : routes
 // Object 			    : {{.ObjectName}} ({{.ObjectNameLower}})
 // Endpoint 	        : {{.EndpointRoot}} ({{.QueryString}})
 // For Project          : {{.ProjectRepo}}

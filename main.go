@@ -139,7 +139,7 @@ func processObjectDefinition(configFile string) {
 	logs.Header("Generating Artifacts")
 	logs.Break()
 
-	e = generateCodeArtifact("application", props, configFile, e)
+	e = generateCodeArtifact("routes", props, configFile, e)
 
 	e = generateCodeArtifact("adaptor", props, configFile, e)
 
@@ -193,7 +193,7 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectDefiniti
 	// }
 
 	if destFolder == "api" {
-		destFolder = "application"
+		destFolder = "routes"
 		out_extn = "_api.go"
 		in_extn = ".go_template"
 	}
@@ -209,7 +209,7 @@ func processCodeArtifact(w string, p string, destFolder string, e ObjectDefiniti
 	}
 
 	if destFolder == "monitor" {
-		destFolder = "application"
+		destFolder = "routes"
 		out_extn = "_monitor_impl.go_template"
 		in_extn = ".go_template"
 	}

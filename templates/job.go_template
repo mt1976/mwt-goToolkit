@@ -13,7 +13,7 @@ package jobs
 // ----------------------------------------------------------------
 
 import (
-	application "{{.ProjectRepo}}application"
+	routes "{{.ProjectRepo}}routes"
 	dm          "{{.ProjectRepo}}datamodel"
 	logs        "{{.ProjectRepo}}logs"
 		core        "{{.ProjectRepo}}core"
@@ -38,7 +38,7 @@ func {{.ObjectName}}_Job() dm.JobDefinition {
 }
 
 func {{.ObjectName}}_Register(c *cron.Cron) {
-	application.Schedule_Register({{.ObjectName}}_Job())
+	routes.Schedule_Register({{.ObjectName}}_Job())
 	c.AddFunc({{.ObjectName}}_Job().Period, func() { {{.ObjectName}}_Run() })
 }
 
@@ -53,6 +53,6 @@ func {{.ObjectName}}_Run() {
 		logs.Warning(err.Error())
 	}
 	/// CONTENT ENDS
-	application.Schedule_Update({{.ObjectName}}_Job(), message)
+	routes.Schedule_Update({{.ObjectName}}_Job(), message)
 	logs.EndJob({{.ObjectName}}_Job().Name)
 }
